@@ -1,0 +1,5 @@
+auth:
+  login: {site-login}
+  password: {site-password}
+
+checked-channels: 10017
