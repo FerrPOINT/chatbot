@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GgMessagesHandlerService {
 
-    private static final String LAST_KNOWN_VERSION = "1.1";
+    private static final String LAST_KNOWN_VERSION = "2";
 
     private final AuthService authService;
     private final MessageAnswerService messageAnswerService;
@@ -59,7 +59,6 @@ public class GgMessagesHandlerService {
                 case success_join -> handleSuccessJoin(getData(data, RespChatJoin.class));
                 case channel_counters -> handleChannelCounters(data);
                 case remove_message -> handleRemoveMessage(getData(data, RespRemoveMessage.class));
-//                case user_ban -> handleBanResult(getData(data, RespUserBan.class));
                 default -> null;
             };
 
@@ -125,11 +124,6 @@ public class GgMessagesHandlerService {
         log.info("{} says: {}", message.getUserName(), message.getText());
         return messageAnswerService.answer(message);
     }
-
-//    public ReqGg handleBanResult(RespUserBan message) {
-//        ReqGgMessage reqGgMessage = messageAnswerService.answerBanResult(message);
-//        return reqGgMessage == null ? null : new ReqGg(MessageType.message, reqGgMessage);
-//    }
 
     public ReqGg handleSuccessJoin(RespChatJoin message) {
         log.info("Join Success to: {}, id: {}", message.getChannelStreamer().getName(), message.getChannelStreamer().getId());

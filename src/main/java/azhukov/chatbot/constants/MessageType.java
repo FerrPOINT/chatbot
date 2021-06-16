@@ -19,7 +19,6 @@ public enum MessageType {
     remove_message,
     accepted,
     ban2,
-    user_ban,
 
     //
     ;

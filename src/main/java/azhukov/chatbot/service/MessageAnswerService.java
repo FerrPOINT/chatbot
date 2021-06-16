@@ -21,7 +21,6 @@ public class MessageAnswerService {
     private static final String DOGGIE_SMILE = ":doggie:";
     private static final String YOU_DOGGIE = "ты догги";
     private static final String[] BAN_TEXT_PARTS = {"bit.ly/"};
-    private static final long TEN_YEARS_IN_SECONDS = TimeUnit.DAYS.toSeconds(365 * 10);
 
     private final AuthService authService;
 
@@ -33,7 +32,6 @@ public class MessageAnswerService {
 
         text = text.trim();
         String lowerCase = text.toLowerCase();
-
 
         List<ReqGg> reqBan = answerBan(message, text, lowerCase);
         if (reqBan != null) {
@@ -47,13 +45,6 @@ public class MessageAnswerService {
 
         return null;
     }
-
-//    public ReqGgMessage answerBanResult(RespUserBan message) {
-//        if (message.getModerName().equals(authService.getLogin()) && message.getReason() != null && message.getReason().contains("Автоматический бан")) {
-//            return new ReqGgMessage(message.getChannelId(), "Боты банят ботов :doggie:", false, false);
-//        }
-//        return null;
-//    }
 
     private ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
         if (lowerCase.contains(YOU_DOGGIE)) {
