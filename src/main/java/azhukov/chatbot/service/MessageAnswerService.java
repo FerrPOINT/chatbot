@@ -3,26 +3,30 @@ package azhukov.chatbot.service;
 import azhukov.chatbot.constants.MessageType;
 import azhukov.chatbot.dto.*;
 import azhukov.chatbot.service.auth.AuthService;
+import azhukov.chatbot.service.messages.MessageHandler;
+import azhukov.chatbot.service.store.DailyStore;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jetty.util.StringUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class MessageAnswerService {
 
     private static final String GREETING = "привет";
-    private static final String DOGGIE_SMILE = ":doggie:";
-    private static final String YOU_DOGGIE = "ты догги";
     private static final String[] BAN_TEXT_PARTS = {"bit.ly/"};
 
+
+
     private final AuthService authService;
+    private final DailyStore dailyStore;
+    private final List<MessageHandler> messageHandlers;
 
     public List<ReqGg> answer(RespGgMessage message) {
         String text = message.getText();
@@ -47,20 +51,17 @@ public class MessageAnswerService {
     }
 
     private ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
-        if (lowerCase.contains(YOU_DOGGIE)) {
-            return createSimpleReqGgMessage(message, ThreadLocalRandom.current().nextInt(99) > 20 ? ":doggie:" : "сам догги)");
+        for (MessageHandler messageHandler : messageHandlers) {
+            final ReqGgMessage resp = messageHandler.answerMessage(message, text, lowerCase);
+            if (resp != null) {
+                return resp;
+            }
         }
-
-        ReqGgMessage withoutCurrentUser = withoutCurrentUser(message, text, lowerCase);
-        if (withoutCurrentUser != null) {
-            return withoutCurrentUser;
-        }
-
         return null;
     }
 
     private List<ReqGg> answerBan(RespGgMessage message, String text, String lowerCase) {
-        if (isCurrentUser(message)) {
+        if (authService.isCurrentUser(message)) {
             return null;
         }
 
@@ -90,29 +91,5 @@ public class MessageAnswerService {
 
         return null;
     }
-
-
-    private ReqGgMessage withoutCurrentUser(RespGgMessage message, String text, String lowerCase) {
-        if (isCurrentUser(message)) {
-            return null;
-        }
-        if (lowerCase.contains(GREETING)) {
-            return createSimpleReqGgMessage(message, "приветики :doggie:");
-        }
-        if (lowerCase.contains(DOGGIE_SMILE)) {
-            return createSimpleReqGgMessage(message, ":doggie:");
-        }
-
-        return null;
-    }
-
-    private boolean isCurrentUser(RespGgMessage message) {
-        return message.getUserName().equals(authService.getLogin());
-    }
-
-    private ReqGgMessage createSimpleReqGgMessage(RespGgMessage message, String text) {
-        return new ReqGgMessage(message.getChannelId(), message.getUserName() + ", " + text, false, false);
-    }
-
 
 }

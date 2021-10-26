@@ -7,6 +7,7 @@ import azhukov.chatbot.service.auth.AuthService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +32,9 @@ public class GgMessagesHandlerService {
 
     @Value("${checked-channels}")
     private int channelId;
+
+    private int messagesCounter;
+    private int dogenAnswerCounter;
 
     public List<String> handleResponse(String message) {
         try {
@@ -68,13 +73,30 @@ public class GgMessagesHandlerService {
                 return Collections.singletonList(jsonResp);
             }
 
+            final RespGgMessage respData = getData(data, RespGgMessage.class);
+            respData.setCurrentUser(authService.isCurrentUser(respData));
+            respData.setForCurrentUser(respData.getText() != null && respData.getText().contains(authService.getLogin() + ", "));
+
             List<ReqGg> listResult = switch (messageType) {
-                case message -> handleChatMessage(getData(data, RespGgMessage.class));
+                case message -> {
+                    messagesCounter++;
+                    yield handleChatMessage(respData);
+                }
                 default -> null;
             };
 
-            if(listResult != null){
+            if (listResult == null && messagesCounter % 100 == 0) {
+                listResult = Collections.singletonList(new ReqGg(MessageType.send_message, new ReqGgMessage(respData.getChannelId(), "Вуфь :doggie:", false, false)));
+            }
+
+            if (listResult != null) {
                 ArrayList<String> jsonsList = new ArrayList<>(listResult.size());
+                if (listResult.size() == 1) {
+                    dogenAnswerCounter++;
+                    if (dogenAnswerCounter % 20 == 0) {
+                        listResult = Collections.singletonList(new ReqGg(MessageType.send_message, new ReqGgMessage(respData.getChannelId(), Randomizer.tossCoin() ? "Я вам что игрушка какая? :doggie:" : (respData.getUserName() + ", нит! :tanushkavl26:"), false, false)));
+                    }
+                }
                 for (ReqGg reqGg : listResult) {
                     String json = objectMapper.writeValueAsString(reqGg);
                     jsonsList.add(json);

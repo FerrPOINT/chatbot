@@ -1,5 +1,6 @@
 package azhukov.chatbot.service.auth;
 
+import azhukov.chatbot.dto.RespGgMessage;
 import azhukov.chatbot.dto.auth.AuthRequest;
 import azhukov.chatbot.dto.auth.AuthResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,6 +51,10 @@ public class AuthService {
             currentAuthData = resp.getBody();
         }
         return currentAuthData;
+    }
+
+    public boolean isCurrentUser(RespGgMessage message) {
+        return login.equals(message.getUserName());
     }
 
 }

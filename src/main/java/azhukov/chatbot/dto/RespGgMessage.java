@@ -2,6 +2,7 @@ package azhukov.chatbot.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Setter;
 
 @Data
 public class RespGgMessage {
@@ -29,5 +30,10 @@ public class RespGgMessage {
     //    private String color;
     @JsonProperty("text")
     private String text;
+
+    @Setter
+    private boolean currentUser;
+    @Setter
+    private boolean forCurrentUser;
 
 }

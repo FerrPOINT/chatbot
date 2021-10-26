@@ -28,7 +28,7 @@ public class WebSocketClientConfig {
         client.doHandshake(new AbstractWebSocketHandler() {
             @Override
             public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-                log.info("GG connection Established, session {}", session.getAttributes());
+                log.info("GG connection established, session {}", session.getUri());
             }
 
             @Override
