@@ -23,8 +23,14 @@ public class DoggieHandler extends MessageHandler {
         if (lowerCase.contains("догги")) {
             return createUserMessage(message, (Randomizer.getPercent() > 30 ? ":doggie:" : "сам догги) :doggie:"));
         }
+        if (lowerCase.contains("!ауф")) {
+            return createUserMessage(message, "Все мои волки делают ауф :doggie:");
+        }
         if (lowerCase.contains("!трусики")) {
             return new ReqGgMessage(message.getChannelId(), message.getUserName() + ", " + (Randomizer.tossCoin() ? "Вы посмотрели на трусики :tanushkavl29:" : "Вам не удалось посмотреть на трусики :tanushkavl19:"), false, false);
+        }
+        if (lowerCase.contains("!чирик")) {
+            return new ReqGgMessage(message.getChannelId(), message.getUserName() + ", " + (Randomizer.tossCoin() ? "Вы чирикнулись :doggie:" : "Вам не чирикнулось :doggie:"), false, false);
         }
         ReqGgMessage result = answerWithoutCurrentUser(message, text, lowerCase);
         if (result == null) {

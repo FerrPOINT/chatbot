@@ -14,7 +14,7 @@ public class Randomizer {
     }
 
     public static boolean tossCoin() {
-        return getRandom().nextInt(1000) > 499;
+        return getRandom().nextBoolean();
     }
 
     public static int nextInt(int bound) {

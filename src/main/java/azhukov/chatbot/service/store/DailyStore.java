@@ -19,7 +19,7 @@ public class DailyStore {
     private static Map<String, AtomicInteger> keyToCount = new ConcurrentHashMap<>();
 
     //every day at 0:00
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0 6 * * ?")
     void cleanScheduled() {
         clean();
     }

@@ -4,6 +4,7 @@ import azhukov.chatbot.constants.MessageType;
 import azhukov.chatbot.dto.*;
 import azhukov.chatbot.dto.auth.AuthResponse;
 import azhukov.chatbot.service.auth.AuthService;
+import azhukov.chatbot.service.messages.RequestContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +37,7 @@ public class GgMessagesHandlerService {
     private int messagesCounter;
     private int dogenAnswerCounter;
 
-    public List<String> handleResponse(String message) {
+    public List<String> handleResponse(String message, RequestContext requestContext) {
         try {
 
             JsonNode jsonNode = objectMapper.readTree(message);
@@ -62,9 +63,13 @@ public class GgMessagesHandlerService {
                 case success_auth -> handleSuccessAuth(getData(data, RespLogin.class));
                 case channels_list -> handleChannelsList(getData(data, RespChannelsList.class));
                 case success_join -> handleSuccessJoin(getData(data, RespChatJoin.class));
-                case channel_counters -> handleChannelCounters(data);
+                case channel_counters -> handleChannelCounters(data, requestContext);
                 case remove_message -> handleRemoveMessage(getData(data, RespRemoveMessage.class));
-                default -> null;
+                case message -> null;
+                default -> {
+                    log.error("Unhandled message type: {}", messageType);
+                    yield  null;
+                }
             };
 
             if (result != null) {
@@ -86,7 +91,7 @@ public class GgMessagesHandlerService {
             };
 
             if (listResult == null && messagesCounter % 100 == 0) {
-                listResult = Collections.singletonList(new ReqGg(MessageType.send_message, new ReqGgMessage(respData.getChannelId(), "Вуфь :doggie:", false, false)));
+                listResult = Collections.singletonList(new ReqGg(MessageType.send_message, new ReqGgMessage(respData.getChannelId(), Randomizer.tossCoin() ? "Вуфь :doggie:" : "Аффь :doggie:", false, false)));
             }
 
             if (listResult != null) {
@@ -94,7 +99,7 @@ public class GgMessagesHandlerService {
                 if (listResult.size() == 1) {
                     dogenAnswerCounter++;
                     if (dogenAnswerCounter % 20 == 0) {
-                        listResult = Collections.singletonList(new ReqGg(MessageType.send_message, new ReqGgMessage(respData.getChannelId(), Randomizer.tossCoin() ? "Я вам что игрушка какая? :doggie:" : (respData.getUserName() + ", нит! :tanushkavl26:"), false, false)));
+//                        listResult = Collections.singletonList(new ReqGg(MessageType.send_message, new ReqGgMessage(respData.getChannelId(), Randomizer.tossCoin() ? "Я вам что игрушка какая? :doggie:" : (respData.getUserName() + ", нит! :tanushkavl26:"), false, false)));
                     }
                 }
                 for (ReqGg reqGg : listResult) {
@@ -152,7 +157,8 @@ public class GgMessagesHandlerService {
         return null;
     }
 
-    public ReqGg handleChannelCounters(JsonNode message) {
+    public ReqGg handleChannelCounters(JsonNode message, RequestContext requestContext) {
+        requestContext.setLastPingTime(System.currentTimeMillis());
         return null;
     }
 
