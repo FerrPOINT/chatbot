@@ -22,6 +22,7 @@ public class PredictionService {
 
     private final ObjectMapper objectMapper;
     private final ResourcePatternResolver resourceResolver;
+    private final DailyStore dailyStore;
 
     private final Map<String, Prediction> predictionsById = new HashMap<>();
     private final List<Prediction> predictions = new ArrayList<>();
@@ -44,7 +45,7 @@ public class PredictionService {
     }
 
     public String predict(String user) {
-        final Store<String, String> store = DailyStore.getStore(PREDICTION_KEY);
+        final Store store = dailyStore.getStore(PREDICTION_KEY);
         final String key = store.get(user);
         if (key == null) {
             final Prediction prediction = Randomizer.getRandomItem(predictions);

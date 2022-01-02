@@ -13,7 +13,8 @@ import java.util.List;
 public class DoggieHandler extends MessageHandler {
 
     private static String MASTER_NAME = "TanushkaVL";
-    private static List<String> MASTER_MESSAGES = List.of("Аффьььь :doggie:", "ррряф :doggie:", "Вуфь? :doggie:", "тяфф из-за угла :doggie:");
+    private static List<String> MASTER_MESSAGES = List.of("Аффьььь :doggie:", "ррряф :doggie:", "Вуфь? :doggie:", "тяфф из-за угла :doggie:", "аф-кусь :doggie:", "ну допустим вуф :doggie:");
+    private static List<String> MASTER_PERSONAL_MESSAGES = List.of("авууу :doggie: :love:", "!любовь :doggie:", "афь афь :love: (ластится)", "вуфь, кусь за зёпку :doggie:");
 
     @Autowired
     private DailyStore dailyStore;
@@ -24,7 +25,7 @@ public class DoggieHandler extends MessageHandler {
             return createUserMessage(message, (Randomizer.getPercent() > 30 ? ":doggie:" : "сам догги) :doggie:"));
         }
         if (lowerCase.contains("!ауф")) {
-            return createUserMessage(message, "Все мои волки делают ауф :doggie:");
+            return createUserMessage(message, "Все мои догги делают ауф :doggie:");
         }
         if (lowerCase.contains("!трусики")) {
             return new ReqGgMessage(message.getChannelId(), message.getUserName() + ", " + (Randomizer.tossCoin() ? "Вы посмотрели на трусики :tanushkavl29:" : "Вам не удалось посмотреть на трусики :tanushkavl19:"), false, false);
@@ -54,7 +55,7 @@ public class DoggieHandler extends MessageHandler {
     private ReqGgMessage answerForMaster(RespGgMessage message, String text, String lowerCase) {
         if (message.isForCurrentUser() && MASTER_NAME.equals(message.getUserName())) {
             if (lowerCase.contains("мой") || lowerCase.contains("моя")) {
-                return Randomizer.tossCoin() ? createUserMessage(message, "авууу :doggie: :love:") : createMessage(message, "!любовь :doggie:");
+                return createUserMessage(message, Randomizer.getRandomItem(MASTER_PERSONAL_MESSAGES));
             }
             return createUserMessage(message, Randomizer.getRandomItem(MASTER_MESSAGES));
         }

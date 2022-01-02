@@ -1,5 +1,8 @@
 package azhukov.chatbot.service.store;
 
+import azhukov.chatbot.db.DbService;
+import azhukov.chatbot.db.DbType;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,7 +15,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DailyStore {
+
+    private final DbService dbService;
 
     private static Map<String, Store> stores = new ConcurrentHashMap<>();
 
@@ -24,14 +30,14 @@ public class DailyStore {
         clean();
     }
 
-    public static void clean(){
+    public void clean(){
         log.info("Clean the store with keys: {}", stores.keySet());
         keyToCount.clear();
         stores.forEach((k, store) -> store.clear());
     }
 
-    public static <K, V> Store<K, V> getStore(String key){
-        return stores.computeIfAbsent(key, s -> new Store<K, V>());
+    public Store getStore(String key){
+        return stores.computeIfAbsent(key, s -> new Store(() -> dbService.getDb(DbType.STORE), key));
     }
 
     public boolean isTodayAllowed(String key) {
