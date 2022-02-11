@@ -80,6 +80,7 @@
             <artifactId>mapdb</artifactId>
             <version>3.0.8</version>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -109,6 +110,11 @@
                     <source>17</source>
                     <target>17</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
             </plugin>
         </plugins>
     </build>
