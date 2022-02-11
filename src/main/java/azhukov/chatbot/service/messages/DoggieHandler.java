@@ -21,6 +21,9 @@ public class DoggieHandler extends MessageHandler {
 
     @Override
     public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
+        if (lowerCase.contains("!гроши")) {
+            return createUserMessage(message, "ваши гроши забрал Доген :doggie:");
+        }
         if (lowerCase.contains("догги")) {
             return createUserMessage(message, (Randomizer.getPercent() > 30 ? ":doggie:" : "сам догги) :doggie:"));
         }

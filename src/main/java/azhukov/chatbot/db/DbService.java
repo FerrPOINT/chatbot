@@ -22,7 +22,10 @@ public class DbService {
 
     public DB getDb(DbType dbType) {
         final String name = dbType.name();
-        return cache.computeIfAbsent(name, s -> DBMaker.fileDB("db" + File.separator + s + ".db")
+
+        String folder = "db" + File.separator;
+        new File(folder).mkdir();
+        return cache.computeIfAbsent(name, s -> DBMaker.fileDB(folder + s + ".db")
                 .transactionEnable()
                 .closeOnJvmShutdown()
                 .fileLockWait()

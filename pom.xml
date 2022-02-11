@@ -11,6 +11,7 @@
     <groupId>azhukov</groupId>
     <artifactId>chatbot</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <name>chatbot</name>
     <description>Application to handle messages in goodgame.ru chats</description>
     <properties>
@@ -123,6 +124,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
