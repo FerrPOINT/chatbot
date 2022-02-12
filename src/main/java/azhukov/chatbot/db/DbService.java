@@ -18,14 +18,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class DbService {
 
-    Map<String, DB> cache = new ConcurrentHashMap<>();
+    private static final String FOLDER = "/opt/db" + File.separator;
+
+    private Map<String, DB> cache = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    void init() {
+        new File(FOLDER).mkdirs();
+    }
 
     public DB getDb(DbType dbType) {
-        final String name = dbType.name();
-
-        String folder = "/opt/db" + File.separator;
-        new File(folder).mkdir();
-        return cache.computeIfAbsent(name, s -> DBMaker.fileDB(folder + s + ".db")
+        return cache.computeIfAbsent(dbType.name(), s -> DBMaker.fileDB(FOLDER + s + ".db")
                 .transactionEnable()
                 .closeOnJvmShutdown()
                 .fileLockWait()
