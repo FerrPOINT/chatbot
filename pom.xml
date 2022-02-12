@@ -11,7 +11,7 @@
     <groupId>azhukov</groupId>
     <artifactId>chatbot</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>chatbot</name>
     <description>Application to handle messages in goodgame.ru chats</description>
     <properties>
@@ -80,7 +80,11 @@
             <artifactId>mapdb</artifactId>
             <version>3.0.8</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
