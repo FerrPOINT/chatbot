@@ -12,7 +12,7 @@ public class StatController {
     private final LifecycleService lifecycleService;
 
     @GetMapping("/life")
-    public String index() {
+    public String life() {
         return lifecycleService.current().getMessage();
     }
 
