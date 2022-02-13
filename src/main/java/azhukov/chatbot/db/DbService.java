@@ -50,6 +50,7 @@ public class DbService {
 
     @PreDestroy
     void shutdown() {
+        log.info("Closing DBs");
         for (DB value : cache.values()) {
             try {
                 value.commit();
