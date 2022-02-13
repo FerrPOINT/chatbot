@@ -3,14 +3,16 @@ package azhukov.chatbot.service.dictionary;
 import azhukov.chatbot.service.Randomizer;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
+import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -21,7 +23,6 @@ public class DictionaryService {
     private static final String DICTIONARY_KEY = "DICTIONARY";
 
     private final ObjectMapper objectMapper;
-    private final ResourcePatternResolver resourceResolver;
     private final DailyStore dailyStore;
 
     private final Map<String, Dictionary> commandsToDictionary = new HashMap<>();
@@ -32,25 +33,31 @@ public class DictionaryService {
     @PostConstruct
     void init() {
         try {
-            final Resource[] resources = resourceResolver.getResources("classpath:dictionary/*.json");
-            for (Resource resource : resources) {
-                final Dictionary dct = objectMapper.readValue(resource.getFile(), Dictionary.class);
-                dictionaries.add(dct);
-                if (idToDictionary.put(dct.getId(), dct) != null) {
-                    throw new IllegalStateException("Duplicate id: " + dct.getId());
-                }
-
-                idToKeys.put(dct.getId(), new ArrayList<>(dct.getData().keySet()));
-                for (String command : dct.getCommandsList()) {
-                    if (commandsToDictionary.put(command, dct) != null) {
-                        throw new IllegalStateException("Duplicate command: " + command);
+            IOUtils.listFilesFromResources("dictionary", ".json", inputStream -> {
+                try {
+                    final Dictionary dct = objectMapper.readValue(inputStream, Dictionary.class);
+                    dictionaries.add(dct);
+                    if (idToDictionary.put(dct.getId(), dct) != null) {
+                        throw new IllegalStateException("Duplicate id: " + dct.getId());
                     }
-                }
 
+                    idToKeys.put(dct.getId(), new ArrayList<>(dct.getData().keySet()));
+                    for (String command : dct.getCommandsList()) {
+                        if (commandsToDictionary.put(command, dct) != null) {
+                            throw new IllegalStateException("Duplicate command: " + command);
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            if (dictionaries.isEmpty()) {
+                throw new IllegalStateException("dictionary is empty");
             }
+
             Collections.shuffle(dictionaries);
         } catch (Exception e) {
-            log.error("While reading predictions", e);
+            throw new IllegalStateException("While reading dictionary", e);
         }
     }
 

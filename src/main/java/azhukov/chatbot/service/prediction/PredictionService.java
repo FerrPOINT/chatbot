@@ -3,10 +3,10 @@ package azhukov.chatbot.service.prediction;
 import azhukov.chatbot.service.Randomizer;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
+import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,6 @@ public class PredictionService {
     private static final String PREDICTION_KEY = "PREDICTION";
 
     private final ObjectMapper objectMapper;
-    private final ResourcePatternResolver resourceResolver;
     private final DailyStore dailyStore;
 
     private final Map<String, Prediction> predictionsById = new HashMap<>();
@@ -30,17 +29,24 @@ public class PredictionService {
     @PostConstruct
     void init() {
         try {
-            final Resource[] resources = resourceResolver.getResources("classpath:predictions/*.json");
-            for (Resource resource : resources) {
-                final Prediction prediction = objectMapper.readValue(resource.getFile(), Prediction.class);
-                predictions.add(prediction);
-                if (predictionsById.put(prediction.getId(), prediction) != null) {
-                    throw new IllegalStateException("Duplicate id: " + prediction.getId());
+            IOUtils.listFilesFromResources("predictions", ".json", inputStream -> {
+                try {
+                    final Prediction prediction = objectMapper.readValue(inputStream, Prediction.class);
+                    this.predictions.add(prediction);
+                    if (predictionsById.put(prediction.getId(), prediction) != null) {
+                        throw new IllegalStateException("Duplicate id: " + prediction.getId());
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
+            });
+            if (predictions.isEmpty()) {
+                throw new IllegalStateException("predictions are empty");
             }
-            Collections.shuffle(predictions);
+
+            Collections.shuffle(this.predictions);
         } catch (Exception e) {
-            log.error("While reading predictions", e);
+            throw new IllegalStateException("While reading predictions", e);
         }
     }
 
