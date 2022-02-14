@@ -1,5 +1,6 @@
 package azhukov.chatbot.service.messages;
 
+import azhukov.chatbot.constants.Constants;
 import azhukov.chatbot.dto.ReqGgMessage;
 import azhukov.chatbot.dto.RespGgMessage;
 import azhukov.chatbot.service.Randomizer;
@@ -12,7 +13,7 @@ import java.util.List;
 @Component
 public class DoggieHandler extends MessageHandler {
 
-    private static String MASTER_NAME = "TanushkaVL";
+    private static String MASTER_NAME = Constants.MASTER_NAME;
     private static List<String> MASTER_MESSAGES = List.of("Аффьььь :doggie:", "ррряф :doggie:", "Вуфь? :doggie:", "тяфф из-за угла :doggie:", "аф-кусь :doggie:", "ну допустим вуф :doggie:");
     private static List<String> MASTER_PERSONAL_MESSAGES = List.of("авууу :doggie: :love:", "!любовь :doggie:", "афь афь :love: (ластится)", "вуфь, кусь за зёпку :doggie:");
 

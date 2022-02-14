@@ -23,6 +23,7 @@ public class MessageAnswerService {
 
     private final AuthService authService;
     private final List<MessageHandler> messageHandlers;
+    private final SweetieService sweetieService;
 
     public List<ReqGg> answer(RespGgMessage message) {
         String text = message.getText();
@@ -37,6 +38,8 @@ public class MessageAnswerService {
         if (reqBan != null) {
             return reqBan;
         }
+
+        sweetieService.addSweetie(message.getUserName(), message);
 
         ReqGgMessage reqGgMessage = answerMessage(message, text, lowerCase);
         if (reqGgMessage != null) {
