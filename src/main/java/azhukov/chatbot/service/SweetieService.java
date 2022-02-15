@@ -4,6 +4,7 @@ import azhukov.chatbot.constants.Constants;
 import azhukov.chatbot.db.DbService;
 import azhukov.chatbot.db.DbType;
 import azhukov.chatbot.dto.RespGgMessage;
+import azhukov.chatbot.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.mapdb.DB;
 import org.mapdb.HTreeMap;
@@ -22,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SweetieService {
 
     private final DbService dbService;
+    private final AuthService authService;
 
     private final Map<String, Map<String, AtomicInteger>> tempData = new ConcurrentHashMap<>();
 
@@ -39,7 +41,7 @@ public class SweetieService {
     public void addSweetie(String user, RespGgMessage message) {
         String text = message.getText();
         String sweetieNickname = getSweetieNickname(text);
-        if (sweetieNickname != null && !Constants.MASTER_NAME.equals(sweetieNickname) && !message.isCurrentUser()) {
+        if (sweetieNickname != null && !Constants.MASTER_NAME.equals(sweetieNickname) && !authService.getLogin().equals(sweetieNickname)) {
             Map<String, AtomicInteger> counter = tempData.computeIfAbsent(user, s -> new ConcurrentHashMap<>());
             counter.computeIfAbsent(sweetieNickname, k -> new AtomicInteger()).addAndGet(1);
         }
