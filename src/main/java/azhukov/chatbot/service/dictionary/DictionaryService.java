@@ -36,6 +36,7 @@ public class DictionaryService {
             IOUtils.listFilesFromResources("dictionary", ".json", inputStream -> {
                 try {
                     final Dictionary dct = objectMapper.readValue(inputStream, Dictionary.class);
+                    dailyStore.getStore(DICTIONARY_KEY + "_" + dct.getId().toUpperCase()); // register store
                     dictionaries.add(dct);
                     if (idToDictionary.put(dct.getId(), dct) != null) {
                         throw new IllegalStateException("Duplicate id: " + dct.getId());

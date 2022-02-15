@@ -7,7 +7,6 @@ import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +27,7 @@ public class PredictionService {
 
     @PostConstruct
     void init() {
+        dailyStore.getStore(PREDICTION_KEY); // register store
         try {
             IOUtils.listFilesFromResources("predictions", ".json", inputStream -> {
                 try {
