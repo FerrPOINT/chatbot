@@ -25,9 +25,6 @@ public class SweetieService {
 
     private final Map<String, Map<String, AtomicInteger>> tempData = new ConcurrentHashMap<>();
 
-
-    private static String MASTER_NAME = Constants.MASTER_NAME;
-
     public String getSweetie(String user) {
         DB db = dbService.getDb(DbType.SWEETIE);
         HTreeMap<String, Integer> map = getMap(db, user);
@@ -42,7 +39,7 @@ public class SweetieService {
     public void addSweetie(String user, RespGgMessage message) {
         String text = message.getText();
         String sweetieNickname = getSweetieNickname(text);
-        if (sweetieNickname != null && !MASTER_NAME.equals(sweetieNickname) && !message.isCurrentUser()) {
+        if (sweetieNickname != null && !Constants.MASTER_NAME.equals(sweetieNickname) && !message.isCurrentUser()) {
             Map<String, AtomicInteger> counter = tempData.computeIfAbsent(user, s -> new ConcurrentHashMap<>());
             counter.computeIfAbsent(sweetieNickname, k -> new AtomicInteger()).addAndGet(1);
         }
