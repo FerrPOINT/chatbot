@@ -28,7 +28,7 @@ public class RangesContainer<T> {
                 return range.item();
             }
         }
-        int center = endIndex + (endIndex - startIndex) / 2;
+        int center = startIndex + (endIndex - startIndex) / 2;
         Range<T> centerRange = ranges.get(center);
         if (in(number, centerRange)) {
             return centerRange.item();
@@ -39,6 +39,9 @@ public class RangesContainer<T> {
         }
 
         if (number > centerRange.end()) {
+            if (center == startIndex) {
+                center++;
+            }
             return getItem(number, center, endIndex);
         }
 

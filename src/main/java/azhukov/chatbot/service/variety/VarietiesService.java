@@ -30,8 +30,8 @@ public class VarietiesService {
     @PostConstruct
     void init() {
         dailyStore.getStore(STORE_KEY); // register store
-        Set<String> ids = new HashSet<>();
         try {
+            Set<String> ids = new HashSet<>();
             IOUtils.listFilesFromResources("variety", ".json", inputStream -> {
                 try {
                     final VarietyList variety = objectMapper.readValue(inputStream, VarietyList.class);
@@ -39,7 +39,7 @@ public class VarietiesService {
                     final List<Range<Variety>> ranges = new ArrayList<>();
                     variety.getVarieties().forEach(v -> ranges.add(parse(v)));
                     this.ranges.put(variety.getId(), new RangesContainer<>(ranges));
-                    if (ids.add(variety.getId())) {
+                    if (!ids.add(variety.getId())) {
                         throw new IllegalStateException("Duplicate id: " + variety.getId());
                     }
                 } catch (Exception e) {
@@ -47,12 +47,12 @@ public class VarietiesService {
                 }
             });
             if (this.varieties.isEmpty()) {
-                throw new IllegalStateException("predictions are empty");
+                throw new IllegalStateException("varieties are empty");
             }
 
             Collections.shuffle(this.varieties);
         } catch (Exception e) {
-            throw new IllegalStateException("While reading predictions", e);
+            throw new IllegalStateException("While reading varieties", e);
         }
     }
 
@@ -61,11 +61,11 @@ public class VarietiesService {
         int start;
         int end;
         if (range.contains("-")) {
-            start = end = Integer.parseInt(range);
-        } else {
             String[] tokenized = range.split("-");
             start = Integer.parseInt(tokenized[0]);
             end = Integer.parseInt(tokenized[1]);
+        } else {
+            start = end = Integer.parseInt(range);
         }
         return new Range<>(start, end, variety);
     }
