@@ -20,6 +20,7 @@ import java.util.*;
 public class VarietiesService {
 
     private static final String STORE_KEY = "VARIETIES";
+    private static final int TOP_ENTRIES_MAX_SIZE = 3;
 
     private final ObjectMapper objectMapper;
     private final DailyStore dailyStore;
@@ -79,6 +80,9 @@ public class VarietiesService {
             for (String command : variety.getCommands()) {
                 RangesContainer<Variety> container = ranges.get(variety.getId());
                 if (lowerMessage.contains(command)) {
+                    if (lowerMessage.contains(command + " топ")) {
+                        return getTop(variety);
+                    }
                     String storeKey = user + "-" + variety.getId();
                     final String percent = store.get(storeKey);
                     int percentNumber;
@@ -94,6 +98,37 @@ public class VarietiesService {
             }
         }
         return null;
+    }
+
+    public String getTop(VarietyList variety) {
+        String varietyPostfix = "-" + variety.getId();
+        final Store store = dailyStore.getStore(STORE_KEY);
+        Map<String, Integer> map = new HashMap<>();
+        store.foreach(stringStringEntry -> {
+            String key = stringStringEntry.getKey();
+            if (!key.endsWith(varietyPostfix)) {
+                return;
+            }
+            Integer value = Integer.parseInt(stringStringEntry.getValue());
+            map.put(key.substring(0, key.length() - varietyPostfix.length()), value);
+        });
+
+        if (map.isEmpty()) {
+            return "Никто не " + variety.getName();
+        }
+
+        ArrayList<Map.Entry<String, Integer>> entries = new ArrayList<>(map.entrySet());
+
+        entries.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+
+        StringJoiner result = new StringJoiner(", ");
+
+        for (int i = 0; i < Math.min(TOP_ENTRIES_MAX_SIZE, entries.size()); i++) {
+            Map.Entry<String, Integer> entry = entries.get(i);
+            result.add(entry.getValue() + "%" + entry.getKey());
+        }
+
+        return variety.getName() + " ТОП - " + result;
     }
 
 }
