@@ -22,6 +22,10 @@ public class SweetieHandler extends MessageHandler {
             String sweetie = sweetieService.getSweetie(message.getUserName());
             return createUserMessage(message, sweetie == null ? "У вас пока нет пупсика :doggie:" : ("Ваш пупсик: " + sweetie + " :doggie:"));
         }
+        if (lowerCase.contains("!непупсик")) {
+            sweetieService.deleteSweetie(message.getUserName());
+            return createUserMessage(message, "Ах ты не пупсик :doggie:");
+        }
         return null;
     }
 

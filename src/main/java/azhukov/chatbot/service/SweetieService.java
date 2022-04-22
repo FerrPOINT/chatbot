@@ -38,6 +38,13 @@ public class SweetieService {
         return entries.get(0).getKey();
     }
 
+    public void deleteSweetie(String user) {
+        DB db = dbService.getDb(DbType.SWEETIE);
+        HTreeMap<String, Integer> map = getMap(db, user);
+        map.clear();
+        map.put(Constants.MASTER_NAME, 1);
+    }
+
     public void addSweetie(String user, RespGgMessage message) {
         String text = message.getText();
         String sweetieNickname = getSweetieNickname(text);
