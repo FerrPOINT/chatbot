@@ -17,6 +17,9 @@ public enum LifecycleStage {
 
     private final String message;
 
+    private final static LifecycleStage MIN = values()[0];
+    private final static LifecycleStage MAX = values()[values().length - 1];
+
     public LifecycleStage offset(int amount) {
         final LifecycleStage[] all = values();
         final int current = ordinal();
@@ -24,6 +27,14 @@ public enum LifecycleStage {
         result = Math.min(result, all.length - 1);
         result = Math.max(result, 0);
         return all[result];
+    }
+
+    public boolean isMax() {
+        return MAX == this;
+    }
+
+    public boolean isMin() {
+        return MIN == this;
     }
 
 }
