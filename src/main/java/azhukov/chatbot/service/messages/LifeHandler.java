@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class LifeHandler extends MessageHandler {
 
+    private List<String> feed = List.of("!кормить","!еда","!накормить","!покормить");
     @Autowired
     private LifecycleService lifecycleService;
     @Autowired
@@ -29,7 +31,7 @@ public class LifeHandler extends MessageHandler {
 
     private ReqGgMessage answerWithoutCurrentUser(RespGgMessage message, String text, String lowerCase) {
         if (!message.isCurrentUser()) {
-            if (lowerCase.contains("!кормить") || lowerCase.contains("!покормить")) {
+            if (feed.stream().anyMatch(lowerCase::contains) ) {
                 if (lifecycleStore.isAllowedToFeed(message)) {
                     LifecycleStage current = lifecycleService.current();
                     if (current.isMax()) {
