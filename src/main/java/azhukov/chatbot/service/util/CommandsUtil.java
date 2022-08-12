@@ -10,6 +10,9 @@ public class CommandsUtil {
         if (nextWordAfterCommand == null) {
             return null;
         }
+        if (nextWordAfterCommand.endsWith(",")) {
+            nextWordAfterCommand = nextWordAfterCommand.substring(0, nextWordAfterCommand.length() - 1);
+        }
         int beginIndex = lowerCase.indexOf(nextWordAfterCommand);
         return original.substring(beginIndex, beginIndex + nextWordAfterCommand.length());
     }
