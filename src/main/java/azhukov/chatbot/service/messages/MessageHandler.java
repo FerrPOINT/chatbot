@@ -10,7 +10,11 @@ public abstract class MessageHandler {
     public abstract ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase);
 
     protected ReqGgMessage createUserMessage(RespGgMessage message, String text) {
-        return new ReqGgMessage(message.getChannelId(), message.getUserName() + ", " + text, false, false);
+        return createUserMessage(message, text, message.getUserName());
+    }
+
+    protected ReqGgMessage createUserMessage(RespGgMessage message, String text, String user) {
+        return new ReqGgMessage(message.getChannelId(), user + ", " + text, false, false);
     }
 
     protected ReqGgMessage createMessage(RespGgMessage message, String text) {
