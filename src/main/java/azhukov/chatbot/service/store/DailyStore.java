@@ -42,4 +42,12 @@ public class DailyStore {
         return keyToCount.computeIfAbsent(key, k -> new AtomicInteger()).incrementAndGet() < 2;
     }
 
+    public int getCount(String key) {
+        return keyToCount.computeIfAbsent(key, k -> new AtomicInteger()).get();
+    }
+
+    public int incrementAndGet(String key) {
+        return keyToCount.computeIfAbsent(key, k -> new AtomicInteger()).incrementAndGet();
+    }
+
 }

@@ -4,16 +4,13 @@ import azhukov.chatbot.constants.MessageType;
 import azhukov.chatbot.dto.*;
 import azhukov.chatbot.service.auth.AuthService;
 import azhukov.chatbot.service.messages.MessageHandler;
-import azhukov.chatbot.service.store.DailyStore;
-import com.google.common.base.Strings;
+import azhukov.chatbot.service.users.UserMessageStore;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +19,7 @@ public class MessageAnswerService {
     private static final String[] BAN_TEXT_PARTS = {"bit.ly/"};
 
     private final AuthService authService;
+    private final UserMessageStore dailyUsersStore;
     private final List<MessageHandler> messageHandlers;
     private final SweetieService sweetieService;
 
@@ -30,6 +28,8 @@ public class MessageAnswerService {
         if (StringUtils.isBlank(text)) {
             return null;
         }
+
+        dailyUsersStore.countMessage(message.getUserName());
 
         text = text.trim();
         String lowerCase = text.toLowerCase();
