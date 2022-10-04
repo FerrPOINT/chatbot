@@ -20,17 +20,22 @@ public class BiteHandler extends MessageHandler {
 
     private static final List<String> BITE_COMMANDS = List.of("!укусить", "!кусить", "!фас");
     // TODO macros
-    private static final  List<String> BITE_MESSAGES = List.of("Вы были укушены псинкой", "Вы были покусаны собачкой из чата", "Вам делают лёгкий кусь");
+    private static final List<String> BITE_MESSAGES = List.of(
+            "Вы были укушены псинкой",
+            "Вы были покусаны собачкой из чата",
+            "Вам делают лёгкий кусь",
+            "Ваc отаковал собаня, получите кусь"
+    );
 
     @Override
     public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
         for (String biteCommand : BITE_COMMANDS) {
-            String nextWordAfterCommand = CommandsUtil.getNextWordAfterCommand(text, lowerCase, biteCommand);
-            if (nextWordAfterCommand != null) {
-                int todayMessagesCount = dailyUsersStore.getTodayMessagesCount(nextWordAfterCommand);
+            String targetName = CommandsUtil.getNextWordAfterCommand(text, lowerCase, biteCommand);
+            if (targetName != null) {
+                int todayMessagesCount = dailyUsersStore.getTodayMessagesCount(targetName);
                 if (todayMessagesCount > 0) {
-                    int biteCount = userBiteStore.bite(nextWordAfterCommand);
-                    return createUserMessage(message, Randomizer.getRandomItem(BITE_MESSAGES) + " :doggie:" + (biteCount > 1 ? (" Вы были укушены " + biteCount + " раз") : ""), nextWordAfterCommand);
+                    int biteCount = userBiteStore.bite(targetName);
+                    return createUserMessage(message, Randomizer.getRandomItem(BITE_MESSAGES) + " :doggie:" + (biteCount > 1 ? (" Вы были укушены " + biteCount + " раз") : ""), targetName);
                 } else {
                     return createUserMessage(message, "Тут таких не обитает :doggie:");
                 }
