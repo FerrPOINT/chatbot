@@ -6,20 +6,22 @@ import azhukov.chatbot.service.Randomizer;
 import azhukov.chatbot.service.pet.LifecycleService;
 import azhukov.chatbot.service.pet.LifecycleStage;
 import azhukov.chatbot.service.pet.LifecycleStore;
+import azhukov.chatbot.service.users.UserBiteStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class LifeHandler extends MessageHandler {
 
-    private List<String> feed = List.of("!кормить","!еда","!накормить","!покормить");
+    private List<String> feed = List.of("!кормить", "!еда", "!накормить", "!покормить");
     @Autowired
     private LifecycleService lifecycleService;
     @Autowired
     private LifecycleStore lifecycleStore;
+    @Autowired
+    private UserBiteStore userBiteStore;
 
     private static final List<String> FEED_MESSAGES = List.of("Вы бросили кость собане", "У вас в кармане была сосиска и вы поделились с пёсиком", "Вы кормите псинку");
     private static final List<String> TAKE_MESSAGES = List.of("Собаня грызёт кость, но вы ловко её отнимаете", "У пёсика есть немного еды и вы отбираете её", "Вы крадёте еду пока собачка отвлеклась");
@@ -51,7 +53,9 @@ public class LifeHandler extends MessageHandler {
                     final LifecycleStage offset = lifecycleService.offset(-1);
                     return createUserMessage(message, Randomizer.getRandomItem(TAKE_MESSAGES) + ". " + offset.getMessage() + " :doggie:");
                 }
-                return createUserMessage(message, "Собаня запомнил того, кто забирал у него еду и он делает вам кусь :doggie:");
+
+                int biteCount = userBiteStore.bite(message.getUserName());
+                return createUserMessage(message, "Собаня запомнил того, кто забирал у него еду и он делает вам кусь :doggie:" + (biteCount > 1 ? (" Вы уже покусаны " + biteCount + " раз") : ""));
             }
             if (lowerCase.contains("!доген") || lowerCase.contains("!собаня")|| lowerCase.contains("!псинка")) {
                 final LifecycleStage offset = lifecycleService.current();
