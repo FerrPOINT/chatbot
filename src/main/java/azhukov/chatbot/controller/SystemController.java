@@ -1,5 +1,6 @@
 package azhukov.chatbot.controller;
 
+import azhukov.chatbot.service.dictionary.DictionaryService;
 import azhukov.chatbot.service.store.DailyStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeansException;
@@ -15,6 +16,7 @@ public class SystemController implements ApplicationContextAware {
 
     private ApplicationContext context;
     private final DailyStore dailyStore;
+    private final DictionaryService dictionaryService;
 
     @GetMapping("/exit")
     public void shutdown() {
@@ -24,6 +26,11 @@ public class SystemController implements ApplicationContextAware {
     @GetMapping("/reset-daily-store")
     public void resetDailyStore() {
         dailyStore.clean();
+    }
+
+    @GetMapping("/migrate-dictionary")
+    public String migrationDictionary() {
+        return dictionaryService.migrateNewVersion();
     }
 
     @Override

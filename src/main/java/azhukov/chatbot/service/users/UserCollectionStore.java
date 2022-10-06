@@ -11,6 +11,7 @@ import org.mapdb.Serializer;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,17 @@ public class UserCollectionStore {
         return dbService.getDb(DbType.COLLECT)
                 .hashMap("TOTAL_" + dictionary, Serializer.STRING, Serializer.STRING)
                 .createOrOpen();
+    }
+
+    public void handleAll(String dictionary, Consumer<Set<String>> handler) {
+        HTreeMap<String, String> current = getCurrent(dictionary);
+        current.forEach((key, value) -> {
+            if (value != null) {
+                Set<String> values = deserialize(value);
+                handler.accept(values);
+                current.put(key, serialize(values));
+            }
+        });
     }
 
     @SneakyThrows
