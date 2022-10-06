@@ -23,16 +23,14 @@ public class UserCollectionStore {
     };
 
     public Set<String> getCurrentSet(String user, String dictionary) {
-        try (HTreeMap<String, String> total = getCurrent(dictionary)) {
-            String value = total.get(user);
-            return value == null ? null : deserialize(value);
-        }
+        HTreeMap<String, String> total = getCurrent(dictionary);
+        String value = total.get(user);
+        return value == null ? null : deserialize(value);
     }
 
     public void save(String user, Set<String> values, String dictionary) {
-        try (HTreeMap<String, String> total = getCurrent(dictionary)) {
-            total.put(user, serialize(values));
-        }
+        HTreeMap<String, String> total = getCurrent(dictionary);
+        total.put(user, serialize(values));
     }
 
     private HTreeMap<String, String> getCurrent(String dictionary) {
