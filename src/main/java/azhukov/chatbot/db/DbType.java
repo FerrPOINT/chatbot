@@ -5,5 +5,6 @@ public enum DbType {
     STORE,
     SWEETIE,
     BITE,
+    COLLECT,
 
 }

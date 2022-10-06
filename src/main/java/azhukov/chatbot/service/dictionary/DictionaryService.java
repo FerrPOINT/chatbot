@@ -3,17 +3,16 @@ package azhukov.chatbot.service.dictionary;
 import azhukov.chatbot.service.Randomizer;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
+import azhukov.chatbot.service.users.UserCollectionStore;
 import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +23,7 @@ public class DictionaryService {
 
     private final ObjectMapper objectMapper;
     private final DailyStore dailyStore;
+    private final UserCollectionStore userCollectionStore;
 
     private final Map<String, Dictionary> commandsToDictionary = new HashMap<>();
     private final Map<String, Dictionary> idToDictionary = new HashMap<>();
@@ -76,14 +76,30 @@ public class DictionaryService {
     public String getDictionaryMessage(String user, Dictionary dictionary) {
         final Store store = dailyStore.getStore(DICTIONARY_KEY + "_" + dictionary.getId().toUpperCase());
         String key = store.get(user);
+
+
+        String result;
         if (key == null) {
             final List<String> keys = idToKeys.get(dictionary.getId());
             key = Randomizer.getRandomItem(keys);
             store.put(user, key);
-            return getDictionaryMessage(dictionary, key);
+            result = getDictionaryMessage(dictionary, key);
         } else {
-            return getDictionaryRepeatMessage(dictionary, key);
+            result = getDictionaryRepeatMessage(dictionary, key);
         }
+
+        String collectPostfix = "";
+        if (dictionary.isCollect()) {
+            Set<String> currentSet = userCollectionStore.getCurrentSet(user, dictionary.getId());
+            if (currentSet == null) {
+                currentSet = new HashSet<>();
+            }
+            currentSet.add(key);
+            userCollectionStore.save(user, currentSet, dictionary.getId());
+            collectPostfix = getCollectionMessage(currentSet, dictionary);
+        }
+
+        return result + collectPostfix;
     }
 
     String getDictionaryMessage(Dictionary dictionary, String key) {
@@ -92,6 +108,10 @@ public class DictionaryService {
 
     String getDictionaryRepeatMessage(Dictionary dictionary, String key) {
         return new StringJoiner(" ").add(dictionary.getRepeatPrefix()).add(dictionary.getData().get(key)).add(dictionary.getPostfix()).toString();
+    }
+
+    public String getCollectionMessage(Set<String> current, Dictionary dictionary) {
+        return " У вас уже " + current.size() + " из " + dictionary.getData().size() + " : " + current.stream().sorted().collect(Collectors.joining(", "));
     }
 
 }
