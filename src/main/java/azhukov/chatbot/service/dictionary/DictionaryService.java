@@ -103,6 +103,7 @@ public class DictionaryService {
         return result + collectPostfix;
     }
 
+    // TODO remove temporary code
     public String migrateNewVersion() {
         MutableInt counter = new MutableInt();
         for (Dictionary dictionary : dictionaries) {

@@ -28,11 +28,6 @@ public class SystemController implements ApplicationContextAware {
         dailyStore.clean();
     }
 
-    @GetMapping("/migrate-dictionary")
-    public String migrationDictionary() {
-        return dictionaryService.migrateNewVersion();
-    }
-
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.context = ctx;
