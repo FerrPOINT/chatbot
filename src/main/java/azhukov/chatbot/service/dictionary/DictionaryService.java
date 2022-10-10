@@ -8,7 +8,6 @@ import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -95,32 +94,12 @@ public class DictionaryService {
             if (currentSet == null) {
                 currentSet = new HashSet<>();
             }
-            currentSet.add(key);
+           String message = currentSet.add(key) ? " Новьё." : " Повторка.";
             userCollectionStore.save(user, currentSet, dictionary.getId());
-            collectPostfix = getCollectionMessage(currentSet, dictionary);
+            collectPostfix = message + getCollectionMessage(currentSet, dictionary);
         }
 
         return result + collectPostfix;
-    }
-
-    // TODO remove temporary code
-    public String migrateNewVersion() {
-        MutableInt counter = new MutableInt();
-        for (Dictionary dictionary : dictionaries) {
-            if (dictionary.isCollect()) {
-                userCollectionStore.handleAll(dictionary.getId(), set -> {
-                    log.info("Handle dictionary = {}, set = {}", dictionary.getId(), set);
-                    dictionary.getData().forEach((k, v) -> {
-                        if (set.contains(v)) {
-                            set.remove(v);
-                            set.add(k);
-                            counter.add(1);
-                        }
-                    });
-                });
-            }
-        }
-        return "Migrated " + counter.intValue() + " values";
     }
 
     String getDictionaryMessage(Dictionary dictionary, String key) {
