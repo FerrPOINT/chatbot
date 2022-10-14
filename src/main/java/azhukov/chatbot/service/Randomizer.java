@@ -1,5 +1,7 @@
 package azhukov.chatbot.service;
 
+import org.springframework.util.CollectionUtils;
+
 import java.util.List;
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
@@ -22,7 +24,7 @@ public class Randomizer {
     }
 
     public static <T> T getRandomItem(List<T> items) {
-        return items.get(Randomizer.nextInt(items.size()));
+        return CollectionUtils.isEmpty(items) ? null : items.get(Randomizer.nextInt(items.size()));
     }
 
     private static RandomGenerator getRandom() {

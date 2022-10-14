@@ -6,6 +6,7 @@ import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.users.UserCollectionStore;
 import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class DictionaryService {
     private final Map<String, Dictionary> commandsToDictionary = new HashMap<>();
     private final Map<String, Dictionary> idToDictionary = new HashMap<>();
     private final Map<String, List<String>> idToKeys = new HashMap<>();
+    @Getter
     private final List<Dictionary> dictionaries = new ArrayList<>();
 
     @PostConstruct
@@ -107,7 +109,11 @@ public class DictionaryService {
     }
 
     String getDictionaryRepeatMessage(Dictionary dictionary, String key) {
-        return new StringJoiner(" ").add(dictionary.getRepeatPrefix()).add(dictionary.getData().get(key)).add(dictionary.getPostfix()).toString();
+        return new StringJoiner(" ")
+                .add(dictionary.getRepeatPrefix())
+                .add(dictionary.isRepeatMessage() ? dictionary.getData().get(key) : key)
+                .add(dictionary.getPostfix())
+                .toString();
     }
 
     public String getCollectionMessage(Set<String> current, Dictionary dictionary) {

@@ -14,4 +14,5 @@ public class Dictionary {
     private String repeatPrefix;
     private String postfix;
     private boolean collect;
+    private boolean repeatMessage;
 }
