@@ -1,7 +1,9 @@
 package azhukov.chatbot.service.fight;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,11 +31,19 @@ public class FightService {
         return fight;
     }
 
+    /**
+     * reset outdated fights half an hour
+     */
+    public synchronized void clearOutdated() {
+        if (fight.getSecondUser() == null && LocalDateTime.now().minusMinutes(30).isAfter(fight.getLocalDateTime())) {
+            fight = new Fight();
+        }
+    }
 
-    //every 1 min
-//    @Scheduled(cron = "0 */1 * ? * *")
-//    void commit() {
-//       reset outdated fights
-//    }
+    //  every 10 min
+    @Scheduled(cron = "0 */10 * ? * *")
+    void commit() {
+        clearOutdated();
+    }
 
 }

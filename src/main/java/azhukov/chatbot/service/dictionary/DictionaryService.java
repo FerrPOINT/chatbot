@@ -78,10 +78,10 @@ public class DictionaryService {
     public String getDictionaryMessage(String user, Dictionary dictionary) {
         final Store store = dailyStore.getStore(DICTIONARY_KEY + "_" + dictionary.getId().toUpperCase());
         String key = store.get(user);
-
+        boolean firstTimeToday = key == null;
 
         String result;
-        if (key == null) {
+        if (firstTimeToday) {
             final List<String> keys = idToKeys.get(dictionary.getId());
             key = Randomizer.getRandomItem(keys);
             store.put(user, key);
@@ -96,7 +96,13 @@ public class DictionaryService {
             if (currentSet == null) {
                 currentSet = new HashSet<>();
             }
-           String message = currentSet.add(key) ? " Новьё." : " Повторка.";
+
+            String message;
+            if (firstTimeToday) {
+                message = currentSet.add(key) ? " Новьё." : " Повторка.";
+            } else {
+                message = currentSet.contains(key) ? " Забыл чтоли?" : " Лудоман.";
+            }
             userCollectionStore.save(user, currentSet, dictionary.getId());
             collectPostfix = message + getCollectionMessage(currentSet, dictionary);
         }
@@ -117,7 +123,7 @@ public class DictionaryService {
     }
 
     public String getCollectionMessage(Set<String> current, Dictionary dictionary) {
-        return " У вас уже " + current.size() + " из " + dictionary.getData().size() + " : " + current.stream().sorted().collect(Collectors.joining(", "));
+        return current.isEmpty() ? " Вы всё проиграли" : " У вас уже " + current.size() + " из " + dictionary.getData().size() + " : " + current.stream().sorted().collect(Collectors.joining(", "));
     }
 
 }

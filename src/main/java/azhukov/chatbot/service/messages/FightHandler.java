@@ -37,21 +37,19 @@ public class FightHandler extends MessageHandler {
     public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
         for (String command : COMMANDS) {
             if (lowerCase.startsWith(command)) {
-
-                int currentDailyTries = getCurrentDailyTries(message.getUserName());
-
-                if (currentDailyTries > 5) {
-                    return createUserMessage(message, "Ты сегодня уже нааренился :doggie:");
-                }
-
                 Fight fight = fightService.fight(message.getUserName());
                 if (fight == null) {
                     return createUserMessage(message, "Вы уже участвуете :doggie:");
                 }
+                int currentDailyTries = getCurrentDailyTries(message.getUserName());
+                if (currentDailyTries > 5) {
+                    fight.setFirstUser(null);
+                    return createUserMessage(message, "Ты сегодня уже нааренился :doggie:");
+                }
                 if (fight.getSecondUser() == null) {
                     return createUserMessage(message, "Ожидайте второго :doggie:");
                 }
-                swapRandomly(fight);
+//                swapRandomly(fight);
                 int percent = Randomizer.getPercent();
                 Set<String> firstCollection = getSet(fight.getFirstUser());
                 Set<String> secondCollection = getSet(fight.getSecondUser());
@@ -61,9 +59,9 @@ public class FightHandler extends MessageHandler {
 
                 String prefix = "Битва! " + fight.getFirstUser() + (firstItem == null ? " рискует жопкой" : " талисман " + firstItem) + " VS " + fight.getSecondUser() + (secondItem == null ? " рискует жопкой" : " талисман " + secondItem) + ". ";
                 String resultMessage;
-                if (percent < 45) {
+                if (percent % 10 <= 4) {
                     resultMessage = createWinMessage(fight.getFirstUser(), fight.getSecondUser(), firstCollection, secondCollection, secondItem);
-                } else if (percent > 55) {
+                } else if (percent % 10 >= 6) {
                     resultMessage = createWinMessage(fight.getSecondUser(), fight.getFirstUser(), secondCollection, firstCollection, firstItem);
                 } else {
                     resultMessage = "Долго бились, но это ничья. Оба нубаськи остаются при своём";
@@ -77,11 +75,7 @@ public class FightHandler extends MessageHandler {
     private int getCurrentDailyTries(String user) {
         Store store = dailyStore.getStore(STORE_KEY);
         String now = store.get(user);
-        if (now == null) {
-            store.put(user, "1");
-            return 1;
-        }
-        int nowInt = Integer.parseInt(now);
+        int nowInt = now == null ? 0 : Integer.parseInt(now);
         store.put(user, String.valueOf(nowInt++));
         return nowInt;
     }

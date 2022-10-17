@@ -2,7 +2,7 @@
   "id": "talisman",
   "autoHandle": false,
   "prefix": "Ты получаешь",
-  "repeatPrefix": "Ты сегодня получил",
+  "repeatPrefix": "Ты сегодня уже получал талисман",
   "postfix": ":doggie:",
   "commandsList": [
     "!талисман"
