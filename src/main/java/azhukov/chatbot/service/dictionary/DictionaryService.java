@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -81,22 +82,40 @@ public class DictionaryService {
         boolean firstTimeToday = key == null;
 
         String result;
+        Set<String> currentSet = null;
         if (firstTimeToday) {
             final List<String> keys = idToKeys.get(dictionary.getId());
             key = Randomizer.getRandomItem(keys);
             store.put(user, key);
             result = getDictionaryMessage(dictionary, key);
         } else {
-            result = getDictionaryRepeatMessage(dictionary, key);
+            final Store secondary = dailyStore.getStore(DICTIONARY_KEY + "2_" + dictionary.getId().toUpperCase());
+            String secondaryKey = secondary.get(user);
+            if (secondaryKey == null && dictionary.isCollect()) {
+                currentSet = userCollectionStore.getCurrentSet(user, dictionary.getId());
+                if (CollectionUtils.isEmpty(currentSet)) {
+                    final List<String> keys = idToKeys.get(dictionary.getId());
+                    secondaryKey = Randomizer.getRandomItem(keys);
+                    secondary.put(user, secondaryKey);
+                    key = secondaryKey;
+                    result = "Вы всё проиграли, но Доген даёт вам второй шанс " + getDictionaryMessage(dictionary, key);
+                    firstTimeToday = true;
+                } else {
+                    result = getDictionaryRepeatMessage(dictionary, key);
+                }
+            } else {
+                result = getDictionaryRepeatMessage(dictionary, key);
+            }
         }
 
         String collectPostfix = "";
         if (dictionary.isCollect()) {
-            Set<String> currentSet = userCollectionStore.getCurrentSet(user, dictionary.getId());
+            if (currentSet == null) {
+                currentSet = userCollectionStore.getCurrentSet(user, dictionary.getId());
+            }
             if (currentSet == null) {
                 currentSet = new HashSet<>();
             }
-
             String message;
             if (firstTimeToday) {
                 message = currentSet.add(key) ? " Новьё." : " Повторка.";

@@ -37,6 +37,7 @@ public class FightService {
     public synchronized void clearOutdated() {
         if (fight.getSecondUser() == null && LocalDateTime.now().minusMinutes(30).isAfter(fight.getLocalDateTime())) {
             fight = new Fight();
+            currentUsers.clear();
         }
     }
 

@@ -13,10 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -37,34 +34,53 @@ public class FightHandler extends MessageHandler {
     public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
         for (String command : COMMANDS) {
             if (lowerCase.startsWith(command)) {
+                Set<String> set = getSet(message.getUserName());
+                if (set.isEmpty()) {
+                    return createUserMessage(message, "У вас нет талисманов для арены :doggie:");
+                }
                 Fight fight = fightService.fight(message.getUserName());
                 if (fight == null) {
                     return createUserMessage(message, "Вы уже участвуете :doggie:");
                 }
-                int currentDailyTries = getCurrentDailyTries(message.getUserName());
-                if (currentDailyTries > 5) {
-                    fight.setFirstUser(null);
-                    return createUserMessage(message, "Ты сегодня уже нааренился :doggie:");
-                }
+//                int currentDailyTries = getCurrentDailyTries(message.getUserName());
+//                if (currentDailyTries > 5) {
+//                    fight.setFirstUser(null);
+//                    return createUserMessage(message, "Ты сегодня уже нааренился :doggie:");
+//                }
                 if (fight.getSecondUser() == null) {
                     return createUserMessage(message, "Ожидайте второго :doggie:");
                 }
 //                swapRandomly(fight);
-                int percent = Randomizer.getPercent();
                 Set<String> firstCollection = getSet(fight.getFirstUser());
                 Set<String> secondCollection = getSet(fight.getSecondUser());
 
-                String firstItem = CollectionUtils.isEmpty(firstCollection) ? null : Randomizer.getRandomItem(new ArrayList<>(firstCollection));
-                String secondItem = CollectionUtils.isEmpty(secondCollection) ? null : Randomizer.getRandomItem(new ArrayList<>(secondCollection));
+                UserSets unique = findUnique(firstCollection, secondCollection);
+
+                String firstItem;
+                String secondItem;
+                if (unique.isEmpty()) {
+                    String randomIntersectItem = getRandomIntersectItem(firstCollection, secondCollection);
+                    firstItem = randomIntersectItem;
+                    secondItem = randomIntersectItem;
+                } else {
+                    firstItem = CollectionUtils.isEmpty(unique.firstCollection) ? null : Randomizer.getRandomItem(new ArrayList<>(unique.firstCollection));
+                    secondItem = CollectionUtils.isEmpty(unique.secondCollection) ? null : Randomizer.getRandomItem(new ArrayList<>(unique.secondCollection));
+                }
 
                 String prefix = "Битва! " + fight.getFirstUser() + (firstItem == null ? " рискует жопкой" : " талисман " + firstItem) + " VS " + fight.getSecondUser() + (secondItem == null ? " рискует жопкой" : " талисман " + secondItem) + ". ";
                 String resultMessage;
-                if (percent % 10 <= 4) {
-                    resultMessage = createWinMessage(fight.getFirstUser(), fight.getSecondUser(), firstCollection, secondCollection, secondItem);
-                } else if (percent % 10 >= 6) {
-                    resultMessage = createWinMessage(fight.getSecondUser(), fight.getFirstUser(), secondCollection, firstCollection, firstItem);
-                } else {
+
+                if (Objects.equals(firstItem, secondItem)) {
                     resultMessage = "Долго бились, но это ничья. Оба нубаськи остаются при своём";
+                } else {
+                    int percent = Randomizer.getPercent();
+                    if (percent % 10 <= 4) {
+                        resultMessage = createWinMessage(fight.getFirstUser(), secondItem);
+                        saveData(fight.getFirstUser(), fight.getSecondUser(), firstCollection, secondCollection, secondItem);
+                    } else {
+                        resultMessage = createWinMessage(fight.getSecondUser(), firstItem);
+                        saveData(fight.getSecondUser(), fight.getFirstUser(), secondCollection, firstCollection, firstItem);
+                    }
                 }
                 return createMessage(message, prefix + resultMessage);
             }
@@ -72,11 +88,39 @@ public class FightHandler extends MessageHandler {
         return null;
     }
 
+    private UserSets findUnique(Set<String> firstCollection, Set<String> secondCollection) {
+        UserSets userSets = new UserSets();
+        userSets.firstCollection = new HashSet<>(firstCollection);
+        userSets.secondCollection = new HashSet<>(secondCollection);
+        userSets.firstCollection.removeAll(secondCollection);
+        userSets.secondCollection.removeAll(firstCollection);
+        return userSets;
+    }
+
+    private String getRandomIntersectItem(Set<String> firstCollection, Set<String> secondCollection) {
+        HashSet<String> newFirst = new HashSet<>(firstCollection);
+        newFirst.retainAll(secondCollection);
+        if (newFirst.isEmpty()) {
+            return null;
+        }
+        return Randomizer.getRandomItem(new ArrayList<>(newFirst));
+    }
+
+    private static class UserSets {
+        Set<String> firstCollection;
+        Set<String> secondCollection;
+
+        private boolean isEmpty() {
+            return CollectionUtils.isEmpty(firstCollection) || CollectionUtils.isEmpty(secondCollection);
+        }
+    }
+
     private int getCurrentDailyTries(String user) {
         Store store = dailyStore.getStore(STORE_KEY);
         String now = store.get(user);
         int nowInt = now == null ? 0 : Integer.parseInt(now);
-        store.put(user, String.valueOf(nowInt++));
+        nowInt++;
+        store.put(user, String.valueOf(nowInt));
         return nowInt;
     }
 
@@ -100,16 +144,19 @@ public class FightHandler extends MessageHandler {
         return talisman == null ? new HashSet<>() : talisman;
     }
 
-    private String createWinMessage(String winUser, String secondUser, Set<String> winCollection, Set<String> secondCollection, String lostItem) {
+    private String createWinMessage(String winUser, String lostItem) {
         if (lostItem == null) {
             return "Победитель " + winUser + " забирает жопку противника так как у него не оказалось талисманов";
         } else {
-            winCollection.add(lostItem);
-            secondCollection.remove(lostItem);
-            userCollectionStore.save(winUser, winCollection, "talisman");
-            userCollectionStore.save(secondUser, secondCollection, "talisman");
+            return "Победитель " + winUser + " забирает талиман противника: " + lostItem;
         }
-        return "Победитель " + winUser + " забирает талиман противника: " + lostItem;
+    }
+
+    private void saveData(String winUser, String secondUser, Set<String> winCollection, Set<String> secondCollection, String lostItem) {
+        winCollection.add(lostItem);
+        secondCollection.remove(lostItem);
+        userCollectionStore.save(winUser, winCollection, "talisman");
+        userCollectionStore.save(secondUser, secondCollection, "talisman");
     }
 
 }
