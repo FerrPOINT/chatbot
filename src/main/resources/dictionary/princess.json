@@ -3,7 +3,7 @@
   "autoHandle": true,
   "prefix": "Сегодня ты принцесса",
   "repeatPrefix": "Ты сегодня уже принцесса",
-  "postfix": ":doggie:",
+  "postfix": "{DOGGIE}",
   "commandsList": [
     "!принцесса",
     "!принцеса"

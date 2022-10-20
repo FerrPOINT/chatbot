@@ -1,6 +1,6 @@
 package azhukov.chatbot.service.webclient;
 
-import azhukov.chatbot.service.GgMessagesHandlerService;
+import azhukov.chatbot.service.gg.GgMessagesHandlerService;
 import azhukov.chatbot.service.messages.RequestContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class WebsocketClietsService {
 
     private final GgMessagesHandlerService ggMessagesHandler;
 
-    private ChatbotWebClient client;
+    private ChatbotWebSocketClient client;
 
     @PostConstruct
     void init() {
@@ -62,8 +62,8 @@ public class WebsocketClietsService {
         client = createWebSocketClient();
     }
 
-    public ChatbotWebClient createWebSocketClient() {
-        ChatbotWebClient client = new ChatbotWebClient();
+    public ChatbotWebSocketClient createWebSocketClient() {
+        ChatbotWebSocketClient client = new ChatbotWebSocketClient();
         client.start();
         client.doHandshake(new AbstractWebSocketHandler() {
             @Override

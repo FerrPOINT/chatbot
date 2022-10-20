@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.springframework.web.socket.client.jetty.JettyWebSocketClient;
 
 
-public class ChatbotWebClient extends JettyWebSocketClient {
+public class ChatbotWebSocketClient extends JettyWebSocketClient {
 
     @Getter
     @Setter

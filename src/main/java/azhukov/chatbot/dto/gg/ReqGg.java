@@ -1,4 +1,4 @@
-package azhukov.chatbot.dto;
+package azhukov.chatbot.dto.gg;
 
 import azhukov.chatbot.constants.MessageType;
 import lombok.Data;

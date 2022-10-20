@@ -3,3 +3,6 @@ auth:
   password: {site-password}
 
 checked-channels: 10017
+
+discord:
+  token: {discord-token}

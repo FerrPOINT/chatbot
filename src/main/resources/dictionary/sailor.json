@@ -3,7 +3,7 @@
   "autoHandle": false,
   "prefix": "Ты получаешь знак",
   "repeatPrefix": "Ты сегодня уже получил знак",
-  "postfix": ":doggie:",
+  "postfix": "{DOGGIE}",
   "commandsList": [
     "!сейлор",
     "!сэйлор",

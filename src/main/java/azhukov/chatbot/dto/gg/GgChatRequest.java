@@ -1,11 +1,11 @@
-package azhukov.chatbot.dto;
+package azhukov.chatbot.dto.gg;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Setter;
 
 @Data
-public class RespGgMessage {
+public class GgChatRequest {
 
     @JsonProperty("channel_id")
     private int channelId;

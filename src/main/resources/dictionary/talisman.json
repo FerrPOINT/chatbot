@@ -3,7 +3,7 @@
   "autoHandle": false,
   "prefix": "Ты получаешь",
   "repeatPrefix": "Ты сегодня уже получал талисман",
-  "postfix": ":doggie:",
+  "postfix": "{DOGGIE}",
   "commandsList": [
     "!талисман"
   ],

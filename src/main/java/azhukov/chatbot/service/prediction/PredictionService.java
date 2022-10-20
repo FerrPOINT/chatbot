@@ -1,8 +1,8 @@
 package azhukov.chatbot.service.prediction;
 
-import azhukov.chatbot.service.Randomizer;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
+import azhukov.chatbot.service.util.Randomizer;
 import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

@@ -1,13 +1,13 @@
 package azhukov.chatbot.service.messages;
 
-import azhukov.chatbot.dto.ReqGgMessage;
-import azhukov.chatbot.dto.RespGgMessage;
-import azhukov.chatbot.service.Randomizer;
+import azhukov.chatbot.dto.ChatRequest;
+import azhukov.chatbot.dto.ChatResponse;
 import azhukov.chatbot.service.fight.Fight;
 import azhukov.chatbot.service.fight.FightService;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.users.UserCollectionStore;
+import azhukov.chatbot.service.util.Randomizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -31,24 +31,24 @@ public class FightHandler extends MessageHandler {
     }
 
     @Override
-    public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
+    public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         for (String command : COMMANDS) {
             if (lowerCase.startsWith(command)) {
                 Set<String> set = getSet(message.getUserName());
                 if (set.isEmpty()) {
-                    return createUserMessage(message, "У вас нет талисманов для арены :doggie:");
+                    return createUserMessage(message, "У вас нет талисманов для арены {DOGGIE}");
                 }
                 Fight fight = fightService.fight(message.getUserName());
                 if (fight == null) {
-                    return createUserMessage(message, "Вы уже участвуете :doggie:");
+                    return createUserMessage(message, "Вы уже участвуете {DOGGIE}");
                 }
 //                int currentDailyTries = getCurrentDailyTries(message.getUserName());
 //                if (currentDailyTries > 5) {
 //                    fight.setFirstUser(null);
-//                    return createUserMessage(message, "Ты сегодня уже нааренился :doggie:");
+//                    return createUserMessage(message, "Ты сегодня уже нааренился {DOGGIE}");
 //                }
                 if (fight.getSecondUser() == null) {
-                    return createUserMessage(message, "Ожидайте второго :doggie:");
+                    return createUserMessage(message, "Ожидайте второго {DOGGIE}");
                 }
 //                swapRandomly(fight);
                 Set<String> firstCollection = getSet(fight.getFirstUser());

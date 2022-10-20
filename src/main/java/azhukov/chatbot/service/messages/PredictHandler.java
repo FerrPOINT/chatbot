@@ -1,7 +1,7 @@
 package azhukov.chatbot.service.messages;
 
-import azhukov.chatbot.dto.ReqGgMessage;
-import azhukov.chatbot.dto.RespGgMessage;
+import azhukov.chatbot.dto.ChatRequest;
+import azhukov.chatbot.dto.ChatResponse;
 import azhukov.chatbot.service.prediction.PredictionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ public class PredictHandler extends MessageHandler {
     private PredictionService predictionService;
 
     @Override
-    public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
+    public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (message.getUserName() != null) {
             for (String predictMessage : PREDICT_MESSAGES) {
                 if (lowerCase.contains(predictMessage)) {

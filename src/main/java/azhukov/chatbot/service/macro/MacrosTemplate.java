@@ -1,10 +1,9 @@
-package azhukov.chatbot.service.util;
+package azhukov.chatbot.service.macro;
 
 import lombok.Value;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class MacrosTemplate {
@@ -33,16 +32,20 @@ public class MacrosTemplate {
                 .flatMap(Collection::stream)
                 .forEach(parts::add);
 
-        Part part = parts.get(parts.size() - 1);
-        if (part.isMacro() && lastIndex.intValue() < text.length()) {
-            parts.add(new Part(text.substring(lastIndex.intValue()), false));
+        if (parts.isEmpty()) {
+            this.parts = List.of(new Part(text, false));
+        } else {
+            Part part = parts.get(parts.size() - 1);
+            if (part.isMacro() && lastIndex.intValue() < text.length()) {
+                parts.add(new Part(text.substring(lastIndex.intValue()), false));
+            }
+            this.parts = parts;
         }
-        this.parts = parts;
     }
 
-    public String compileString(Map<String, Supplier<Object>> macroToValue) {
+    public String compileString(Map<String, String> macroToValue) {
         return parts.stream()
-                .map(part -> part.isMacro() ? String.valueOf(macroToValue.get(part.getValue()).get()) : part.getValue())
+                .map(part -> part.isMacro() ? macroToValue.get(part.getValue()) : part.getValue())
                 .collect(Collectors.joining(""));
     }
 

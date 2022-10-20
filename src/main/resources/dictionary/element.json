@@ -3,7 +3,7 @@
   "autoHandle": false,
   "prefix": "Ты владеешь",
   "repeatPrefix": "Ты сегодня владеешь",
-  "postfix": ":doggie:",
+  "postfix": "{DOGGIE}",
   "commandsList": [
     "!магия",
     "!стихия"

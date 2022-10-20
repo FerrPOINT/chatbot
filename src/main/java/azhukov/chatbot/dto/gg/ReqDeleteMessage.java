@@ -1,16 +1,16 @@
-package azhukov.chatbot.dto;
+package azhukov.chatbot.dto.gg;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class RespRemoveMessage {
+public class ReqDeleteMessage {
 
     @JsonProperty("channel_id")
-    private int channelId;
+    private final String channelId;
     @JsonProperty("message_id")
-    private long messageId;
+    private final long messageId;
     @JsonProperty("adminName")
-    private String adminName;
+    private final String adminName;
 
 }

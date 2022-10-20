@@ -1,11 +1,11 @@
 package azhukov.chatbot.service.messages;
 
-import azhukov.chatbot.dto.ReqGgMessage;
-import azhukov.chatbot.dto.RespGgMessage;
-import azhukov.chatbot.service.Randomizer;
+import azhukov.chatbot.dto.ChatRequest;
+import azhukov.chatbot.dto.ChatResponse;
 import azhukov.chatbot.service.users.UserBiteStore;
 import azhukov.chatbot.service.users.UserMessageStore;
 import azhukov.chatbot.service.util.CommandsUtil;
+import azhukov.chatbot.service.util.Randomizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -28,16 +28,16 @@ public class BiteHandler extends MessageHandler {
     );
 
     @Override
-    public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
+    public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         for (String biteCommand : BITE_COMMANDS) {
             String targetName = CommandsUtil.getNextWordAfterCommand(text, lowerCase, biteCommand);
             if (targetName != null) {
                 int todayMessagesCount = dailyUsersStore.getTodayMessagesCount(targetName);
                 if (todayMessagesCount > 0) {
                     int biteCount = userBiteStore.bite(targetName);
-                    return createUserMessage(message, Randomizer.getRandomItem(BITE_MESSAGES) + " :doggie:" + (biteCount > 1 ? (" Вы были укушены " + biteCount + " раз") : ""), targetName);
+                    return createUserMessage(message, Randomizer.getRandomItem(BITE_MESSAGES) + " {DOGGIE}" + (biteCount > 1 ? (" Вы были укушены " + biteCount + " раз") : ""), targetName);
                 } else {
-                    return createUserMessage(message, "Тут таких не обитает :doggie:");
+                    return createUserMessage(message, "Тут таких не обитает {DOGGIE}");
                 }
             }
         }

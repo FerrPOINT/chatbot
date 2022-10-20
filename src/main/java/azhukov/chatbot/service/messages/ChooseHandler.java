@@ -1,15 +1,15 @@
 package azhukov.chatbot.service.messages;
 
-import azhukov.chatbot.dto.ReqGgMessage;
-import azhukov.chatbot.dto.RespGgMessage;
-import azhukov.chatbot.service.Randomizer;
+import azhukov.chatbot.dto.ChatRequest;
+import azhukov.chatbot.dto.ChatResponse;
+import azhukov.chatbot.service.util.Randomizer;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ChooseHandler extends MessageHandler {
 
     @Override
-    public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
+    public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (lowerCase.contains("!выбор")) {
             String[] tokenized = lowerCase.split(" ");
             if (tokenized.length == 4 || tokenized.length == 3) {

@@ -1,9 +1,9 @@
 package azhukov.chatbot.service.dictionary;
 
-import azhukov.chatbot.service.Randomizer;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.users.UserCollectionStore;
+import azhukov.chatbot.service.util.Randomizer;
 import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -66,6 +66,7 @@ public class DictionaryService {
     }
 
     public String getDictionaryAnswer(String user, String messageLowerCase) {
+        log.info("Dictionary request for {}", user);
         for (Dictionary dictionary : dictionaries) {
             for (String command : dictionary.getCommandsList()) {
                 if (messageLowerCase.contains(command)) {

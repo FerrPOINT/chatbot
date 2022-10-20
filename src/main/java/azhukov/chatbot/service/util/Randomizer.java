@@ -1,4 +1,4 @@
-package azhukov.chatbot.service;
+package azhukov.chatbot.service.util;
 
 import org.springframework.util.CollectionUtils;
 

@@ -1,5 +1,6 @@
 package azhukov.chatbot.service.util;
 
+import azhukov.chatbot.service.macro.MacrosTemplate;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -14,8 +15,8 @@ class MacrosTemplateTest {
         MacrosTemplate macrosTemplate = new MacrosTemplate("yoyo{MACRO1}texttext%%MACRO2%%aa", Set.of("{MACRO1}", "%%MACRO2%%"));
 
         String result = macrosTemplate.compileString(Map.of(
-                "{MACRO1}", () -> "value1",
-                "%%MACRO2%%", () -> "value2"
+                "{MACRO1}", "value1",
+                "%%MACRO2%%", "value2"
         ));
 
         assertEquals("yoyovalue1texttextvalue2aa", result);
@@ -23,11 +24,21 @@ class MacrosTemplateTest {
         macrosTemplate = new MacrosTemplate("{MACRO1}texttext%%MACRO2%%", Set.of("{MACRO1}", "%%MACRO2%%"));
 
         result = macrosTemplate.compileString(Map.of(
-                "{MACRO1}", () -> "value1",
-                "%%MACRO2%%", () -> "value2"
+                "{MACRO1}", "value1",
+                "%%MACRO2%%", "value2"
         ));
 
         assertEquals("value1texttextvalue2", result);
+
+
+        macrosTemplate = new MacrosTemplate("onlytext", Set.of("{MACRO1}", "%%MACRO2%%"));
+
+        result = macrosTemplate.compileString(Map.of(
+                "{MACRO1}", "value1",
+                "%%MACRO2%%", "value2"
+        ));
+
+        assertEquals("onlytext", result);
     }
 
 

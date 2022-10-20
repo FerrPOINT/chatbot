@@ -1,9 +1,11 @@
-package azhukov.chatbot.service;
+package azhukov.chatbot.service.gg;
 
 import azhukov.chatbot.constants.MessageType;
-import azhukov.chatbot.dto.*;
-import azhukov.chatbot.service.auth.AuthService;
-import azhukov.chatbot.service.messages.MessageHandler;
+import azhukov.chatbot.dto.ChatResponse;
+import azhukov.chatbot.dto.gg.*;
+import azhukov.chatbot.service.CommonChatService;
+import azhukov.chatbot.service.MappingService;
+import azhukov.chatbot.service.auth.GgAuthService;
 import azhukov.chatbot.service.users.UserMessageStore;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -14,52 +16,43 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MessageAnswerService {
+public class GgMessageAnswerService {
 
     private static final String[] BAN_TEXT_PARTS = {"bit.ly/"};
 
-    private final AuthService authService;
+    private final GgAuthService authService;
     private final UserMessageStore dailyUsersStore;
-    private final List<MessageHandler> messageHandlers;
-    private final SweetieService sweetieService;
+    private final MappingService mappingService;
+    private final CommonChatService chatService;
 
-    public List<ReqGg> answer(RespGgMessage message) {
-        String text = message.getText();
+    public List<ReqGg> answer(GgChatRequest ggRequest) {
+        String text = ggRequest.getText();
         if (StringUtils.isBlank(text)) {
             return null;
         }
 
-        dailyUsersStore.countMessage(message.getUserName());
+        dailyUsersStore.countMessage(ggRequest.getUserName());
 
         text = text.trim();
         String lowerCase = text.toLowerCase();
 
-        List<ReqGg> reqBan = answerBan(message, text, lowerCase);
+        List<ReqGg> reqBan = answerBan(ggRequest, text, lowerCase);
         if (reqBan != null) {
             return reqBan;
         }
 
-        sweetieService.addSweetie(message.getUserName(), message);
 
-        ReqGgMessage reqGgMessage = answerMessage(message, text, lowerCase);
-        if (reqGgMessage != null) {
-            return Collections.singletonList(new ReqGg(MessageType.send_message, reqGgMessage));
+        ChatResponse chatResponse = chatService.answerMessage(mappingService.mapDis(ggRequest), text, lowerCase);
+
+        if (chatResponse != null) {
+            GgChatResponse ggMessage = mappingService.mapDis(ggRequest, chatResponse);
+            return Collections.singletonList(new ReqGg(MessageType.send_message, ggMessage));
         }
 
         return null;
     }
 
-    private ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
-        for (MessageHandler messageHandler : messageHandlers) {
-            final ReqGgMessage resp = messageHandler.answerMessage(message, text, lowerCase);
-            if (resp != null) {
-                return resp;
-            }
-        }
-        return null;
-    }
-
-    private List<ReqGg> answerBan(RespGgMessage message, String text, String lowerCase) {
+    private List<ReqGg> answerBan(GgChatRequest message, String text, String lowerCase) {
         if (authService.isCurrentUser(message)) {
             return null;
         }
@@ -83,7 +76,7 @@ public class MessageAnswerService {
                                 message.getMessageId(),
                                 authService.getLogin()
                         )),
-                        new ReqGg(MessageType.send_message, new ReqGgMessage(message.getChannelId(), comment, false, false))
+                        new ReqGg(MessageType.send_message, new GgChatResponse(message.getChannelId(), comment, false, false))
                 );
             }
         }

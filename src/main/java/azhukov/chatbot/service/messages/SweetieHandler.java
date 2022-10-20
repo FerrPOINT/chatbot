@@ -1,8 +1,8 @@
 package azhukov.chatbot.service.messages;
 
 import azhukov.chatbot.constants.Constants;
-import azhukov.chatbot.dto.ReqGgMessage;
-import azhukov.chatbot.dto.RespGgMessage;
+import azhukov.chatbot.dto.ChatRequest;
+import azhukov.chatbot.dto.ChatResponse;
 import azhukov.chatbot.service.SweetieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,17 +14,17 @@ public class SweetieHandler extends MessageHandler {
     private SweetieService sweetieService;
 
     @Override
-    public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
+    public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (lowerCase.contains("!пупсик")) {
             if (Constants.MASTER_NAME.equals(message.getUserName())) {
-                return createUserMessage(message, "Весь чат ваш пупсик :doggie:");
+                return createUserMessage(message, "Весь чат ваш пупсик {DOGGIE}");
             }
             String sweetie = sweetieService.getSweetie(message.getUserName());
-            return createUserMessage(message, sweetie == null ? "У вас пока нет пупсика :doggie:" : ("Ваш пупсик: " + sweetie + " :doggie:"));
+            return createUserMessage(message, sweetie == null ? "У вас пока нет пупсика {DOGGIE}" : ("Ваш пупсик: " + sweetie + " {DOGGIE}"));
         }
         if (lowerCase.contains("!непупсик")) {
             sweetieService.deleteSweetie(message.getUserName());
-            return createUserMessage(message, "Ах ты не пупсик :doggie:");
+            return createUserMessage(message, "Ах ты не пупсик {DOGGIE}");
         }
         return null;
     }

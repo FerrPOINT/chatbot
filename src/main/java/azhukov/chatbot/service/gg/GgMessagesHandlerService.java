@@ -1,14 +1,14 @@
-package azhukov.chatbot.service;
+package azhukov.chatbot.service.gg;
 
 import azhukov.chatbot.constants.MessageType;
-import azhukov.chatbot.dto.*;
 import azhukov.chatbot.dto.auth.AuthResponse;
-import azhukov.chatbot.service.auth.AuthService;
+import azhukov.chatbot.dto.gg.*;
+import azhukov.chatbot.service.auth.GgAuthService;
 import azhukov.chatbot.service.messages.RequestContext;
+import azhukov.chatbot.service.util.Randomizer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -27,8 +25,8 @@ public class GgMessagesHandlerService {
 
     private static final String LAST_KNOWN_VERSION = "2";
 
-    private final AuthService authService;
-    private final MessageAnswerService messageAnswerService;
+    private final GgAuthService authService;
+    private final GgMessageAnswerService messageAnswerService;
     private final ObjectMapper objectMapper;
 
     @Value("${checked-channels}")
@@ -78,29 +76,24 @@ public class GgMessagesHandlerService {
                 return Collections.singletonList(jsonResp);
             }
 
-            final RespGgMessage respData = getData(data, RespGgMessage.class);
-            respData.setCurrentUser(authService.isCurrentUser(respData));
-            respData.setForCurrentUser(respData.getText() != null && respData.getText().contains(authService.getLogin() + ", "));
+            final GgChatRequest request = getData(data, GgChatRequest.class);
 
             List<ReqGg> listResult = switch (messageType) {
                 case message -> {
                     messagesCounter++;
-                    yield handleChatMessage(respData);
+                    yield handleChatMessage(request);
                 }
                 default -> null;
             };
 
             if (listResult == null && messagesCounter % 100 == 0) {
-                listResult = Collections.singletonList(new ReqGg(MessageType.send_message, new ReqGgMessage(respData.getChannelId(), Randomizer.tossCoin() ? "Вуфь :doggie:" : "Аффь :doggie:", false, false)));
+                listResult = Collections.singletonList(new ReqGg(MessageType.send_message, new GgChatResponse(request.getChannelId(), Randomizer.tossCoin() ? "Вуфь :doggie:" : "Аффь :doggie:", false, false)));
             }
 
             if (listResult != null) {
                 ArrayList<String> jsonsList = new ArrayList<>(listResult.size());
                 if (listResult.size() == 1) {
                     dogenAnswerCounter++;
-                    if (dogenAnswerCounter % 20 == 0) {
-//                        listResult = Collections.singletonList(new ReqGg(MessageType.send_message, new ReqGgMessage(respData.getChannelId(), Randomizer.tossCoin() ? "Я вам что игрушка какая? :doggie:" : (respData.getUserName() + ", нит! :tanushkavl26:"), false, false)));
-                    }
                 }
                 for (ReqGg reqGg : listResult) {
                     String json = objectMapper.writeValueAsString(reqGg);
@@ -147,7 +140,7 @@ public class GgMessagesHandlerService {
         return new ReqGg(MessageType.join, new ReqChatJoin(channelId, false));
     }
 
-    public List<ReqGg> handleChatMessage(RespGgMessage message) {
+    public List<ReqGg> handleChatMessage(GgChatRequest message) {
         log.info("{} says: {}", message.getUserName(), message.getText());
         return messageAnswerService.answer(message);
     }
@@ -166,6 +159,5 @@ public class GgMessagesHandlerService {
         log.info("{} deleted the message with id: {}", message.getAdminName(), message.getMessageId());
         return null;
     }
-
 
 }

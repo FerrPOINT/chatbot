@@ -1,8 +1,8 @@
 package azhukov.chatbot.service.variety;
 
-import azhukov.chatbot.service.Randomizer;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
+import azhukov.chatbot.service.util.Randomizer;
 import azhukov.chatbot.util.IOUtils;
 import azhukov.chatbot.util.Range;
 import azhukov.chatbot.util.RangesContainer;

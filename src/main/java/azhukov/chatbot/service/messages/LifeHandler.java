@@ -1,12 +1,12 @@
 package azhukov.chatbot.service.messages;
 
-import azhukov.chatbot.dto.ReqGgMessage;
-import azhukov.chatbot.dto.RespGgMessage;
-import azhukov.chatbot.service.Randomizer;
+import azhukov.chatbot.dto.ChatRequest;
+import azhukov.chatbot.dto.ChatResponse;
 import azhukov.chatbot.service.pet.LifecycleService;
 import azhukov.chatbot.service.pet.LifecycleStage;
 import azhukov.chatbot.service.pet.LifecycleStore;
 import azhukov.chatbot.service.users.UserBiteStore;
+import azhukov.chatbot.service.util.Randomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,40 +27,34 @@ public class LifeHandler extends MessageHandler {
     private static final List<String> TAKE_MESSAGES = List.of("Собаня грызёт кость, но вы ловко её отнимаете", "У пёсика есть немного еды и вы отбираете её", "Вы крадёте еду пока собачка отвлеклась");
 
     @Override
-    public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
-        return answerWithoutCurrentUser(message, text, lowerCase);
-    }
-
-    private ReqGgMessage answerWithoutCurrentUser(RespGgMessage message, String text, String lowerCase) {
-        if (!message.isCurrentUser()) {
-            if (feed.stream().anyMatch(lowerCase::contains) ) {
-                if (lifecycleStore.isAllowedToFeed(message)) {
-                    LifecycleStage current = lifecycleService.current();
-                    if (current.isMax()) {
-                        return createUserMessage(message, "Пёсонька уже итак перекормлен :doggie:");
-                    }
-                    final LifecycleStage offset = lifecycleService.offset(+2);
-                    return createUserMessage(message, Randomizer.getRandomItem(FEED_MESSAGES) + ". " + offset.getMessage() + " :doggie:");
+    public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
+        if (feed.stream().anyMatch(lowerCase::contains)) {
+            if (lifecycleStore.isAllowedToFeed(message)) {
+                LifecycleStage current = lifecycleService.current();
+                if (current.isMax()) {
+                    return createUserMessage(message, "Пёсонька уже итак перекормлен {DOGGIE}");
                 }
-                return createUserMessage(message, "Сегодня вы уже покормили пёсика и он вам благодарен :doggie:");
+                final LifecycleStage offset = lifecycleService.offset(+2);
+                return createUserMessage(message, Randomizer.getRandomItem(FEED_MESSAGES) + ". " + offset.getMessage() + " {DOGGIE}");
             }
-            if (lowerCase.contains("!отобрать") || lowerCase.contains("!отнять")) {
-                if (lifecycleStore.isAllowedToTake(message)) {
-                    LifecycleStage current = lifecycleService.current();
-                    if (current.isMin()) {
-                        return createUserMessage(message, "У собачки итак ничего нет - отнимать нечего :doggie:");
-                    }
-                    final LifecycleStage offset = lifecycleService.offset(-1);
-                    return createUserMessage(message, Randomizer.getRandomItem(TAKE_MESSAGES) + ". " + offset.getMessage() + " :doggie:");
+            return createUserMessage(message, "Сегодня вы уже покормили пёсика и он вам благодарен {DOGGIE}");
+        }
+        if (lowerCase.contains("!отобрать") || lowerCase.contains("!отнять")) {
+            if (lifecycleStore.isAllowedToTake(message)) {
+                LifecycleStage current = lifecycleService.current();
+                if (current.isMin()) {
+                    return createUserMessage(message, "У собачки итак ничего нет - отнимать нечего {DOGGIE}");
                 }
+                final LifecycleStage offset = lifecycleService.offset(-1);
+                return createUserMessage(message, Randomizer.getRandomItem(TAKE_MESSAGES) + ". " + offset.getMessage() + " {DOGGIE}");
+            }
 
-                int biteCount = userBiteStore.bite(message.getUserName());
-                return createUserMessage(message, "Собаня запомнил того, кто забирал у него еду и он делает вам кусь :doggie:" + (biteCount > 1 ? (" Вы уже покусаны " + biteCount + " раз") : ""));
-            }
-            if (lowerCase.contains("!доген") || lowerCase.contains("!собаня")|| lowerCase.contains("!псинка")) {
-                final LifecycleStage offset = lifecycleService.current();
-                return createMessage(message, offset.getMessage() + " :doggie:");
-            }
+            int biteCount = userBiteStore.bite(message.getUserName());
+            return createUserMessage(message, "Собаня запомнил того, кто забирал у него еду и он делает вам кусь {DOGGIE}" + (biteCount > 1 ? (" Вы уже покусаны " + biteCount + " раз") : ""));
+        }
+        if (lowerCase.contains("!доген") || lowerCase.contains("!собаня") || lowerCase.contains("!псинка")) {
+            final LifecycleStage offset = lifecycleService.current();
+            return createMessage(message, offset.getMessage() + " {DOGGIE}");
         }
         return null;
     }

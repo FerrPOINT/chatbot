@@ -1,10 +1,8 @@
 package azhukov.chatbot.service.auth;
 
-import azhukov.chatbot.dto.RespGgMessage;
 import azhukov.chatbot.dto.auth.AuthRequest;
 import azhukov.chatbot.dto.auth.AuthResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import azhukov.chatbot.dto.gg.GgChatRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,15 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AuthService {
+public class GgAuthService {
 
     @Getter
     @Value("${auth.login}")
@@ -32,7 +26,7 @@ public class AuthService {
 
     private AuthResponse currentAuthData;
 
-        public AuthResponse getAuthData() {
+    public AuthResponse getAuthData() {
         if (currentAuthData == null) {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
@@ -53,7 +47,7 @@ public class AuthService {
         return currentAuthData;
     }
 
-    public boolean isCurrentUser(RespGgMessage message) {
+    public boolean isCurrentUser(GgChatRequest message) {
         return login.equals(message.getUserName());
     }
 

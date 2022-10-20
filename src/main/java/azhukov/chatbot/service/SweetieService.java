@@ -3,8 +3,8 @@ package azhukov.chatbot.service;
 import azhukov.chatbot.constants.Constants;
 import azhukov.chatbot.db.DbService;
 import azhukov.chatbot.db.DbType;
-import azhukov.chatbot.dto.RespGgMessage;
-import azhukov.chatbot.service.auth.AuthService;
+import azhukov.chatbot.dto.ChatRequest;
+import azhukov.chatbot.service.auth.GgAuthService;
 import lombok.RequiredArgsConstructor;
 import org.mapdb.DB;
 import org.mapdb.HTreeMap;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SweetieService {
 
     private final DbService dbService;
-    private final AuthService authService;
+    private final GgAuthService authService;
 
     private final Map<String, Map<String, AtomicInteger>> tempData = new ConcurrentHashMap<>();
 
@@ -45,7 +45,7 @@ public class SweetieService {
         map.put(Constants.MASTER_NAME, 1);
     }
 
-    public void addSweetie(String user, RespGgMessage message) {
+    public void addSweetie(String user, ChatRequest message) {
         String text = message.getText();
         String sweetieNickname = getSweetieNickname(text);
         if (sweetieNickname != null && !Constants.MASTER_NAME.equals(sweetieNickname) && !authService.getLogin().equals(sweetieNickname)) {

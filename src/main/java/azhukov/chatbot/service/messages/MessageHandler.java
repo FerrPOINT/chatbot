@@ -1,28 +1,24 @@
 package azhukov.chatbot.service.messages;
 
-import azhukov.chatbot.dto.ReqGgMessage;
-import azhukov.chatbot.dto.RespGgMessage;
+import azhukov.chatbot.dto.ChatRequest;
+import azhukov.chatbot.dto.ChatResponse;
 import org.springframework.stereotype.Component;
 
 @Component
 public abstract class MessageHandler {
 
-    public abstract ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase);
+    public abstract ChatResponse answerMessage(ChatRequest message, String text, String lowerCase);
 
-    protected ReqGgMessage createUserMessage(RespGgMessage message, String text) {
+    protected ChatResponse createUserMessage(ChatRequest message, String text) {
         return createUserMessage(message, text, message.getUserName());
     }
 
-    protected ReqGgMessage createUserMessage(RespGgMessage message, String text, String user) {
-        return new ReqGgMessage(message.getChannelId(), user + ", " + text, false, false);
+    protected ChatResponse createUserMessage(ChatRequest message, String text, String user) {
+        return new ChatResponse(user, text);
     }
 
-    protected ReqGgMessage createMessage(RespGgMessage message, String text) {
-        return new ReqGgMessage(message.getChannelId(), text, false, false);
-    }
-
-    protected boolean isTanushka(RespGgMessage message) {
-        return "TanushkaVL".equals(message.getUserName());
+    protected ChatResponse createMessage(ChatRequest message, String text) {
+        return new ChatResponse(null, text);
     }
 
 }
