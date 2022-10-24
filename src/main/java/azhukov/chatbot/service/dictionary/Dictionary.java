@@ -15,4 +15,6 @@ public class Dictionary {
     private String postfix;
     private boolean collect;
     private boolean repeatMessage;
+    private String fullCollectionMessage;
+    private boolean locked;
 }

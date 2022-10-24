@@ -9,6 +9,7 @@ public class VarietyList {
 
     private String id;
     private String name;
+    private boolean locked;
     private List<String> commands;
     private List<Variety> varieties;
 

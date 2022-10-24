@@ -1,5 +1,6 @@
 package azhukov.chatbot.service.variety;
 
+import azhukov.chatbot.service.CommandsPermissionsService;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.util.Randomizer;
@@ -24,6 +25,7 @@ public class VarietiesService {
 
     private final ObjectMapper objectMapper;
     private final DailyStore dailyStore;
+    private final CommandsPermissionsService commandsPermissionsService;
 
     private final List<VarietyList> varieties = new ArrayList<>();
     private final Map<String, RangesContainer<Variety>> ranges = new HashMap<>();
@@ -82,6 +84,9 @@ public class VarietiesService {
                 if (lowerMessage.contains(command)) {
                     if (lowerMessage.contains(command + " топ")) {
                         return getTop(variety);
+                    }
+                    if (variety.isLocked() && !commandsPermissionsService.isPermitted(command, user)) {
+                        return "Вы пока еще не открыли эту команду";
                     }
                     String storeKey = user + "-" + variety.getId();
                     final String percent = store.get(storeKey);

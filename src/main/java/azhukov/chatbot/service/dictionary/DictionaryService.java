@@ -1,5 +1,6 @@
 package azhukov.chatbot.service.dictionary;
 
+import azhukov.chatbot.service.CommandsPermissionsService;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.users.UserCollectionStore;
@@ -26,6 +27,7 @@ public class DictionaryService {
     private final ObjectMapper objectMapper;
     private final DailyStore dailyStore;
     private final UserCollectionStore userCollectionStore;
+    private final CommandsPermissionsService commandsPermissionsService;
 
     private final Map<String, Dictionary> commandsToDictionary = new HashMap<>();
     private final Map<String, Dictionary> idToDictionary = new HashMap<>();
@@ -70,6 +72,9 @@ public class DictionaryService {
         for (Dictionary dictionary : dictionaries) {
             for (String command : dictionary.getCommandsList()) {
                 if (messageLowerCase.contains(command)) {
+                    if (dictionary.isLocked() && !commandsPermissionsService.isPermitted(command, user)) {
+                        return "Вы пока еще не открыли эту команду {DOGGIE}";
+                    }
                     return getDictionaryMessage(user, dictionary);
                 }
             }
@@ -124,17 +129,21 @@ public class DictionaryService {
                 message = currentSet.contains(key) ? " Забыл чтоли?" : " Лудоман.";
             }
             userCollectionStore.save(user, currentSet, dictionary.getId());
-            collectPostfix = message + getCollectionMessage(currentSet, dictionary);
+            collectPostfix = message + " " + (currentSet.size() == dictionary.getData().size() ? getFullCollectionMessage(dictionary) : getCollectionMessage(currentSet, dictionary));
         }
 
         return result + collectPostfix;
     }
 
-    String getDictionaryMessage(Dictionary dictionary, String key) {
+    public Dictionary getById(String id) {
+        return idToDictionary.get(id);
+    }
+
+    private String getDictionaryMessage(Dictionary dictionary, String key) {
         return new StringJoiner(" ").add(dictionary.getPrefix()).add(dictionary.getData().get(key)).add(dictionary.getPostfix()).toString();
     }
 
-    String getDictionaryRepeatMessage(Dictionary dictionary, String key) {
+    private String getDictionaryRepeatMessage(Dictionary dictionary, String key) {
         return new StringJoiner(" ")
                 .add(dictionary.getRepeatPrefix())
                 .add(dictionary.isRepeatMessage() ? dictionary.getData().get(key) : key)
@@ -142,8 +151,12 @@ public class DictionaryService {
                 .toString();
     }
 
-    public String getCollectionMessage(Set<String> current, Dictionary dictionary) {
-        return current.isEmpty() ? " Вы всё проиграли" : " У вас уже " + current.size() + " из " + dictionary.getData().size() + " : " + current.stream().sorted().collect(Collectors.joining(", "));
+    private String getCollectionMessage(Set<String> current, Dictionary dictionary) {
+        return current.isEmpty() ? "Вы всё проиграли" : "У вас уже " + current.size() + " из " + dictionary.getData().size() + " : " + current.stream().sorted().collect(Collectors.joining(", "));
+    }
+
+    private String getFullCollectionMessage(Dictionary dictionary) {
+        return dictionary.getFullCollectionMessage() != null ? dictionary.getFullCollectionMessage() : "Вся коллекция собрана, можно её !обменять";
     }
 
 }
