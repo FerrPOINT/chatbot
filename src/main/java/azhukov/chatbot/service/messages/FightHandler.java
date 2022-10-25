@@ -71,7 +71,14 @@ public class FightHandler extends MessageHandler {
                 String resultMessage;
 
                 if (Objects.equals(firstItem, secondItem)) {
-                    resultMessage = "Долго бились, но это ничья. Оба нубаськи остаются при своём";
+                    if (firstCollection.size() == secondCollection.size()) {
+                        resultMessage = "Долго бились, но это ничья. Оба нубаськи остаются при своём";
+                    } else {
+                        String bigger = firstCollection.size() > secondCollection.size() ? fight.getFirstUser() : fight.getSecondUser();
+                        String lower = firstCollection.size() > secondCollection.size() ? fight.getSecondUser() : fight.getFirstUser();
+                        resultMessage = bigger + " не заинтересован в талисманах " + lower + " поищите других соперников";
+                        prefix = "";
+                    }
                 } else {
                     int percent = Randomizer.getPercent();
                     if (percent % 10 <= 4) {
