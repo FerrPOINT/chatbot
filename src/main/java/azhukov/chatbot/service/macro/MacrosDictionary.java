@@ -14,7 +14,8 @@ public class MacrosDictionary {
             PANTS.getMacro(), ":tanushkavl29:",
             CAT_PISOS.getMacro(), ":tanushkavl1:",
             PLEASURE.getMacro(), ":tanushkavl3:",
-            GUN.getMacro(), ":tanushkavl15:"
+            GUN.getMacro(), ":tanushkavl15:",
+            SIGH.getMacro(), ":sigh:"
     );
 
     public static final Map<String, String> DISCORD_DICTIONARY = Map.of(
@@ -31,7 +32,8 @@ public class MacrosDictionary {
             PANTS.getMacro(), ":nerd:",
             CAT_PISOS.getMacro(), ":smirk_cat:",
             PLEASURE.getMacro(), ":heart_eyes:",
-            GUN.getMacro(), ":gun:"
+            GUN.getMacro(), ":gun:",
+            SIGH.getMacro(), ":eyes:"
     );
 
     static {

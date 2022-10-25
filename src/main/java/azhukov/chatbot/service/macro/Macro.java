@@ -14,6 +14,7 @@ public enum Macro {
     CAT_PISOS("{CAT_PISOS}"),
     PLEASURE("{PLEASURE}"),
     GUN("{GUN}"),
+    SIGH("{SIGH}"),
 
     //
     ;

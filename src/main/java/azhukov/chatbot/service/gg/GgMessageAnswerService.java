@@ -6,7 +6,6 @@ import azhukov.chatbot.dto.gg.*;
 import azhukov.chatbot.service.CommonChatService;
 import azhukov.chatbot.service.MappingService;
 import azhukov.chatbot.service.auth.GgAuthService;
-import azhukov.chatbot.service.users.UserMessageStore;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,6 @@ public class GgMessageAnswerService {
     private static final String[] BAN_TEXT_PARTS = {"bit.ly/"};
 
     private final GgAuthService authService;
-    private final UserMessageStore dailyUsersStore;
     private final MappingService mappingService;
     private final CommonChatService chatService;
 
@@ -31,8 +29,6 @@ public class GgMessageAnswerService {
             return null;
         }
 
-        dailyUsersStore.countMessage(ggRequest.getUserName());
-
         text = text.trim();
         String lowerCase = text.toLowerCase();
 
@@ -40,7 +36,6 @@ public class GgMessageAnswerService {
         if (reqBan != null) {
             return reqBan;
         }
-
 
         ChatResponse chatResponse = chatService.answerMessage(mappingService.mapDis(ggRequest), text, lowerCase);
 
