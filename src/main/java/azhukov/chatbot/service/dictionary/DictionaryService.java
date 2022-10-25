@@ -159,4 +159,14 @@ public class DictionaryService {
         return dictionary.getFullCollectionMessage() != null ? dictionary.getFullCollectionMessage() : "Вся коллекция собрана, можно её !обменять";
     }
 
+    public List<String> getTalismansList(String user) {
+        Dictionary dictionary = getById("talisman");
+        Set<String> currentSet = userCollectionStore.getCurrentSet(user, dictionary.getId());
+        List<String> result = currentSet == null ? List.of() : new ArrayList<>(currentSet);
+        if (!result.isEmpty()) {
+            Collections.sort(result);
+        }
+        return result;
+    }
+
 }
