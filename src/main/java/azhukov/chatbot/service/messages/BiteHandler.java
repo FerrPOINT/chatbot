@@ -3,7 +3,7 @@ package azhukov.chatbot.service.messages;
 import azhukov.chatbot.dto.ChatRequest;
 import azhukov.chatbot.dto.ChatResponse;
 import azhukov.chatbot.service.users.UserBiteStore;
-import azhukov.chatbot.service.users.UserMessageStore;
+import azhukov.chatbot.service.users.UserStore;
 import azhukov.chatbot.service.util.CommandsUtil;
 import azhukov.chatbot.service.util.Randomizer;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BiteHandler extends MessageHandler {
 
-    private final UserMessageStore dailyUsersStore;
+    private final UserStore dailyUsersStore;
     private final UserBiteStore userBiteStore;
 
     private static final List<String> BITE_COMMANDS = List.of("!укусить", "!кусить", "!фас");
@@ -32,8 +32,7 @@ public class BiteHandler extends MessageHandler {
         for (String biteCommand : BITE_COMMANDS) {
             String targetName = CommandsUtil.getNextWordAfterCommand(text, lowerCase, biteCommand);
             if (targetName != null) {
-                int todayMessagesCount = dailyUsersStore.getTodayMessagesCount(targetName);
-                if (todayMessagesCount > 0) {
+                if (dailyUsersStore.isExist(targetName)) {
                     int biteCount = userBiteStore.bite(targetName);
                     return createUserMessage(message, Randomizer.getRandomItem(BITE_MESSAGES) + " {DOGGIE}" + (biteCount > 1 ? (" Вы были укушены " + biteCount + " раз") : ""), targetName);
                 } else {

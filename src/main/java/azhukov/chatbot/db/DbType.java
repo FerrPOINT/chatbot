@@ -6,5 +6,6 @@ public enum DbType {
     SWEETIE,
     BITE,
     COLLECT,
+    USERS,
 
 }
