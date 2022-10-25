@@ -21,9 +21,13 @@ public class CommonChatService {
         if (message.isCurrentUser()) {
             return null;
         }
-        dailyUsersStore.addUser(message.getUserName());
-        // TODO fix sweetie for all platforms
-        sweetieService.addSweetie(message.getUserName(), message);
+
+        if (message.getUserName() != null) {
+            dailyUsersStore.addUser(message.getUserName());
+            // TODO fix sweetie for all platforms
+            sweetieService.addSweetie(message.getUserName(), message);
+        }
+
         for (MessageHandler messageHandler : messageHandlers) {
             final ChatResponse resp = messageHandler.answerMessage(message, text, lowerCase);
             if (resp != null) {
