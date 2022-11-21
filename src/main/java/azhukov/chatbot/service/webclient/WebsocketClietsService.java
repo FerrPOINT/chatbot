@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
@@ -23,6 +24,8 @@ public class WebsocketClietsService {
     private final GgMessagesHandlerService ggMessagesHandler;
 
     private ChatbotWebSocketClient client;
+    private boolean transportError;
+    private boolean connectionClosed;
 
     @PostConstruct
     void init() {
@@ -37,17 +40,26 @@ public class WebsocketClietsService {
     //every 10 mins
     @Scheduled(cron = "0 */10 * ? * *")
     void reconnect() {
-        if (!client.isRunning() || client.getLastPingTime() != 0) {
-            final long last = TimeUnit.MILLISECONDS.toHours(client.getLastPingTime());
-            final long current = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis());
-
-            if (!client.isRunning()) {
-                client = createWebSocketClient();
-                log.info("RECREATE");
-            } else if (current - last > 1) {
+        if (!client.isRunning()) {
+            log.info("RECREATE START");
+            client = createWebSocketClient();
+            log.info("RECREATE COMPLETE");
+        } else {
+            if (client.getLastPingTime() != 0) {
+                final long last = TimeUnit.MILLISECONDS.toHours(client.getLastPingTime());
+                final long current = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis());
+                if (current - last > 1) {
+                    log.info("RECONNECT START");
+                    client.stop();
+                    client = createWebSocketClient();
+                    log.info("RECONNECT COMPLETE");
+                }
+            }
+            if (transportError || connectionClosed) {
+                log.info("RECONNECT AFTER ERROR START");
                 client.stop();
                 client = createWebSocketClient();
-                log.info("RECONNECT");
+                log.info("RECONNECT AFTER ERROR COMPLETE");
             }
         }
     }
@@ -89,7 +101,21 @@ public class WebsocketClietsService {
                 }
 
             }
+
+            public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+                transportError = true;
+                log.error("Transport error", exception);
+            }
+
+            public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+                connectionClosed = true;
+                log.error("Connection closed with code: {}, reason: {}", status.getCode(), status.getCode());
+            }
+
         }, "wss://chat-1.goodgame.ru/chat2/");
+
+        this.transportError = false;
+        this.connectionClosed = false;
         return client;
     }
 
