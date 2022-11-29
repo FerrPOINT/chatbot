@@ -39,7 +39,7 @@ public class WebsocketClietsService {
 
     //every 10 mins
     @Scheduled(cron = "0 */10 * ? * *")
-    void reconnect() {
+    synchronized void reconnect() {
         if (!client.isRunning()) {
             log.info("RECREATE START");
             client = createWebSocketClient();
@@ -66,7 +66,7 @@ public class WebsocketClietsService {
 
     //every day 6:00
     @Scheduled(cron = "0 0 6 * * ?")
-    void forceReconnect() {
+    synchronized void forceReconnect() {
         if (client.isRunning()) {
             client.stop();
         }

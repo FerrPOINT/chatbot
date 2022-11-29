@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -82,14 +80,8 @@ public class DiscordWebClient {
                 if (chatResponse != null) {
                     String mapped = mappingService.mapDis(chatResponse);
                     if (chatResponse.getTargetUser() != null) {
-                        mapped = event.getJDA().
-                                getUsersByName(chatResponse.getTargetUser(), false).
-                                stream().
-                                map(ISnowflake::getId).
-                                map(s -> "<@" + s + ">").
-                                collect(Collectors.joining()) + " " + mapped;
+                        mapped = chatResponse.getTargetUser() + ", " + mapped;
                     }
-
                     event.getChannel()
                             .sendMessage(mapped)
                             .complete();
