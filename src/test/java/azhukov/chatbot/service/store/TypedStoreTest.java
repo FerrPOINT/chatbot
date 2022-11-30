@@ -1,17 +1,17 @@
 package azhukov.chatbot.service.store;
 
-import azhukov.chatbot.db.DbService;
 import org.junit.jupiter.api.Test;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 
-import static azhukov.chatbot.db.DbType.STORE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TypedStoreTest {
 
     @Test
     void test() {
-        DbService dbService = new DbService();
-        TypedStore<Data> dataTypedStore = new TypedStore<>(() -> dbService.getDb(STORE), "test", Data.class);
+        DB db = DBMaker.memoryDB().closeOnJvmShutdown().make();
+        TypedStore<Data> dataTypedStore = new TypedStore<>(() -> db, "test", Data.class);
         dataTypedStore.clear();
         Data data = dataTypedStore.get("key1");
         assertNull(data);
@@ -19,8 +19,9 @@ class TypedStoreTest {
         data.setVal1(100500);
         data.setVal2("somevalue");
         dataTypedStore.put("key1", data);
+        db.commit();
         Data dataStored = dataTypedStore.get("key1");
-        assertNotNull(data);
+        assertNotNull(dataStored);
         assertEquals(data.getVal1(), dataStored.getVal1());
         assertEquals(data.getVal2(), dataStored.getVal2());
     }
