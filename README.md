@@ -60,3 +60,7 @@ nohup /usr/lib/jvm/java-17/bin/java -jar -Xrunjdwp:server=y,transport=dt_socket,
 * /usr/lib/jvm/java-17/bin/java - к установленной java 17.
 * -Dspring.config.location - путь к application.yml. В проекте лежит под названием application.yml-default.
 * -Dlogging.config - путь к logback.xml - файл настройки логирования. В проекте лежит под названием logback.xml.default
+
+## Discord bot example:
+
+![img.png](img.png)

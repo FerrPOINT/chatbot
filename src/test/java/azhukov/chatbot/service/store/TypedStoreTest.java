@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TypedStoreTest {
@@ -18,6 +20,7 @@ class TypedStoreTest {
         data = new Data();
         data.setVal1(100500);
         data.setVal2("somevalue");
+        data.setDate(LocalDateTime.now());
         dataTypedStore.put("key1", data);
         db.commit();
         Data dataStored = dataTypedStore.get("key1");
@@ -30,5 +33,6 @@ class TypedStoreTest {
     public static class Data {
         int val1;
         String val2;
+        LocalDateTime date;
     }
 }

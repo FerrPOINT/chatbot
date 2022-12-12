@@ -7,5 +7,7 @@ public enum DbType {
     BITE,
     COLLECT,
     USERS,
+    DUNGE,
+    DUNGE_BOSS,
 
 }

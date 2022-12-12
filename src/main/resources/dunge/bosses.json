@@ -1,0 +1,29 @@
+[
+  {
+    "stage": 1,
+    "name": "ВоришкаВл",
+    "label": "похитительница сладких булочек",
+    "minionsName": "воришки",
+    "minionsLabel": "воришки из чата",
+    "strong": "PIE",
+    "weak": "ELF"
+  },
+  {
+    "stage": 2,
+    "name": "Озара",
+    "label": "с пушкой",
+    "minionsName": "бандюганы",
+    "minionsLabel": "бандюганы с пистолетами",
+    "strong": "LALKA",
+    "weak": "WEREWOLF"
+  },
+  {
+    "stage": 3,
+    "name": "Ворлоин",
+    "label": "второй вор в гильдии",
+    "minionsName": "опытные воришки",
+    "minionsLabel": "матёрые воришки из чата",
+    "strong": "ELF",
+    "weak": "ORC"
+  }
+]

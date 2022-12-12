@@ -1,4 +1,4 @@
-package azhukov.chatbot.service.fight;
+package azhukov.chatbot.service.arena;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

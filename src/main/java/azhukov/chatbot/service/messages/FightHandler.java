@@ -2,8 +2,8 @@ package azhukov.chatbot.service.messages;
 
 import azhukov.chatbot.dto.ChatRequest;
 import azhukov.chatbot.dto.ChatResponse;
-import azhukov.chatbot.service.fight.Fight;
-import azhukov.chatbot.service.fight.FightService;
+import azhukov.chatbot.service.arena.Fight;
+import azhukov.chatbot.service.arena.FightService;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.users.UserCollectionStore;

@@ -1,4 +1,4 @@
-package azhukov.chatbot.service.fight;
+package azhukov.chatbot.service.arena;
 
 public enum FightResult {
 
