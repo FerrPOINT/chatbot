@@ -48,11 +48,8 @@ public class DungeonService {
             current = heroInfoService.createNew(userName);
             return "Новый герой - " + getUserShortStats(userName, current) + " уже готов спуститься в подземелье, подумайте, может не надо? {DOGGIE}";
         }
-        if (current.getDamageGot() == DEAD) {
-            return "Вы мертвы, ждите респауна {DOGGIE}";
-        }
-        if (current.getDeadTime() != null) {
-            return "Вы мертвы, ваша душа блуждает в другом мире, подождите чтобы вновь обрести физическую оболочку! {DOGGIE}";
+        if (current.getDamageGot() == DEAD || current.getDeadTime() != null) {
+            return "Вы мертвы, ваша душа блуждает в другом мире, подождите чтобы вновь обрести физическую форму! {DOGGIE}";
         }
         FightResult fight = fight(userName, current);
 
@@ -77,7 +74,7 @@ public class DungeonService {
         BossInfo boss = fight.getBoss();
         HeroInfo hero = fight.getHero();
         HeroDamage damageGet = fight.getDamageGet();
-        return (damageGet == HeroDamage.NONE ? "Вам удалось увернуться от всех атак " + boss.getName() : "Вам досталось от " + boss.getName() + " " + damageGet.getLabel() + ", вместе с этим вы получили " + hero.getDamageGot().getLabel());
+        return (damageGet == HeroDamage.NONE ? "Вам удалось увернуться от всех атак " + boss.getName() : "Вам досталось от " + boss.getName() + " " + damageGet.getLabel() + ", вместе с этим вы получили " + hero.getDamageGot().join(damageGet).getLabel());
     }
 
     private String getUserStats(String userName, HeroInfo info) {
