@@ -1,0 +1,11 @@
+{
+  "id": "prism",
+  "name": "Лунная призма",
+  "label": "Лунная призма дарует вам силу",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": 20
+    }
+  ]
+}

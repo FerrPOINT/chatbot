@@ -9,6 +9,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Artifact {
 
+    private final String id;
     private final String name;
     private final String label;
     private final List<Modificator> modifications;

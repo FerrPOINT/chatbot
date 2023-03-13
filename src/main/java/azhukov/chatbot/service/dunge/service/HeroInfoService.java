@@ -1,9 +1,7 @@
 package azhukov.chatbot.service.dunge.service;
 
-import azhukov.chatbot.service.dunge.data.HeroClass;
-import azhukov.chatbot.service.dunge.data.HeroDamage;
-import azhukov.chatbot.service.dunge.data.HeroInfo;
-import azhukov.chatbot.service.dunge.data.HeroInfoStore;
+import azhukov.chatbot.service.ArticfactService;
+import azhukov.chatbot.service.dunge.data.*;
 import azhukov.chatbot.service.util.Randomizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +20,7 @@ import java.util.stream.Stream;
 public class HeroInfoService {
 
     private final HeroInfoStore store;
+    private final ArticfactService service;
 
     public HeroInfo getCurrent(String name) {
         return store.get(name);
@@ -46,8 +45,7 @@ public class HeroInfoService {
         HeroInfo heroInfo = new HeroInfo()
                 .setName(name)
                 .setDamageGot(HeroDamage.NONE)
-                .setType(Stream.of(values).skip(Randomizer.nextInt(values.length)).findFirst().get())
-                .setLevel(1);
+                .setType(Stream.of(values).skip(Randomizer.nextInt(values.length)).findFirst().get());
         store.put(name, heroInfo);
         return heroInfo;
     }
@@ -78,6 +76,19 @@ public class HeroInfoService {
         });
         log.info("Heal complete. total: {}, dead: {}", counter.intValue(), toDelete.size());
         toDelete.forEach(store::delete);
+    }
+
+    public void addArtifact(String name, Artifact artifact) {
+        update(name, heroInfo -> {
+            if (heroInfo.getArtifacts() == null) {
+                heroInfo.setArtifacts(new ArrayList<>());
+            }
+            heroInfo.getArtifacts().add(artifact);
+        });
+    }
+
+    public void addArtifact(String name, String artifactId) {
+        addArtifact(name, service.getById(artifactId));
     }
 
 }

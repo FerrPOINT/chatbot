@@ -4,6 +4,7 @@ import azhukov.chatbot.dto.ChatRequest;
 import azhukov.chatbot.dto.ChatResponse;
 import azhukov.chatbot.service.dunge.service.BossService;
 import azhukov.chatbot.service.dunge.service.DungeonService;
+import azhukov.chatbot.service.dunge.service.HeroInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ public class DungeonHandler extends MessageHandler {
 
     private final DungeonService dungeonService;
     private final BossService bossService;
+    private final HeroInfoService heroInfoService;
 
     private static final List<String> COMMANDS = List.of("!данж", "!dungeon", "!данжн");
     private static final List<String> BOSS_COMMANDS = List.of("!босс", "!boss");
@@ -28,6 +30,13 @@ public class DungeonHandler extends MessageHandler {
             if (lowerCase.contains("!резет1")) {
                 dungeonService.reset();
                 return createMessage(message, "резет {DOGGIE}");
+            }
+            if (lowerCase.contains("!призма1")) {
+                heroInfoService.addArtifact(message.getUserName(), "prism");
+                return createMessage(message, "получи призму) {DOGGIE}");
+            }
+            if (lowerCase.contains("!стата1")) {
+                return createMessage(message, dungeonService.getHeroStats(message));
             }
             for (String command : COMMANDS) {
                 if (lowerCase.contains(command)) {

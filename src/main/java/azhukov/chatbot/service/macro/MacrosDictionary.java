@@ -10,7 +10,7 @@ public class MacrosDictionary {
     public static final Map<String, String> GG_DICTIONARY = Map.of(
             DOGGIE.getMacro(), ":doggie:",
             PEKA.getMacro(), ":peka:",
-            LICK.getMacro(), ":tanushkavlsilver:",
+            LICK.getMacro(), ":tanushkavl11:",
             PANTS.getMacro(), ":tanushkavl29:",
             CAT_PISOS.getMacro(), ":tanushkavl1:",
             PLEASURE.getMacro(), ":tanushkavl3:",

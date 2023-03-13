@@ -23,6 +23,13 @@ public class ExchangeHandler extends MessageHandler {
     @Override
     public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (lowerCase.startsWith("!обменять")) {
+            if (lowerCase.contains("!обменять сейлор на призму")) {
+                // TODO
+            }
+            if (lowerCase.contains("!обменять талисманы на призму")) {
+                // TODO
+            }
+
             if (lowerCase.contains("!обменять талисманы на сейлор")) {
                 Dictionary talisman = dictionaryService.getById("talisman");
                 Set<String> talismansSet = userCollectionStore.getCurrentSet(message.getUserName(), talisman.getId());

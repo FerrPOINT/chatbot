@@ -18,13 +18,16 @@ public class HeroInfo {
     private String name;
     private HeroClass type;
     private int experience;
-    private int level;
     private List<Artifact> artifacts;
     private HeroDamage damageGot;
     private LocalDateTime deadTime;
 
-    public int getAttack() {
-        int result = level;
+    public int getLevel() {
+        return (experience / 1000) + 1;
+    }
+
+    public int getAttack(BossInfo boss) {
+        int result = getLevel() + 10;
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
                 if (artifact.getModifications() != null) {
@@ -45,8 +48,10 @@ public class HeroInfo {
                 }
             }
         }
+        if (boss.getWeak() == type) {
+            result *= 2;
+        }
         return result;
     }
-
 
 }

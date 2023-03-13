@@ -25,5 +25,23 @@
     "minionsLabel": "матёрые воришки из чата",
     "strong": "ELF",
     "weak": "ORC"
+  },
+  {
+    "stage": 4,
+    "name": "Индейка",
+    "label": "огромная индейка",
+    "minionsName": "индюшата",
+    "minionsLabel": "яростные индейки",
+    "strong": "DARK",
+    "weak": "HALFLING"
+  },
+  {
+    "stage": 5,
+    "name": "Коммандир душнил",
+    "label": "Душнила с поводком",
+    "minionsName": "душнята)",
+    "minionsLabel": "душнилы из чатика",
+    "strong": "DARK",
+    "weak": "HALFLING"
   }
 ]

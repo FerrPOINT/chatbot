@@ -1,44 +1,44 @@
 package azhukov.chatbot.service.dunge.data;
 
-import azhukov.chatbot.util.Range;
-import azhukov.chatbot.util.RangesContainer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
 public enum HeroDamage {
 
-    NONE(0, 40, "нет урона"),
-    SLIGHT(40, 70, "незначительный урон"),
-    MEDIUM(70, 85, "средний урон"),
-    HUGE(85, 95, "огромный урон"),
-    DEAD(95, 100, "смертельный урон"),
+    NONE(0, "нет урона", "нет урона"),
+    SLIGHT(1, "незначительный урон", "слегка ранен"),
+    MEDIUM(2, "средний урон", "средне ранен"),
+    BIG(3, "большой урон", "сильно ранен"),
+    HUGE(4, "огромный урон", "очень даже ранен =)"),
+    ALMOUST_DEAD(5, "громадный урон", "при смерти"),
+    DEAD(6, "смертельный урон", "мертв"),
 
     //
     ;
 
-    private static final RangesContainer<HeroDamage> RANGES = new RangesContainer<>(Arrays.stream(values())
-            .map(heroDamage -> new Range<>(heroDamage.getPercentStart(), heroDamage.getPercentEnd(), heroDamage))
-            .collect(Collectors.toList())
-    );
+    private static final HeroDamage[] RANGES;
 
-    private static int LAST_PERCENT = values()[values().length - 1].getPercentEnd();
+    static {
+        HeroDamage[] values = values();
+        RANGES = new HeroDamage[values.length];
+        for (HeroDamage value : values) {
+            RANGES[value.getValue()] = value;
+        }
+    }
 
-    private final int percentStart;
-    private final int percentEnd;
+    private final int value;
     private final String label;
+    private final String status;
 
-    public static HeroDamage getByPercent(int percent) {
-        return RANGES.getItem(percent);
+    public static HeroDamage getByValue(int value) {
+        return value >= RANGES.length || value < 0 ? null : RANGES[value];
     }
 
     public HeroDamage join(HeroDamage damage) {
-        int percent = Math.min(LAST_PERCENT, this.percentStart + damage.getPercentStart());
-        return getByPercent(percent);
+        int newValue = Math.min(damage.getValue() + getValue(), RANGES.length - 1);
+        return getByValue(newValue);
     }
 
 }

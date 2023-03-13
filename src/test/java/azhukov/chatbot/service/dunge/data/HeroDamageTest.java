@@ -8,7 +8,12 @@ class HeroDamageTest {
 
     @Test
     void test() {
-        assertEquals(HeroDamage.DEAD, HeroDamage.HUGE.join(HeroDamage.SLIGHT));
+        assertEquals(HeroDamage.ALMOUST_DEAD, HeroDamage.HUGE.join(HeroDamage.SLIGHT));
+        assertEquals(HeroDamage.SLIGHT, HeroDamage.NONE.join(HeroDamage.SLIGHT));
+        assertEquals(HeroDamage.MEDIUM, HeroDamage.SLIGHT.join(HeroDamage.SLIGHT));
+        assertEquals(HeroDamage.BIG, HeroDamage.MEDIUM.join(HeroDamage.SLIGHT));
+        assertEquals(HeroDamage.ALMOUST_DEAD, HeroDamage.BIG.join(HeroDamage.MEDIUM));
+        assertEquals(HeroDamage.DEAD, HeroDamage.ALMOUST_DEAD.join(HeroDamage.MEDIUM));
     }
 
 }

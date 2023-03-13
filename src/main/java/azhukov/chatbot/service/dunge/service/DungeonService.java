@@ -41,6 +41,12 @@ public class DungeonService {
         return "Данж пока закрыт на ремонт, но вы не теряете времени и уже собираетесь в путешествие - " + getUserStats(userName, current);
     }
 
+    public String getHeroStats(ChatRequest request) {
+        String userName = request.getUserName();
+        HeroInfo current = heroInfoService.getCurrent(userName);
+        return getUserStats(userName, current);
+    }
+
     public synchronized String getDungeonResponse1(ChatRequest request) {
         String userName = request.getUserName();
         HeroInfo current = heroInfoService.getCurrent(userName);
@@ -67,18 +73,33 @@ public class DungeonService {
 
     private String getBossMessage(FightResult fight) {
         BossInfo boss = fight.getBoss();
-        return "вы нанесли " + fight.getDamageDone() + " урона " + boss.getName() + ", " + (boss.isDead() ? "вы завалили босса, поздравляем!" : "у него осталось " + boss.getCurrentHp() + " ХП");
+        return "Вы нанесли " + fight.getDamageDone() + " урона " + boss.getName() + ", " + (boss.isDead() ? "вы завалили босса, поздравляем!" : "у него осталось " + boss.getCurrentHp() + " ХП");
     }
 
     private String getHeroMessage(FightResult fight) {
         BossInfo boss = fight.getBoss();
         HeroInfo hero = fight.getHero();
         HeroDamage damageGet = fight.getDamageGet();
-        return (damageGet == HeroDamage.NONE ? "Вам удалось увернуться от всех атак " + boss.getName() : "Вам досталось от " + boss.getName() + " " + damageGet.getLabel() + ", вместе с этим вы получили " + hero.getDamageGot().join(damageGet).getLabel());
+        if (hero.getDamageGot() == DEAD) {
+            return "Вы рискнули напасть на " + boss.getName() + ", но он вам нанес " + damageGet.getLabel() + ", вместе с этим вы получили смертельный урон, press F";
+        }
+        return (damageGet == HeroDamage.NONE ? "Вам удалось увернуться от всех атак " + boss.getName() :
+                "Вам досталось от " + boss.getName() + " " + damageGet.getLabel() +
+                        ", вы получили " + fight.getExp() + " опыта, общий статус: " + hero.getDamageGot().getStatus()) +
+                (hero.getDamageGot().getValue() < HeroDamage.BIG.getValue() ? ""
+                        : ", сегодня ходить в данж уже опасно, но вы можете рискнуть");
     }
 
     private String getUserStats(String userName, HeroInfo info) {
-        return new StringJoiner(", ").add(userName + " " + info.getType().getLabel()).add("здоровье: " + info.getDamageGot().getLabel()).add("уровень: " + info.getLevel()).add("опыт: " + info.getExperience()).add((CollectionUtils.isEmpty(info.getArtifacts()) ? "нет артефактов" : ("артефакты: " + info.getArtifacts().stream().map(Artifact::getName).collect(Collectors.joining(","))))).toString();
+        return new StringJoiner(", ").add(userName + ", Класс: " + info.getType().getLabel())
+                .add("Здоровье: " + info.getDamageGot().getStatus() + (info.getDamageGot().getValue() > HeroDamage.MEDIUM.getValue() ? " (опасно)" : " (го в данж)"))
+                .add("Уровень: " + info.getLevel())
+                .add("Опыт: " + info.getExperience())
+                .add((CollectionUtils.isEmpty(info.getArtifacts()) ? "Нет артефактов" : ("Артефакты: " + info.getArtifacts()
+                        .stream()
+                        .map(Artifact::getName)
+                        .collect(Collectors.joining(",")))))
+                .toString();
     }
 
     private String getUserShortStats(String userName, HeroInfo info) {
@@ -90,16 +111,19 @@ public class DungeonService {
         if (boss == null) {
             return null;
         }
-        FightResult result = new FightResult().setBoss(boss).setHero(heroInfo);
+        LocalDateTime now = LocalDateTime.now();
+        FightResult result = new FightResult()
+                .setBoss(boss)
+                .setHero(heroInfo);
 
         // boss
-        int heroDamage = heroInfo.getAttack();
+        int heroDamage = heroInfo.getAttack(boss);
         boss.dealDamage(heroDamage);
         result.setDamageDone(heroDamage);
         bossService.damage(heroInfo.getName(), heroDamage);
 
         // hero
-        HeroDamage bossDamage = HeroDamage.getByPercent(Randomizer.getPercent());
+        HeroDamage bossDamage = boss.getStrong() == heroInfo.getType() ? HeroDamage.BIG : HeroDamage.getByValue(Randomizer.getPercent() % HeroDamage.BIG.getValue());
         result.setDamageGet(bossDamage);
         HeroDamage join = heroInfo.getDamageGot() == null ? bossDamage : heroInfo.getDamageGot().join(bossDamage);
         Consumer<HeroInfo> update = hero -> {
@@ -109,13 +133,17 @@ public class DungeonService {
                 hero.setDamageGot(HeroDamage.NONE);
             }
             if (join == DEAD) {
-                hero.setDeadTime(LocalDateTime.now());
+                hero.setDeadTime(now);
             }
             hero.setDamageGot(join);
-
         };
         update.accept(heroInfo);
-        heroInfoService.update(name, update);
+        earnXP(result);
+
+        heroInfoService.update(name, heroInfo1 -> {
+            update.accept(heroInfo1);
+            heroInfo1.setExperience(heroInfo.getExperience());
+        });
 
         return result;
     }
@@ -133,6 +161,11 @@ public class DungeonService {
             currentBoss = next;
         }
         return currentBoss;
+    }
+
+    public void earnXP(FightResult fight) {
+        fight.setExp((fight.getDamageGet().getValue() * 10) + fight.getDamageDone() + fight.getBoss().getStage() + Randomizer.nextInt(50));
+        fight.getHero().setExperience(fight.getHero().getExperience() + fight.getExp());
     }
 
 }
