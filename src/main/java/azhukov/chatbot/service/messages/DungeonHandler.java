@@ -24,28 +24,38 @@ public class DungeonHandler extends MessageHandler {
     @Override
     public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (lowerCase != null) {
-            if (lowerCase.contains("!данж1")) {
-                return createMessage(message, dungeonService.getDungeonResponse1(message));
+            if (lowerCase.contains("!резетвсё13")) {
+                dungeonService.resetAccs();
+                dungeonService.resetBoss();
+                return createUserMessage(message, "резет {DOGGIE}");
             }
-            if (lowerCase.contains("!резет1")) {
-                dungeonService.reset();
-                return createMessage(message, "резет {DOGGIE}");
+            if (lowerCase.contains("!резетбосс13")) {
+                dungeonService.resetBoss();
+                return createUserMessage(message, "резет {DOGGIE}");
             }
-            if (lowerCase.contains("!призма1")) {
+            if (lowerCase.contains("!резетаккс13")) {
+                dungeonService.resetAccs();
+                return createUserMessage(message, "резет {DOGGIE}");
+            }
+            if (lowerCase.contains("!резеткур13")) {
+                dungeonService.resetCurrAcc();
+                return createUserMessage(message, "резет {DOGGIE}");
+            }
+            if (lowerCase.contains("!призма13")) {
                 heroInfoService.addArtifact(message.getUserName(), "prism");
-                return createMessage(message, "получи призму) {DOGGIE}");
+                return createUserMessage(message, "получи призму) {DOGGIE}");
             }
-            if (lowerCase.contains("!стата1")) {
-                return createMessage(message, dungeonService.getHeroStats(message));
+            if (lowerCase.contains("!стата")) {
+                return createUserMessage(message, dungeonService.getHeroStats(message));
             }
             for (String command : COMMANDS) {
                 if (lowerCase.contains(command)) {
-                    return createMessage(message, dungeonService.getDungeonResponse(message));
+                    return createUserMessage(message, dungeonService.getDungeonResponse(message));
                 }
             }
             for (String command : BOSS_COMMANDS) {
                 if (lowerCase.contains(command)) {
-                    return createMessage(message, bossService.getCurrentBossData());
+                    return createUserMessage(message, bossService.getCurrentBossData());
                 }
             }
         }

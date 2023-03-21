@@ -44,7 +44,7 @@ public class BossService {
         }
     }
 
-    public BossInfo getCurrentBoss() {
+    public synchronized BossInfo getCurrentBoss() {
         BossInfo bigBoss = store.get("BIG_BOSS");
         if (bigBoss == null) {
             store.put("BIG_BOSS", info.get(0));
@@ -53,7 +53,7 @@ public class BossService {
         return bigBoss;
     }
 
-    public BossInfo next(BossInfo bossInfo) {
+    public synchronized BossInfo next(BossInfo bossInfo) {
         BossInfo bigBoss = store.get("BIG_BOSS");
         for (BossInfo iter : info) {
             if (iter.getStage() > bigBoss.getStage()) {

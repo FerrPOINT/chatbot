@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 public class HeroInfoService {
 
     private final HeroInfoStore store;
-    private final ArticfactService service;
+    private final ArticfactService articfactService;
 
     public HeroInfo getCurrent(String name) {
         return store.get(name);
@@ -88,7 +88,7 @@ public class HeroInfoService {
     }
 
     public void addArtifact(String name, String artifactId) {
-        addArtifact(name, service.getById(artifactId));
+        addArtifact(name, articfactService.getById(artifactId));
     }
 
 }

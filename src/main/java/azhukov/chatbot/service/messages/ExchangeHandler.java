@@ -2,8 +2,11 @@ package azhukov.chatbot.service.messages;
 
 import azhukov.chatbot.dto.ChatRequest;
 import azhukov.chatbot.dto.ChatResponse;
+import azhukov.chatbot.service.ArticfactService;
 import azhukov.chatbot.service.dictionary.Dictionary;
 import azhukov.chatbot.service.dictionary.DictionaryService;
+import azhukov.chatbot.service.dunge.data.Artifact;
+import azhukov.chatbot.service.dunge.service.HeroInfoService;
 import azhukov.chatbot.service.users.UserCollectionStore;
 import azhukov.chatbot.service.util.Randomizer;
 import lombok.AllArgsConstructor;
@@ -19,16 +22,26 @@ public class ExchangeHandler extends MessageHandler {
 
     private final UserCollectionStore userCollectionStore;
     private final DictionaryService dictionaryService;
+    private final ArticfactService articfactService;
+    private final HeroInfoService heroInfoService;
 
     @Override
     public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (lowerCase.startsWith("!обменять")) {
             if (lowerCase.contains("!обменять сейлор на призму")) {
-                // TODO
+                Dictionary sailor = dictionaryService.getById("sailor");
+                Set<String> sailorSet = userCollectionStore.getCurrentSet(message.getUserName(), sailor.getId());
+                if (sailorSet != null && sailor.getData().size() == sailorSet.size()) {
+                    Artifact prism = articfactService.getById("prism");
+                    heroInfoService.addArtifact(message.getUserName(), prism);
+                    userCollectionStore.save(message.getUserName(), Set.of(), sailor.getId());
+                    return createUserMessage(message, "Ты получаешь призму: +" + prism.getModifications().get(0).getValue() + " к атаке");
+                }
+                return createUserMessage(message, "Вы еще не собрали всей коллекции. Собирайте и сражайтесь на арене, меняйтесь!");
             }
-            if (lowerCase.contains("!обменять талисманы на призму")) {
-                // TODO
-            }
+//            if (lowerCase.contains("!обменять талисманы на ???")) {
+//                // TODO
+//            }
 
             if (lowerCase.contains("!обменять талисманы на сейлор")) {
                 Dictionary talisman = dictionaryService.getById("talisman");
@@ -52,7 +65,7 @@ public class ExchangeHandler extends MessageHandler {
                 }
                 return createUserMessage(message, "Вы еще не собрали всей коллекции. Собирайте и сражайтесь на арене!");
             }
-            return createUserMessage(message, "На данный момент можно обменять всю коллекцию талисманов на один из недостающих знаков Сейлор (!обменять талисманы на сейлор)");
+            return createUserMessage(message, "!обменять талисманы на сейлор, !обменять сейлор на призму");
         }
         return null;
     }

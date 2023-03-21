@@ -22,23 +22,10 @@ public class DungeonService {
     private final HeroInfoService heroInfoService;
     private final BossService bossService;
 
-    //every day at 6:00
-    @Scheduled(cron = "0 0 6 * * ?")
+    //every day at 3:00
+    @Scheduled(cron = "0 0 3 * * ?")
     void healScheduled() {
         heroInfoService.healAll();
-    }
-
-    public synchronized String getDungeonResponse(ChatRequest request) {
-        String userName = request.getUserName();
-        HeroInfo current = heroInfoService.getCurrent(userName);
-        if (current == null) {
-            current = heroInfoService.createNew(userName);
-            return "Новый герой - " + getUserShortStats(userName, current) + " уже готов спуститься в подземелье, подумайте, может не надо? {DOGGIE}";
-        }
-        if (current.getDeadTime() != null) {
-            return "Вы мертвы, ваша душа блуждает в другом мире, подождите чтобы вновь обрести физическую оболочку! {DOGGIE}";
-        }
-        return "Данж пока закрыт на ремонт, но вы не теряете времени и уже собираетесь в путешествие - " + getUserStats(userName, current);
     }
 
     public String getHeroStats(ChatRequest request) {
@@ -47,7 +34,7 @@ public class DungeonService {
         return getUserStats(userName, current);
     }
 
-    public synchronized String getDungeonResponse1(ChatRequest request) {
+    public synchronized String getDungeonResponse(ChatRequest request) {
         String userName = request.getUserName();
         HeroInfo current = heroInfoService.getCurrent(userName);
         if (current == null) {
@@ -66,14 +53,21 @@ public class DungeonService {
         return getBossMessage(fight) + ". " + getHeroMessage(fight) + " {DOGGIE}";
     }
 
-    public void reset() {
+    public void resetAccs() {
         heroInfoService.reset();
+    }
+
+    public void resetBoss() {
+        bossService.reset();
+    }
+
+    public void resetCurrAcc() {
         bossService.reset();
     }
 
     private String getBossMessage(FightResult fight) {
         BossInfo boss = fight.getBoss();
-        return "Вы нанесли " + fight.getDamageDone() + " урона " + boss.getName() + ", " + (boss.isDead() ? "вы завалили босса, поздравляем!" : "у него осталось " + boss.getCurrentHp() + " ХП");
+        return "Вы нанесли " + fight.getDamageDone() + " урона " + boss.getName() + ", " + (boss.isDead() ? "ВЫ ЗАВАЛИЛИ БОССА, ПОЗДРАВЛЯЕМ!" : "у него осталось " + boss.getCurrentHp() + " ХП");
     }
 
     private String getHeroMessage(FightResult fight) {
