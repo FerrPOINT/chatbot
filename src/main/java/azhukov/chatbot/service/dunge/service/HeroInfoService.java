@@ -73,18 +73,14 @@ public class HeroInfoService {
                 toDelete.add(heroInfo.getName());
             }
             heroInfo.setDamageGot(HeroDamage.NONE);
+            heroInfo.resetShield();
         });
         log.info("Heal complete. total: {}, dead: {}", counter.intValue(), toDelete.size());
         toDelete.forEach(store::delete);
     }
 
     public void addArtifact(String name, Artifact artifact) {
-        update(name, heroInfo -> {
-            if (heroInfo.getArtifacts() == null) {
-                heroInfo.setArtifacts(new ArrayList<>());
-            }
-            heroInfo.getArtifacts().add(artifact);
-        });
+        update(name, heroInfo -> heroInfo.addArtifact(artifact));
     }
 
     public void addArtifact(String name, String artifactId) {

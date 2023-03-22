@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class BossStore extends TypedStore<BossInfo> {
 
     public BossStore(DbService dbService) {
-        super(() -> dbService.getDb(DbType.DUNGE), DbType.DUNGE.name(), BossInfo.class);
+        super(() -> dbService.getDb(DbType.DUNGE_BOSS), DbType.DUNGE_BOSS.name(), BossInfo.class);
     }
 
 }

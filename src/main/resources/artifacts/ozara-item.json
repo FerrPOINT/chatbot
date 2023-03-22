@@ -1,0 +1,11 @@
+{
+  "id": "ozara-item",
+  "name": "Плащ Озары",
+  "label": "Защищает один раз в день",
+  "modifications": [
+    {
+      "modificationType": "DAILY_GUARD",
+      "value": 2
+    }
+  ]
+}

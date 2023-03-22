@@ -3,10 +3,13 @@ package azhukov.chatbot.service.dunge.data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum HeroDamage {
 
+    SHIELD(-1, "защита", "защита"),
     NONE(0, "нет урона", "нет урона"),
     SLIGHT(1, "незначительный урон", "слегка ранен"),
     MEDIUM(2, "средний урон", "средне ранен"),
@@ -22,9 +25,11 @@ public enum HeroDamage {
 
     static {
         HeroDamage[] values = values();
-        RANGES = new HeroDamage[values.length];
+        RANGES = new HeroDamage[(int) Arrays.stream(values).filter(heroDamage -> heroDamage.getValue() >= 0).count()];
         for (HeroDamage value : values) {
-            RANGES[value.getValue()] = value;
+            if (value.getValue() >= 0) {
+                RANGES[value.getValue()] = value;
+            }
         }
     }
 
@@ -37,6 +42,12 @@ public enum HeroDamage {
     }
 
     public HeroDamage join(HeroDamage damage) {
+        if (damage.getValue() < 0) {
+            damage = NONE;
+        }
+        if (this.getValue() < 0) {
+            return damage;
+        }
         int newValue = Math.min(damage.getValue() + getValue(), RANGES.length - 1);
         return getByValue(newValue);
     }

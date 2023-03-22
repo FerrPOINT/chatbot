@@ -17,27 +17,32 @@ public class BossInfo {
     private String minionsLabel;
     private HeroClass strong;
     private HeroClass weak;
-    private int gotDamage;
+    private int damageReceived;
     private Set<String> damagedHeroes = new HashSet<>();
+    private Set<String> rewards = new HashSet<>();
 
     public int getMaxHp() {
         return stage * DUNGEON_MULTIPLIER;
     }
 
     public boolean isDead() {
-        return gotDamage >= getMaxHp();
+        return damageReceived >= getMaxHp();
     }
 
     public void dealDamage(int damage) {
-        gotDamage += Math.abs(damage);
+        damageReceived += Math.abs(damage);
     }
 
     public void heal(int heal) {
-        gotDamage = Math.max(0, gotDamage - Math.abs(heal));
+        damageReceived = Math.max(0, damageReceived - Math.abs(heal));
+    }
+
+    public void resetOpponents() {
+        damagedHeroes = new HashSet<>();
     }
 
     public int getCurrentHp() {
-        return getMaxHp() - gotDamage;
+        return getMaxHp() - damageReceived;
     }
 
 }

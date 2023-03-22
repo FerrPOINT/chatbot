@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class FightResult {
 
     private int damageDone;
-    private HeroDamage damageGet;
+    private HeroDamage damageReceived;
     private Artifact artPrize;
     private int moneyPrize;
     private int exp;
@@ -18,5 +18,7 @@ public class FightResult {
     private LocalDateTime fightTime;
     private BossInfo boss;
     private HeroInfo hero;
+    private int crit;
+    private int shieldSpent;
 
 }

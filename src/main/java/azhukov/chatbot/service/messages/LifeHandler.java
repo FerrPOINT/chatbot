@@ -26,16 +26,33 @@ public class LifeHandler extends MessageHandler {
     private static final List<String> FEED_MESSAGES = List.of("Вы бросили кость собане", "У вас в кармане была сосиска и вы поделились с пёсиком", "Вы кормите псинку");
     private static final List<String> TAKE_MESSAGES = List.of("Собаня грызёт кость, но вы ловко её отнимаете", "У пёсика есть немного еды и вы отбираете её", "Вы крадёте еду пока собачка отвлеклась");
 
+
+    private ChatResponse randomStray(ChatRequest message) {
+        if (Randomizer.getPercent() % 10 == 7) {
+            lifecycleService.reset();
+            return createUserMessage(message, "У собачки итак много еды, но вы случайно привели за собой стаю бездомных догенов, которые всё отобрали у нашей пёси))) {DOGGIE}");
+        }
+        return null;
+    }
+
     @Override
     public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (feed.stream().anyMatch(lowerCase::contains)) {
             if (lifecycleStore.isAllowedToFeed(message)) {
                 LifecycleStage current = lifecycleService.current();
                 if (current.isMax()) {
+                    ChatResponse stray = randomStray(message);
+                    if (stray != null) {
+                        return stray;
+                    }
                     return createUserMessage(message, "Пёсонька уже итак перекормлен {DOGGIE}");
                 }
                 final LifecycleStage offset = lifecycleService.offset(+2);
                 return createUserMessage(message, Randomizer.getRandomItem(FEED_MESSAGES) + ". " + offset.getMessage() + " {DOGGIE}");
+            }
+            ChatResponse stray = randomStray(message);
+            if (stray != null) {
+                return stray;
             }
             return createUserMessage(message, "Сегодня вы уже покормили пёсика и он вам благодарен {DOGGIE}");
         }

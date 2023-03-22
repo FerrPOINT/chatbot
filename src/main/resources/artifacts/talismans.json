@@ -1,11 +1,11 @@
 {
   "id": "talismans",
   "name": "12 Талисманов",
-  "label": "Лунная призма дарует вам силу",
+  "label": "Защита и большой крит",
   "modifications": [
     {
-      "modificationType": "ATTACK_CHANGE",
-      "value": 10
+      "modificationType": "DAILY_GUARD",
+      "value": 3
     }
   ]
 }

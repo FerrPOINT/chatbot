@@ -24,6 +24,9 @@ public class DungeonHandler extends MessageHandler {
     @Override
     public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (lowerCase != null) {
+//            if (lowerCase.contains("!пати")) {
+//
+//            }
             if (lowerCase.contains("!резетвсё13")) {
                 dungeonService.resetAccs();
                 dungeonService.resetBoss();
@@ -38,19 +41,20 @@ public class DungeonHandler extends MessageHandler {
                 return createUserMessage(message, "резет {DOGGIE}");
             }
             if (lowerCase.contains("!резеткур13")) {
-                dungeonService.resetCurrAcc();
+                dungeonService.resetCurrAcc(message.getUserName());
                 return createUserMessage(message, "резет {DOGGIE}");
             }
             if (lowerCase.contains("!призма13")) {
                 heroInfoService.addArtifact(message.getUserName(), "prism");
+                heroInfoService.addArtifact(message.getUserName(), "ozara-item");
                 return createUserMessage(message, "получи призму) {DOGGIE}");
             }
             if (lowerCase.contains("!стата")) {
-                return createUserMessage(message, dungeonService.getHeroStats(message));
+                return createMessage(message, dungeonService.getHeroStats(message));
             }
             for (String command : COMMANDS) {
                 if (lowerCase.contains(command)) {
-                    return createUserMessage(message, dungeonService.getDungeonResponse(message));
+                    return createMessage(message, dungeonService.getDungeonResponse(message));
                 }
             }
             for (String command : BOSS_COMMANDS) {

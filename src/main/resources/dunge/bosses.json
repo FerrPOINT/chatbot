@@ -1,21 +1,27 @@
 [
   {
     "stage": 1,
-    "name": "ВоришкаВл",
+    "name": "ВоришкаВЛ",
     "label": "похитительница сладких булочек",
     "minionsName": "воришки",
     "minionsLabel": "воришки из чата",
     "strong": "PIE",
-    "weak": "ELF"
+    "weak": "ELF",
+    "rewards": [
+      "pie"
+    ]
   },
   {
     "stage": 2,
     "name": "Озара",
-    "label": "с пушкой",
+    "label": "бандюга с пушкой",
     "minionsName": "бандюганы",
     "minionsLabel": "бандюганы с пистолетами",
     "strong": "LALKA",
-    "weak": "WEREWOLF"
+    "weak": "WEREWOLF",
+    "rewards": [
+      "ozara-item"
+    ]
   },
   {
     "stage": 3,
@@ -24,21 +30,45 @@
     "minionsName": "опытные воришки",
     "minionsLabel": "матёрые воришки из чата",
     "strong": "ELF",
-    "weak": "ORC"
+    "weak": "ORC",
+    "rewards": [
+      "thief-gloves"
+    ]
   },
   {
     "stage": 4,
+    "name": "Тануш",
+    "label": "она вернулась с 12-ю талисманами",
+    "minionsName": "талисманы",
+    "minionsLabel": "вся сила 12-ти талисманов",
+    "strong": "PIE",
+    "weak": "LALKA",
+    "rewards": [
+      "talismans"
+    ]
+  },
+  {
+    "stage": 5,
     "name": "Индейка",
-    "label": "огромная индейка",
+    "label": "большая и свирепая",
     "minionsName": "индюшата",
     "minionsLabel": "яростные индейки",
     "strong": "DARK",
     "weak": "HALFLING"
   },
   {
-    "stage": 5,
+    "stage": 6,
+    "name": "Мужестик",
+    "label": "пятый маньяк в гильдии",
+    "minionsName": "маньячата)",
+    "minionsLabel": "сталкеры из чатика",
+    "strong": "DARK",
+    "weak": "ORC"
+  },
+  {
+    "stage": 7,
     "name": "Коммандир душнил",
-    "label": "Душнила с поводком",
+    "label": "душнила с поводком",
     "minionsName": "душнята)",
     "minionsLabel": "душнилы из чатика",
     "strong": "DARK",

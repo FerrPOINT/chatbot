@@ -22,6 +22,10 @@ public class LifecycleService {
         offset(-1);
     }
 
+    public void reset() {
+        offset(-100500);
+    }
+
     public LifecycleStage offset(int count) {
         final LifecycleStage offset = current().offset(count);
         save(offset);

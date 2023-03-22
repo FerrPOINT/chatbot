@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class BossService {
     private List<BossInfo> info;
 
     @PostConstruct
-    void init() {
+    synchronized void init() {
         try {
             info = new ArrayList<>();
             IOUtils.listFilesFromResources("dunge", "bosses.json", inputStream -> {
@@ -44,21 +45,32 @@ public class BossService {
         }
     }
 
+    public synchronized void updateCurrentBoss(Consumer<BossInfo> consumer) {
+        BossInfo currentBoss = getCurrentBoss();
+        consumer.accept(currentBoss);
+        store.put("CURRENT_BOSS", currentBoss);
+    }
+
     public synchronized BossInfo getCurrentBoss() {
-        BossInfo bigBoss = store.get("BIG_BOSS");
+        BossInfo bigBoss = store.get("CURRENT_BOSS");
         if (bigBoss == null) {
-            store.put("BIG_BOSS", info.get(0));
-            bigBoss = store.get("BIG_BOSS");
+            store.put("CURRENT_BOSS", info.get(0));
+            bigBoss = store.get("CURRENT_BOSS");
+        } else if (bigBoss.isDead()) {
+            bigBoss = next(bigBoss);
+            if (bigBoss == null) {
+                return null;
+            }
+            store.put("CURRENT_BOSS", bigBoss);
         }
         return bigBoss;
     }
 
-    public synchronized BossInfo next(BossInfo bossInfo) {
-        BossInfo bigBoss = store.get("BIG_BOSS");
+    private synchronized BossInfo next(BossInfo bigBoss) {
         for (BossInfo iter : info) {
             if (iter.getStage() > bigBoss.getStage()) {
+                store.put("BOSS_" + bigBoss.getStage(), bigBoss);
                 bigBoss = iter;
-                store.put("BIG_BOSS", bigBoss);
                 break;
             }
         }
@@ -66,10 +78,10 @@ public class BossService {
     }
 
     public synchronized BossInfo damage(String hero, int damage) {
-        BossInfo bigBoss = store.get("BIG_BOSS");
+        BossInfo bigBoss = store.get("CURRENT_BOSS");
         bigBoss.getDamagedHeroes().add(hero);
-        bigBoss.setGotDamage(bigBoss.getGotDamage() + damage);
-        store.put("BIG_BOSS", bigBoss);
+        bigBoss.setDamageReceived(bigBoss.getDamageReceived() + damage);
+        store.put("CURRENT_BOSS", bigBoss);
         return bigBoss;
     }
 

@@ -5,4 +5,6 @@ public enum ModificationType {
     LIFE_PERCENT,
     ATTACK_CHANGE,
     ATTACK_PERCENT,
+    DAILY_GUARD,
+    RANDOM_CLASS,
 }
