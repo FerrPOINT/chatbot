@@ -1,6 +1,9 @@
 package azhukov.chatbot.service.variety;
 
+import azhukov.chatbot.service.ArticfactService;
 import azhukov.chatbot.service.CommandsPermissionsService;
+import azhukov.chatbot.service.dunge.data.Artifact;
+import azhukov.chatbot.service.dunge.service.HeroInfoService;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.util.Randomizer;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,8 @@ public class VarietiesService {
     private final ObjectMapper objectMapper;
     private final DailyStore dailyStore;
     private final CommandsPermissionsService commandsPermissionsService;
+    private final ArticfactService articfactService;
+    private final HeroInfoService heroInfoService;
 
     private final List<VarietyList> varieties = new ArrayList<>();
     private final Map<String, RangesContainer<Variety>> ranges = new HashMap<>();
@@ -89,20 +95,35 @@ public class VarietiesService {
                         return "Вы пока еще не открыли эту команду";
                     }
                     String storeKey = user + "-" + variety.getId();
-                    final String percent = store.get(storeKey);
+                    final String storedPercent = store.get(storeKey);
                     int percentNumber;
-                    if (percent == null) {
+                    if (storedPercent == null) {
                         percentNumber = Randomizer.nextInt(101);
                         store.put(storeKey, String.valueOf(percentNumber));
                     } else {
-                        percentNumber = Integer.parseInt(percent);
+                        percentNumber = Integer.parseInt(storedPercent);
                     }
                     Variety item = container.getItem(percentNumber);
-                    return item == null ? null : "Вы на " + percentNumber + "% " + variety.getName() + ". " + item.getMessage();
+                    return item == null ? null : "Вы на " + percentNumber + "% " + variety.getName() + ". " + item.getMessage() + getVarietyMessage(user, variety, storedPercent == null ? percentNumber : 0);
                 }
             }
         }
         return null;
+    }
+
+    String getVarietyMessage(String user, VarietyList list, int percent) {
+        if (percent >= 95) {
+            List<Artifact> arts = new ArrayList<>();
+            switch (list.getId()) {
+                case "sytkin" -> arts.add(articfactService.getById("sytkin-guitar"));
+                case "tolerancy" -> arts.add(articfactService.getById("tolerancy-item"));
+            }
+            if (!arts.isEmpty()) {
+                heroInfoService.update(user, heroInfo -> arts.forEach(heroInfo::addArtifact));
+                return " В данже у вас появляется: " + arts.stream().map(Artifact::getName).collect(Collectors.joining(", "));
+            }
+        }
+        return "";
     }
 
     public String getTop(VarietyList variety) {

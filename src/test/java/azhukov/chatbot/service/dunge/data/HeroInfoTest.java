@@ -13,4 +13,14 @@ class HeroInfoTest {
         heroInfo.addArtifact(new Artifact("", "", "", List.of(new Modificator(ModificationType.DAILY_GUARD, 10))));
         assertEquals(10, heroInfo.getShield());
     }
+
+    @Test
+    void testAttack() {
+        HeroInfo heroInfo = new HeroInfo();
+        heroInfo.setType(HeroClass.LALKA);
+        heroInfo.addArtifact(new Artifact("", "", "", List.of(new Modificator(ModificationType.ATTACK_CHANGE, 10))));
+        heroInfo.addArtifact(new Artifact("", "", "", List.of(new Modificator(ModificationType.ATTACK_PERCENT, 50))));
+        assertEquals(30, heroInfo.getAttack(new BossInfo()));
+    }
+
 }

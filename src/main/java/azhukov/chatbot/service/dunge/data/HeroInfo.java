@@ -44,7 +44,7 @@ public class HeroInfo {
                 if (artifact.getModifications() != null) {
                     for (Modificator modification : artifact.getModifications()) {
                         if (modification.getModificationType() == ModificationType.ATTACK_PERCENT) {
-                            result += (result / 100 * modification.getValue());
+                            result += (int) (((double) result / 100D) * (double) modification.getValue());
                         }
                     }
                 }

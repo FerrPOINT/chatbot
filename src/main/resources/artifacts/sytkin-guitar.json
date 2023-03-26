@@ -1,0 +1,11 @@
+{
+  "id": "sytkin-guitar",
+  "name": "Гитара Сюткина",
+  "label": "Даёт дополнительную атаку",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": 10
+    }
+  ]
+}

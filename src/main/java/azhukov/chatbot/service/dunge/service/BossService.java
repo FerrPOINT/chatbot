@@ -89,7 +89,7 @@ public class BossService {
         BossInfo currentBoss = getCurrentBoss();
         return new StringJoiner(", ")
                 .add("Текущий босс - " + currentBoss.getName() + " " + currentBoss.getLabel())
-                .add("со своими преспешниками - " + currentBoss.getMinionsLabel())
+                .add("со своими приспешниками - " + currentBoss.getMinionsLabel())
                 .add("силен против: " + currentBoss.getStrong().getLabel())
                 .add("слаб против " + currentBoss.getWeak().getLabel())
                 .add(currentBoss.isDead() ? "Босс уже отъехал" : "ХП: " + currentBoss.getCurrentHp() + " из " + currentBoss.getMaxHp())

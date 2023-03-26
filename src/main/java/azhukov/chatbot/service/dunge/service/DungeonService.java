@@ -40,7 +40,7 @@ public class DungeonService {
     public String getHeroStats(ChatRequest request) {
         String userName = request.getUserName();
         HeroInfo current = heroInfoService.getCurrent(userName);
-        return getUserStats(userName, current);
+        return current != null ? getUserStats(userName, current) : "Вас нет в мире живых, но вы уже готовы возродиться героем!";
     }
 
     public synchronized String getDungeonResponse(ChatRequest request) {
