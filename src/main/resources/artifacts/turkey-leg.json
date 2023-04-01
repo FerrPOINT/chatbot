@@ -1,0 +1,11 @@
+{
+  "id": "turkey-leg",
+  "name": "Лапка индейки",
+  "label": "Увеличивает силу и удачу",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": 30
+    }
+  ]
+}

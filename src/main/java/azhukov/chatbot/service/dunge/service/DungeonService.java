@@ -91,6 +91,10 @@ public class DungeonService {
         heroInfoService.clean(name);
     }
 
+    public void resetCurrBoss() {
+        bossService.resetCurrentBoss();
+    }
+
     private String getBossMessage(FightResult fight) {
         BossInfo boss = fight.getBoss();
         HeroInfo hero = fight.getHero();

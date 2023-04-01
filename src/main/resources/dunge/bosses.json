@@ -49,21 +49,33 @@
   },
   {
     "stage": 5,
-    "name": "Индейка",
-    "label": "большая и свирепая",
+    "name": "Гигантская индейка",
+    "label": "типа годзиллы",
     "minionsName": "индюшата",
     "minionsLabel": "яростные индейки",
-    "strong": "DARK",
-    "weak": "HALFLING"
+    "strong": "WEREWOLF",
+    "weak": "HALFLING",
+    "rewards": [
+      "turkey-leg"
+    ]
   },
   {
     "stage": 6,
     "name": "Мужестик",
-    "label": "пятый маньяк в гильдии",
+    "label": "пятый сталкер в гильдии",
     "minionsName": "маньячата)",
     "minionsLabel": "сталкеры из чатика",
     "strong": "DARK",
     "weak": "ORC"
+  },
+  {
+    "stage": 8,
+    "name": "Танос",
+    "label": "разрушитель булочных",
+    "minionsName": "булки",
+    "minionsLabel": "порабощенные булки",
+    "strong": "DEFENDER",
+    "weak": "NUBAS"
   },
   {
     "stage": 7,
@@ -71,7 +83,7 @@
     "label": "душнила с поводком",
     "minionsName": "душнята)",
     "minionsLabel": "душнилы из чатика",
-    "strong": "DARK",
-    "weak": "HALFLING"
+    "strong": "HALFLING",
+    "weak": "DARK"
   }
 ]

@@ -44,6 +44,10 @@ public class DungeonHandler extends MessageHandler {
                 dungeonService.resetCurrAcc(message.getUserName());
                 return createUserMessage(message, "резет {DOGGIE}");
             }
+            if (lowerCase.contains("!боссрезет13")) {
+                dungeonService.resetCurrBoss();
+                return createUserMessage(message, "резет {DOGGIE}");
+            }
             if (lowerCase.contains("!призма13")) {
                 heroInfoService.addArtifact(message.getUserName(), "prism");
                 heroInfoService.addArtifact(message.getUserName(), "ozara-item");

@@ -24,6 +24,7 @@ public class WebsocketClietsService {
     private final GgMessagesHandlerService ggMessagesHandler;
 
     private ChatbotWebSocketClient client;
+    private DiscordWebClient discordClient;
     private boolean transportError;
     private boolean connectionClosed;
 
@@ -72,6 +73,8 @@ public class WebsocketClietsService {
         }
         log.info("FORCE RECONNECT");
         client = createWebSocketClient();
+        discordClient.shutdown();
+        discordClient.init();
     }
 
     public ChatbotWebSocketClient createWebSocketClient() {

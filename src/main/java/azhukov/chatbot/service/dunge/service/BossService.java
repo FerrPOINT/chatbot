@@ -51,6 +51,14 @@ public class BossService {
         store.put("CURRENT_BOSS", currentBoss);
     }
 
+    public synchronized void resetCurrentBoss() {
+        BossInfo currentBoss = getCurrentBoss();
+        if (currentBoss != null) {
+            BossInfo bossInfo = info.get(currentBoss.getStage() - 1);
+            store.put("CURRENT_BOSS", bossInfo);
+        }
+    }
+
     public synchronized BossInfo getCurrentBoss() {
         BossInfo bigBoss = store.get("CURRENT_BOSS");
         if (bigBoss == null) {

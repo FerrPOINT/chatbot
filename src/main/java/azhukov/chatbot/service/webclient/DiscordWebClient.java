@@ -40,7 +40,7 @@ public class DiscordWebClient {
             return;
         }
         jda = JDABuilder.createDefault(token)
-                .disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE, CacheFlag.ACTIVITY, CacheFlag.STICKER, CacheFlag.ROLE_TAGS, CacheFlag.FORUM_TAGS)
+                .disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE, CacheFlag.ACTIVITY, CacheFlag.STICKER, CacheFlag.ROLE_TAGS, CacheFlag.FORUM_TAGS, CacheFlag.ONLINE_STATUS, CacheFlag.CLIENT_STATUS)
                 .setBulkDeleteSplittingEnabled(false)
                 .setCompression(Compression.NONE)
                 .setActivity(Activity.playing("собачьи дела"))
