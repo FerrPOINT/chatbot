@@ -9,7 +9,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum HeroDamage {
 
-    SHIELD(-1, "защита", "защита"),
+    //    SHIELD(-1, "защита", "защита"),
     NONE(0, "нет урона", "нет урона"),
     SLIGHT(1, "незначительный урон", "слегка ранен"),
     MEDIUM(2, "средний урон", "средне ранен"),
@@ -38,7 +38,13 @@ public enum HeroDamage {
     private final String status;
 
     public static HeroDamage getByValue(int value) {
-        return value >= RANGES.length || value < 0 ? null : RANGES[value];
+        if (value < 0) {
+            return NONE;
+        }
+        if (value >= RANGES.length) {
+            return DEAD;
+        }
+        return RANGES[value];
     }
 
     public HeroDamage join(HeroDamage damage) {

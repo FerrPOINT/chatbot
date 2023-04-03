@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -85,6 +86,24 @@ public class HeroInfoService {
 
     public void addArtifact(String name, String artifactId) {
         addArtifact(name, articfactService.getById(artifactId));
+    }
+
+    // TODO REMOVE
+    public void distinctAllArtifacts() {
+        HashMap<String, Artifact> arts = new HashMap<>();
+        store.updateAll(heroInfo -> {
+            arts.clear();
+            List<Artifact> artifacts = heroInfo.getArtifacts();
+            if (artifacts != null) {
+                for (Artifact artifact : artifacts) {
+                    Artifact byId = articfactService.getById(artifact.getId());
+                    if (byId != null) {
+                        arts.put(byId.getId(), byId);
+                    }
+                }
+                heroInfo.setArtifacts(new ArrayList<>(arts.values()));
+            }
+        });
     }
 
 }

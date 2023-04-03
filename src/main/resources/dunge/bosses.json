@@ -66,7 +66,22 @@
     "minionsName": "маньячата)",
     "minionsLabel": "сталкеры из чатика",
     "strong": "DARK",
-    "weak": "ORC"
+    "weak": "ORC",
+    "rewards": [
+      "magic-binoculars"
+    ]
+  },
+  {
+    "stage": 7,
+    "name": "Коммандир душнил",
+    "label": "с удавкой",
+    "minionsName": "душнята)",
+    "minionsLabel": "душнилы из чатика",
+    "strong": "HALFLING",
+    "weak": "DARK",
+    "rewards": [
+      "slipknot"
+    ]
   },
   {
     "stage": 8,
@@ -75,15 +90,9 @@
     "minionsName": "булки",
     "minionsLabel": "порабощенные булки",
     "strong": "DEFENDER",
-    "weak": "NUBAS"
-  },
-  {
-    "stage": 7,
-    "name": "Коммандир душнил",
-    "label": "душнила с поводком",
-    "minionsName": "душнята)",
-    "minionsLabel": "душнилы из чатика",
-    "strong": "HALFLING",
-    "weak": "DARK"
+    "weak": "NUBAS",
+    "rewards": [
+      "tanos-gems"
+    ]
   }
 ]

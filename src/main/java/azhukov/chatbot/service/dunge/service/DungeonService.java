@@ -110,7 +110,7 @@ public class DungeonService {
         }
         return (damageGet.getValue() <= 0 ? "Вы всё задоджили " :
                 "Вам досталось " + damageGet.getLabel()) +
-                (fight.getShieldSpent() > 0 ? ", " + " брони потрачено: " + fight.getShieldSpent() : "") +
+                (fight.getShieldSpent() > 0 ? ", потрачено брони: " + fight.getShieldSpent() : "") +
                 ", получено опыта: " + fight.getExp() + ", общий статус: " + hero.getDamageGot().getStatus() + ", " +
                 (hero.getDamageGot().getValue() < HeroDamage.BIG.getValue() ? "не опасно"
                         : "сегодня уже опасно, рискнешь?");
@@ -143,21 +143,35 @@ public class DungeonService {
                 .setBoss(boss)
                 .setHero(heroInfo);
 
-
         // hero
-        HeroDamage bossDamage = null;
-        boolean shield = false;
-        if (heroInfo.getShield() > 0) {
-            bossDamage = SHIELD;
-            shield = true;
+        HeroDamage bossDamage = NONE;
+        int crit = 0;
+
+        while (bossDamage.getValue() <= 0) {
+            crit++;
+            bossDamage = boss.getStrong() == heroInfo.getType() ? HeroDamage.BIG : HeroDamage.getByValue(Randomizer.getPercent() % HeroDamage.BIG.getValue());
         }
 
-        int crit = 0;
-        if (bossDamage == null) {
-            bossDamage = NONE;
-            while (bossDamage.getValue() <= 0) {
-                crit++;
-                bossDamage = boss.getStrong() == heroInfo.getType() ? HeroDamage.BIG : HeroDamage.getByValue(Randomizer.getPercent() % HeroDamage.BIG.getValue());
+        crit = Math.min(2, crit);
+
+        if (heroInfo.getDamageGot().getValue() > MEDIUM.getValue()) {
+            crit++;
+        }
+
+        int shieldEvailable = heroInfo.getShield();
+        int shieldSpent = 0;
+
+        if (shieldEvailable > 0) {
+            int damageValue = bossDamage.getValue();
+
+            if (damageValue >= shieldEvailable) {
+                bossDamage = HeroDamage.getByValue(damageValue - shieldEvailable);
+                shieldSpent = shieldEvailable;
+                shieldEvailable = 0;
+            } else {
+                bossDamage = NONE;
+                shieldSpent = damageValue;
+                shieldEvailable = shieldEvailable - damageValue;
             }
         }
 
@@ -169,29 +183,26 @@ public class DungeonService {
         bossService.damage(heroInfo.getName(), heroDamage);
 
         result.setDamageReceived(bossDamage);
+        result.setShieldSpent(shieldSpent);
 
         HeroDamage join = heroInfo.getDamageGot() == null || bossDamage.getValue() < 0 ? heroInfo.getDamageGot() : heroInfo.getDamageGot().join(bossDamage);
-        boolean finalShield = shield;
+        int finalShieldSpent = shieldSpent;
+        int finalShieldEvailable = shieldEvailable;
         Consumer<HeroInfo> update = hero -> {
-            // todo remove name + start damage update after some time
-            hero.setName(name);
-            if (hero.getDamageGot() == null) {
-                hero.setDamageGot(HeroDamage.NONE);
-            }
             if (join == DEAD) {
                 hero.setDeadTime(now);
             }
             hero.setDamageGot(join);
-            if (finalShield) {
-                hero.setShield(0);
+            if (finalShieldSpent > 0) {
+                hero.setShield(finalShieldEvailable);
             }
         };
         update.accept(heroInfo);
         earnXP(result);
 
-        heroInfoService.update(name, heroInfo1 -> {
-            update.accept(heroInfo1);
-            heroInfo1.setExperience(heroInfo.getExperience());
+        heroInfoService.update(name, info -> {
+            update.accept(info);
+            info.setExperience(heroInfo.getExperience());
         });
 
         return result;

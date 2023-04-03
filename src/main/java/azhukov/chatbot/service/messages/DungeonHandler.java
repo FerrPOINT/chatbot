@@ -53,6 +53,10 @@ public class DungeonHandler extends MessageHandler {
                 heroInfoService.addArtifact(message.getUserName(), "ozara-item");
                 return createUserMessage(message, "получи призму) {DOGGIE}");
             }
+            if (lowerCase.contains("!дистинкт13")) {
+                heroInfoService.distinctAllArtifacts();
+                return createUserMessage(message, "дистинкт {DOGGIE}");
+            }
             if (lowerCase.contains("!стата")) {
                 return createMessage(message, dungeonService.getHeroStats(message));
             }

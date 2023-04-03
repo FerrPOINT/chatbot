@@ -1,0 +1,11 @@
+{
+  "id": "tanos-gems",
+  "name": "Булки таноса",
+  "label": "Булки таноса",
+  "modifications": [
+    {
+      "modificationType": "DAILY_GUARD",
+      "value": 4
+    }
+  ]
+}

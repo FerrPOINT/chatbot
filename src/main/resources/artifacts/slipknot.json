@@ -1,0 +1,11 @@
+{
+  "id": "slipknot",
+  "name": "Удавка душителя",
+  "label": "Наяривает атаку",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": 20
+    }
+  ]
+}

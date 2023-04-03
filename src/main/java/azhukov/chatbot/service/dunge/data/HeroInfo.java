@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor
 @Getter
@@ -80,8 +81,10 @@ public class HeroInfo {
         if (artifacts == null) {
             artifacts = new ArrayList<>();
         }
-        artifacts.add(artifact);
-        resetShield();
+        if (artifacts.stream().noneMatch(artifact1 -> Objects.equals(artifact1.getId(), artifact.getId()))) {
+            artifacts.add(artifact);
+            resetShield();
+        }
     }
 
 }

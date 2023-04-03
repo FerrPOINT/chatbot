@@ -5,7 +5,7 @@
   "modifications": [
     {
       "modificationType": "ATTACK_PERCENT",
-      "value": 50
+      "value": 20
     }
   ]
 }
