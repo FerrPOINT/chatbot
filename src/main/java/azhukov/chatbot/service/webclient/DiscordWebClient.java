@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -67,9 +68,14 @@ public class DiscordWebClient {
             if (event.isFromType(ChannelType.PRIVATE)) {
                 log.info("[PM] {}: {}", event.getAuthor().getName(), event.getMessage().getContentDisplay());
             } else {
-                log.info("[{}][{}] {}: {}",
+
+                MessageChannelUnion channel = event.getChannel();
+                String name = channel.getType() == ChannelType.TEXT ? channel.asTextChannel().getName() : "not text";
+
+                log.info("{} [{}][{}] {}: {}",
+                        channel.getType(),
                         event.getGuild().getName(),
-                        event.getChannel().asTextChannel().getName(), event.getMember().getEffectiveName(),
+                        name, event.getMember().getEffectiveName(),
                         event.getMessage().getContentDisplay()
                 );
 
@@ -82,8 +88,7 @@ public class DiscordWebClient {
                     if (chatResponse.getTargetUser() != null) {
                         mapped = chatResponse.getTargetUser() + ", " + mapped;
                     }
-                    event.getChannel()
-                            .sendMessage(mapped)
+                    channel.sendMessage(mapped)
                             .complete();
                 }
 

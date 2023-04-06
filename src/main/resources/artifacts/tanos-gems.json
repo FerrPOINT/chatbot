@@ -1,7 +1,7 @@
 {
   "id": "tanos-gems",
-  "name": "Булки таноса",
-  "label": "Булки таноса",
+  "name": "Булки бесконечности",
+  "label": "Булки бесконечности",
   "modifications": [
     {
       "modificationType": "DAILY_GUARD",
