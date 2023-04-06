@@ -3,6 +3,8 @@ package azhukov.chatbot.service.dunge.service;
 import azhukov.chatbot.dto.ChatRequest;
 import azhukov.chatbot.service.ArticfactService;
 import azhukov.chatbot.service.dunge.data.*;
+import azhukov.chatbot.service.store.DailyStore;
+import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.util.Randomizer;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -25,16 +27,22 @@ public class DungeonService {
     private final HeroInfoService heroInfoService;
     private final BossService bossService;
     private final ArticfactService articfactService;
+    private final DailyStore dailyStore;
 
-    //every day at 3:00
-    @Scheduled(cron = "0 0 3 * * ?")
+    //every 10 mins
+    @Scheduled(cron = "0 */10 * ? * *")
     void healScheduled() {
-        heroInfoService.healAll();
-        bossService.updateCurrentBoss(bossInfo -> {
-            int threshold = bossInfo.getMaxHp() / 2 - bossInfo.getDamageReceived();
-            bossInfo.heal(threshold <= 0 ? Math.abs(threshold) : 0);
-            bossInfo.resetOpponents();
-        });
+        Store dailySettings = dailyStore.getDailySettings();
+        String heal = dailySettings.get("DAILY_HEAL");
+        if (heal == null) {
+            heroInfoService.healAll();
+            bossService.updateCurrentBoss(bossInfo -> {
+                int threshold = bossInfo.getMaxHp() / 2 - bossInfo.getDamageReceived();
+                bossInfo.heal(threshold <= 0 ? Math.abs(threshold) : 0);
+                bossInfo.resetOpponents();
+            });
+            dailySettings.put("DAILY_HEAL", "true");
+        }
     }
 
     public String getHeroStats(ChatRequest request) {
@@ -149,7 +157,7 @@ public class DungeonService {
 
         while (bossDamage.getValue() <= 0) {
             crit++;
-            bossDamage = boss.getStrong() == heroInfo.getType() ? HeroDamage.BIG : HeroDamage.getByValue(Randomizer.getPercent() % HeroDamage.BIG.getValue());
+            bossDamage = boss.getStrong() == heroInfo.getType() ? HeroDamage.BIG : HeroDamage.getByValue(Randomizer.getPercent() % (heroInfo.getDamageGot() == NONE ? HUGE : HeroDamage.BIG).getValue());
         }
 
         crit = Math.min(2, crit);

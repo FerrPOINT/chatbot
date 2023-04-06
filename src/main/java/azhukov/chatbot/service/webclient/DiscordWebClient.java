@@ -63,37 +63,35 @@ public class DiscordWebClient {
     }
 
     private class MessageListener extends ListenerAdapter {
+
         @Override
         public void onMessageReceived(MessageReceivedEvent event) {
-            if (event.isFromType(ChannelType.PRIVATE)) {
-                log.info("[PM] {}: {}", event.getAuthor().getName(), event.getMessage().getContentDisplay());
-            } else {
+            if (!event.isFromType(ChannelType.TEXT)) {
+                return;
+            }
 
-                MessageChannelUnion channel = event.getChannel();
-                String name = channel.getType() == ChannelType.TEXT ? channel.asTextChannel().getName() : "not text";
+            MessageChannelUnion channel = event.getChannel();
 
-                log.info("{} [{}][{}] {}: {}",
-                        channel.getType(),
-                        event.getGuild().getName(),
-                        name, event.getMember().getEffectiveName(),
-                        event.getMessage().getContentDisplay()
-                );
+            log.info("[{}][{}] {}: {}",
+                    event.getGuild().getName(),
+                    channel.asTextChannel().getName(), event.getMember().getEffectiveName(),
+                    event.getMessage().getContentDisplay()
+            );
 
-                ChatRequest request = mappingService.mapDis(event);
+            ChatRequest request = mappingService.mapDis(event);
 
-                ChatResponse chatResponse = commonChatService.answerMessage(request, request.getText(), request.getText().toLowerCase());
+            ChatResponse chatResponse = commonChatService.answerMessage(request, request.getText(), request.getText().toLowerCase());
 
-                if (chatResponse != null) {
-                    String mapped = mappingService.mapDis(chatResponse);
-                    if (chatResponse.getTargetUser() != null) {
-                        mapped = chatResponse.getTargetUser() + ", " + mapped;
-                    }
-                    channel.sendMessage(mapped)
-                            .complete();
+            if (chatResponse != null) {
+                String mapped = mappingService.mapDis(chatResponse);
+                if (chatResponse.getTargetUser() != null) {
+                    mapped = chatResponse.getTargetUser() + ", " + mapped;
                 }
-
+                channel.sendMessage(mapped)
+                        .complete();
             }
         }
+
     }
 
 }

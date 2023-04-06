@@ -52,7 +52,7 @@ public class HeroInfo {
             }
         }
         if (boss.getWeak() == type) {
-            result *= 2;
+            result += result / 2;
         }
         return result;
     }

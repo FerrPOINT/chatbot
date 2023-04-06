@@ -47,8 +47,10 @@ public class BossService {
 
     public synchronized void updateCurrentBoss(Consumer<BossInfo> consumer) {
         BossInfo currentBoss = getCurrentBoss();
-        consumer.accept(currentBoss);
-        store.put("CURRENT_BOSS", currentBoss);
+        if (currentBoss != null) {
+            consumer.accept(currentBoss);
+            store.put("CURRENT_BOSS", currentBoss);
+        }
     }
 
     public synchronized void resetCurrentBoss() {
@@ -95,6 +97,9 @@ public class BossService {
 
     public String getCurrentBossData() {
         BossInfo currentBoss = getCurrentBoss();
+        if (currentBoss == null) {
+            return "Самый матёрый босс был побеждён, подождём пока не прийдёт кто-то посильнее! {DOGGIE}";
+        }
         return new StringJoiner(", ")
                 .add("Текущий босс - " + currentBoss.getName() + " " + currentBoss.getLabel())
                 .add("со своими приспешниками - " + currentBoss.getMinionsLabel())
