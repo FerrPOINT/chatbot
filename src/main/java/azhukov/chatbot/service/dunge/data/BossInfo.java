@@ -11,6 +11,7 @@ import static azhukov.chatbot.constants.Constants.DUNGEON_MULTIPLIER;
 public class BossInfo {
 
     private int stage;
+    private int level;
     private String name;
     private String label;
     private String minionsName;
@@ -22,7 +23,7 @@ public class BossInfo {
     private Set<String> rewards = new HashSet<>();
 
     public int getMaxHp() {
-        return stage * DUNGEON_MULTIPLIER;
+        return level * DUNGEON_MULTIPLIER;
     }
 
     public boolean isDead() {

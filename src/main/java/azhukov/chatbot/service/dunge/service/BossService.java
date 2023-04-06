@@ -56,8 +56,7 @@ public class BossService {
     public synchronized void resetCurrentBoss() {
         BossInfo currentBoss = getCurrentBoss();
         if (currentBoss != null) {
-            BossInfo bossInfo = info.get(currentBoss.getStage() - 1);
-            store.put("CURRENT_BOSS", bossInfo);
+            setCurrentBoss(currentBoss.getStage());
         }
     }
 
@@ -87,6 +86,14 @@ public class BossService {
         return bigBoss;
     }
 
+    public synchronized BossInfo getBossInfo(int stage) {
+        return info.get(stage - 1);
+    }
+
+    public synchronized void setCurrentBoss(int stage) {
+        store.put("CURRENT_BOSS", info.get(stage - 1));
+    }
+
     public synchronized BossInfo damage(String hero, int damage) {
         BossInfo bigBoss = store.get("CURRENT_BOSS");
         bigBoss.getDamagedHeroes().add(hero);
@@ -101,12 +108,20 @@ public class BossService {
             return "Самый матёрый босс был побеждён, подождём пока не прийдёт кто-то посильнее! {DOGGIE}";
         }
         return new StringJoiner(", ")
-                .add("Текущий босс - " + currentBoss.getName() + " " + currentBoss.getLabel())
+                .add("Текущий босс - " + currentBoss.getName() + " - " + currentBoss.getLabel())
                 .add("со своими приспешниками - " + currentBoss.getMinionsLabel())
                 .add("силен против: " + currentBoss.getStrong().getLabel())
                 .add("слаб против " + currentBoss.getWeak().getLabel())
                 .add(currentBoss.isDead() ? "Босс уже отъехал" : "ХП: " + currentBoss.getCurrentHp() + " из " + currentBoss.getMaxHp())
                 .toString();
+    }
+
+    public void handlePrevBosses(Consumer<BossInfo> consumer) {
+        store.handleAll(bossInfo -> {
+            if (bossInfo.isDead()) {
+                consumer.accept(bossInfo);
+            }
+        });
     }
 
     public void reset() {

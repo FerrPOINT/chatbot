@@ -68,10 +68,10 @@ public class DictionaryService {
     }
 
     public String getDictionaryAnswer(String user, String messageLowerCase) {
-        log.info("Dictionary request for {}", user);
         for (Dictionary dictionary : dictionaries) {
             for (String command : dictionary.getCommandsList()) {
                 if (messageLowerCase.contains(command)) {
+                    log.info("Dictionary request for {}", user);
                     if (dictionary.isLocked() && !commandsPermissionsService.isPermitted(command, user)) {
                         return "Вы пока еще не открыли эту команду {DOGGIE}";
                     }

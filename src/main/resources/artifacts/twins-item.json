@@ -1,0 +1,11 @@
+{
+  "id": "twins-item",
+  "name": "Палки близняшек",
+  "label": "Сила близняшек",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": 10
+    }
+  ]
+}

@@ -88,7 +88,6 @@ public class HeroInfoService {
         addArtifact(name, articfactService.getById(artifactId));
     }
 
-    // TODO REMOVE
     public void distinctAllArtifacts() {
         HashMap<String, Artifact> arts = new HashMap<>();
         store.updateAll(heroInfo -> {
@@ -106,4 +105,7 @@ public class HeroInfoService {
         });
     }
 
+    public void updateAll(Consumer<HeroInfo> acceptor) {
+        store.updateAll(acceptor);
+    }
 }

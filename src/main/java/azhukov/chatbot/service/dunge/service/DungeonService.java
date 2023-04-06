@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class DungeonService {
         HeroInfo current = heroInfoService.getCurrent(userName);
         if (current == null) {
             current = heroInfoService.createNew(userName);
-            return "Новый герой - " + getUserShortStats(userName, current) + " уже готов спуститься в подземелье !данж !стата !босс {DOGGIE}";
+            return "Новый герой - " + getUserShortStats(userName, current) + " уже готов спуститься в подземелье !данж !стата !босс !артефакты {DOGGIE}";
         }
         if (current.getDamageGot() == DEAD || current.getDeadTime() != null) {
             return "Вы мертвы, ваша душа блуждает в другом мире, подождите чтобы вновь обрести физическую форму! {DOGGIE}";
@@ -72,7 +73,7 @@ public class DungeonService {
 
     private String getRewardsMessage(FightResult fight) {
         if (fight.getBoss().isDead() && CollectionUtils.isNotEmpty(fight.getBoss().getRewards())) {
-            List<Artifact> rewards = fight.getBoss().getRewards().stream().map(articfactService::getById).filter(Objects::nonNull).collect(Collectors.toList());
+            List<Artifact> rewards = fight.getBoss().getRewards().stream().map(articfactService::getById).filter(Objects::nonNull).toList();
             if (!rewards.isEmpty()) {
                 for (String damagedHero : fight.getBoss().getDamagedHeroes()) {
                     heroInfoService.update(damagedHero, heroInfo -> {
@@ -81,7 +82,7 @@ public class DungeonService {
                         }
                     });
                 }
-                return ". Все кто участвовал и выжил получают " + fight.getBoss().getRewards().stream().collect(Collectors.joining(", "));
+                return ". Все кто участвовал и выжил получают " + String.join(", ", fight.getBoss().getRewards());
             }
         }
         return "";
@@ -106,7 +107,15 @@ public class DungeonService {
     private String getBossMessage(FightResult fight) {
         BossInfo boss = fight.getBoss();
         HeroInfo hero = fight.getHero();
-        return "Данж " + hero.getName() + " " + fight.getHero().getType().getLabel() + " VS " + boss.getName() + " " + fight.getBoss().getLabel() + ". Ваш урон " + fight.getDamageDone() + (fight.getCrit() > 1 ? ", КРИТ Х" + fight.getCrit() : "") + (boss.isDead() ? ", ВЫ ЗАВАЛИЛИ БОССА, ПОЗДРАВЛЯЕМ!" : ", у босса осталось " + boss.getCurrentHp() + " HP");
+        return "Данж " + hero.getName() + " " + fight.getHero().getType().getLabel() + " VS " + boss.getName() + " " + fight.getBoss().getLabel() + ". Ваш урон " + fight.getDamageDone() + (fight.getCrit() > 1 ? ", КРИТ Х" + fight.getCrit() : "") + (boss.isDead() ? (", ВЫ ЗАВАЛИЛИ БОССА, ПОЗДРАВЛЯЕМ! Все бившиеся герои получают: " + getRewardsString(boss)) : ", у босса осталось " + boss.getCurrentHp() + " HP");
+    }
+
+    private String getRewardsString(BossInfo boss) {
+        Set<String> rewards = boss.getRewards();
+        if (CollectionUtils.isEmpty(rewards)) {
+            return "ничего))";
+        }
+        return rewards.stream().map(articfactService::getById).map(artifact -> artifact.getName() + " - " + artifact.getLabel()).collect(Collectors.joining(", "));
     }
 
     private String getHeroMessage(FightResult fight) {
@@ -130,11 +139,16 @@ public class DungeonService {
                 .add("Защита: " + info.getShield())
                 .add("Уровень: " + info.getLevel())
                 .add("Опыт: " + info.getExperience())
-                .add((CollectionUtils.isEmpty(info.getArtifacts()) ? "Нет артефактов" : ("Артефакты: " + info.getArtifacts()
-                        .stream()
-                        .map(Artifact::getName)
-                        .collect(Collectors.joining(", ")))))
+                .add(CollectionUtils.isEmpty(info.getArtifacts()) ? "Нет артефактов" : ("Артефакты: " + info.getArtifacts().size() + " штук"))
                 .toString();
+    }
+
+    public String getArtifactsMessage(ChatRequest message) {
+        HeroInfo info = heroInfoService.getCurrent(message.getUserName());
+        if (info == null) {
+            return "А ты вобще жив?";
+        }
+        return info.getArtifacts() == null ? "У вас нет артефактов" : info.getArtifacts().stream().map(Artifact::getName).collect(Collectors.joining(", ", "Ваши артефакты: ", ""));
     }
 
     private String getUserShortStats(String userName, HeroInfo info) {
@@ -221,8 +235,32 @@ public class DungeonService {
     }
 
     public void earnXP(FightResult fight) {
-        fight.setExp((fight.getDamageReceived().getValue() * 10) + fight.getDamageDone() + fight.getBoss().getStage() + Randomizer.nextInt(50));
+        fight.setExp((fight.getDamageReceived().getValue() * 10) + (fight.getDamageDone() / fight.getHero().getLevel()) + fight.getBoss().getStage() + Randomizer.nextInt(50 - fight.getHero().getLevel()));
         fight.getHero().setExperience(fight.getHero().getExperience() + fight.getExp());
+    }
+
+    public void updateRewards() {
+        bossService.handlePrevBosses(bossInfo -> {
+            BossInfo boss = bossService.getBossInfo(bossInfo.getStage());
+            if (CollectionUtils.isNotEmpty(boss.getRewards())) {
+                List<Artifact> rewards = boss.getRewards().stream().map(articfactService::getById).toList();
+                for (String hero : bossInfo.getDamagedHeroes()) {
+                    heroInfoService.update(hero, heroInfo -> rewards.forEach(heroInfo::addArtifact));
+                }
+            }
+        });
+    }
+
+    // TODO remove
+    public void migra1() {
+        bossService.setCurrentBoss(8);
+        BossInfo currentBoss = bossService.getCurrentBoss();
+        heroInfoService.updateAll(heroInfo -> {
+            if (heroInfo.getArtifacts() != null) {
+                heroInfo.getArtifacts().removeIf(artifact -> currentBoss.getRewards().contains(artifact.getId()));
+            }
+        });
+        bossService.updateCurrentBoss(bossInfo -> bossInfo.setDamageReceived(4000));
     }
 
 }

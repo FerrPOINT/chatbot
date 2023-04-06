@@ -52,6 +52,14 @@ public class TypedStore<T> {
         }
     }
 
+    public void handleAll(Consumer<T> acceptor) {
+        Set<String> keys = getMap().getKeys();
+        for (String s : keys) {
+            T value = get(s);
+            acceptor.accept(value);
+        }
+    }
+
     private HTreeMap<String, String> getMap() {
         return dbGet.get().hashMap(this.key, new SerializerString(), new SerializerString()).createOrOpen();
     }

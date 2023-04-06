@@ -57,8 +57,19 @@ public class DungeonHandler extends MessageHandler {
                 heroInfoService.distinctAllArtifacts();
                 return createUserMessage(message, "дистинкт {DOGGIE}");
             }
+            if (lowerCase.contains("!апревардс13")) {
+                dungeonService.updateRewards();
+                return createUserMessage(message, "ревардс {DOGGIE}");
+            }
+            if (lowerCase.contains("!мигра113")) {
+                dungeonService.migra1();
+                return createUserMessage(message, "ревардс {DOGGIE}");
+            }
             if (lowerCase.contains("!стата")) {
                 return createMessage(message, dungeonService.getHeroStats(message));
+            }
+            if (lowerCase.contains("!артефакты") || lowerCase.contains("!артифакты")) {
+                return createMessage(message, dungeonService.getArtifactsMessage(message));
             }
             for (String command : COMMANDS) {
                 if (lowerCase.contains(command)) {
