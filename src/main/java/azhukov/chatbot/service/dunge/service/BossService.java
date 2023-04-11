@@ -107,12 +107,12 @@ public class BossService {
         if (currentBoss == null) {
             return "Самый матёрый босс был побеждён, подождём пока не прийдёт кто-то посильнее! {DOGGIE}";
         }
-        return new StringJoiner(", ")
+        return currentBoss.isDead() ? "Босс уже отъехал" : new StringJoiner(", ")
                 .add("Текущий босс - " + currentBoss.getName() + " - " + currentBoss.getLabel())
                 .add("со своими приспешниками - " + currentBoss.getMinionsLabel())
                 .add("силен против: " + currentBoss.getStrong().getLabel())
                 .add("слаб против " + currentBoss.getWeak().getLabel())
-                .add(currentBoss.isDead() ? "Босс уже отъехал" : "ХП: " + currentBoss.getCurrentHp() + " из " + currentBoss.getMaxHp())
+                .add("ХП: " + currentBoss.getCurrentHp() + " из " + currentBoss.getMaxHp())
                 .toString();
     }
 

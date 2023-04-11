@@ -1,7 +1,7 @@
 package azhukov.chatbot.service.variety;
 
-import azhukov.chatbot.service.ArticfactService;
 import azhukov.chatbot.service.CommandsPermissionsService;
+import azhukov.chatbot.service.dunge.ArticfactService;
 import azhukov.chatbot.service.dunge.data.Artifact;
 import azhukov.chatbot.service.dunge.service.HeroInfoService;
 import azhukov.chatbot.service.store.DailyStore;

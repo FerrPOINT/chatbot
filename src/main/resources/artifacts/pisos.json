@@ -1,0 +1,11 @@
+{
+  "id": "pisos",
+  "name": "Проклятье писоса",
+  "label": "Снижает атаку",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": -10
+    }
+  ]
+}

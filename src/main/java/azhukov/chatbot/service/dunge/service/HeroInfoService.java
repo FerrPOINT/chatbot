@@ -1,6 +1,6 @@
 package azhukov.chatbot.service.dunge.service;
 
-import azhukov.chatbot.service.ArticfactService;
+import azhukov.chatbot.service.dunge.ArticfactService;
 import azhukov.chatbot.service.dunge.data.*;
 import azhukov.chatbot.service.util.Randomizer;
 import lombok.RequiredArgsConstructor;

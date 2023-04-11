@@ -16,7 +16,11 @@ public class Randomizer {
     }
 
     public static boolean tossCoin() {
-        return getRandom().nextBoolean();
+        int num = 0;
+        while (num == 0) {
+            num = getRandom().nextInt(2);
+        }
+        return num == 1;
     }
 
     public static int nextInt(int bound) {

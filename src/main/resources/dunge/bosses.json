@@ -128,5 +128,18 @@
     "rewards": [
       "twins-item"
     ]
+  },
+  {
+    "stage": 11,
+    "level": 20,
+    "name": "Кот писос",
+    "label": "повелитель, дёргающий за ниточки",
+    "minionsName": "нету",
+    "minionsLabel": "кот самодостаточен",
+    "strong": "LALKA",
+    "weak": "WEREWOLF",
+    "rewards": [
+      "pisos"
+    ]
   }
 ]

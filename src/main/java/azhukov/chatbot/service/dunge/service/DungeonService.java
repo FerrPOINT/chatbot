@@ -1,7 +1,7 @@
 package azhukov.chatbot.service.dunge.service;
 
 import azhukov.chatbot.dto.ChatRequest;
-import azhukov.chatbot.service.ArticfactService;
+import azhukov.chatbot.service.dunge.ArticfactService;
 import azhukov.chatbot.service.dunge.data.*;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
@@ -38,9 +38,11 @@ public class DungeonService {
         if (heal == null) {
             heroInfoService.healAll();
             bossService.updateCurrentBoss(bossInfo -> {
-                int threshold = bossInfo.getMaxHp() / 2 - bossInfo.getDamageReceived();
-                bossInfo.heal(threshold <= 0 ? Math.abs(threshold) : 0);
-                bossInfo.resetOpponents();
+                if (!bossInfo.isDead()) {
+                    int threshold = bossInfo.getMaxHp() / 2 - bossInfo.getDamageReceived();
+                    bossInfo.heal(threshold <= 0 ? Math.abs(threshold) : 0);
+                    bossInfo.resetOpponents();
+                }
             });
             dailySettings.put("DAILY_HEAL", "true");
         }
@@ -157,7 +159,7 @@ public class DungeonService {
 
     private FightResult fight(String name, HeroInfo heroInfo) {
         BossInfo boss = getCurrentOrNext();
-        if (boss == null) {
+        if (boss == null || boss.isDead()) {
             return null;
         }
         LocalDateTime now = LocalDateTime.now();

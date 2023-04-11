@@ -1,4 +1,4 @@
-package azhukov.chatbot.service;
+package azhukov.chatbot.service.dunge;
 
 import azhukov.chatbot.service.dunge.data.Artifact;
 import azhukov.chatbot.util.IOUtils;

@@ -2,9 +2,9 @@ package azhukov.chatbot.service.messages;
 
 import azhukov.chatbot.dto.ChatRequest;
 import azhukov.chatbot.dto.ChatResponse;
-import azhukov.chatbot.service.ArticfactService;
 import azhukov.chatbot.service.dictionary.Dictionary;
 import azhukov.chatbot.service.dictionary.DictionaryService;
+import azhukov.chatbot.service.dunge.ArticfactService;
 import azhukov.chatbot.service.dunge.data.Artifact;
 import azhukov.chatbot.service.dunge.service.HeroInfoService;
 import azhukov.chatbot.service.users.UserCollectionStore;
