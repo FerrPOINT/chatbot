@@ -141,5 +141,83 @@
     "rewards": [
       "pisos"
     ]
+  },
+  {
+    "stage": 12,
+    "level": 22,
+    "name": "Термоядерный помидор",
+    "label": "наносит токсичный урон по площади",
+    "minionsName": "огородик",
+    "minionsLabel": "гопники из огородика",
+    "strong": "HALFLING",
+    "weak": "DARK",
+    "rewards": [
+      "tomato-item"
+    ]
+  },
+  {
+    "stage": 13,
+    "level": 22,
+    "name": "Таинственная макарошка",
+    "label": "темная сущность из будущего",
+    "minionsName": "мучные",
+    "minionsLabel": "мучные изделия из будущего",
+    "strong": "PIE",
+    "weak": "DARK",
+    "rewards": [
+      "macaroni-shield"
+    ]
+  },
+  {
+    "stage": 14,
+    "level": 24,
+    "name": "Мудрец гадкий мэн",
+    "label": "ворчащий без умолку, наносит урон по морали",
+    "minionsName": "феи",
+    "minionsLabel": "ворчащие феи",
+    "strong": "WEREWOLF",
+    "weak": "LALKA",
+    "rewards": [
+      "stick-of-wisdom"
+    ]
+  },
+  {
+    "stage": 15,
+    "level": 24,
+    "name": "Безликий советчик",
+    "label": "наносит урон цифровой атакой",
+    "minionsName": "советчики",
+    "minionsLabel": "советчики из чата",
+    "strong": "ORC",
+    "weak": "PIE",
+    "rewards": [
+      "expert-medal"
+    ]
+  },
+  {
+    "stage": 16,
+    "level": 26,
+    "name": "Сладкоголосая сирена",
+    "label": "манящая моряков из чатика",
+    "minionsName": "морячки",
+    "minionsLabel": "влюблённые морячки",
+    "strong": "NUBAS",
+    "weak": "LALKA",
+    "rewards": [
+      "shell-bra"
+    ]
+  },
+  {
+    "stage": 17,
+    "level": 26,
+    "name": "Ночной тентакль",
+    "label": "из темных глубин",
+    "minionsName": "тентакли",
+    "minionsLabel": "тентакли из водички",
+    "strong": "LALKA",
+    "weak": "ORC",
+    "rewards": [
+      "slime"
+    ]
   }
 ]

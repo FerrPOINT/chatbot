@@ -1,0 +1,11 @@
+{
+  "id": "tomato-item",
+  "name": "Магический бинокль",
+  "label": "Наяривает атаку",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": 10
+    }
+  ]
+}

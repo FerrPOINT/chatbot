@@ -1,0 +1,11 @@
+{
+  "id": "slime",
+  "name": "Люминесцентная слизь",
+  "label": "Проклинает носителя",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": -10
+    }
+  ]
+}

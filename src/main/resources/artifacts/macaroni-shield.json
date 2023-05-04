@@ -1,0 +1,11 @@
+{
+  "id": "macaroni-shield",
+  "name": "Макаронный щит",
+  "label": "Защищает от мучных изделий",
+  "modifications": [
+    {
+      "modificationType": "DAILY_GUARD",
+      "value": 1
+    }
+  ]
+}
