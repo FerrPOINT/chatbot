@@ -1,6 +1,8 @@
 package azhukov.chatbot.util;
 
+import azhukov.chatbot.service.util.Randomizer;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -10,14 +12,27 @@ import java.util.List;
 public class RangesContainer<T> {
 
     private final List<Range<T>> ranges;
+    @Getter
+    private final int lastPoint;
+    @Getter
+    private final int firstPoint;
 
     public RangesContainer(List<Range<T>> ranges) {
         List<Range<T>> newList = new ArrayList<>(ranges);
         newList.sort(Comparator.comparingInt(Range::start));
         this.ranges = newList;
+        firstPoint = ranges.stream().min(Comparator.comparingInt(Range::start)).get().start();
+        lastPoint = ranges.stream().max(Comparator.comparingInt(Range::end)).get().end();
+    }
+
+    public T getRandomItem() {
+        return getItem(Randomizer.nextInt(firstPoint, lastPoint + 1));
     }
 
     public T getItem(int number) {
+        if (number < firstPoint || number > lastPoint) {
+            return null;
+        }
         return getItem(number, 0, ranges.size() - 1);
     }
 

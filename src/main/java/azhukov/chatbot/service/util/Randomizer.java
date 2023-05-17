@@ -27,6 +27,10 @@ public class Randomizer {
         return getRandom().nextInt(bound);
     }
 
+    public static int nextInt(int origin, int bound) {
+        return getRandom().nextInt(origin, bound);
+    }
+
     public static <T> T getRandomItem(List<T> items) {
         return CollectionUtils.isEmpty(items) ? null : items.get(Randomizer.nextInt(items.size()));
     }

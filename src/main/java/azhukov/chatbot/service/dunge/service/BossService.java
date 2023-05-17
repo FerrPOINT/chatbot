@@ -1,19 +1,20 @@
 package azhukov.chatbot.service.dunge.service;
 
+import azhukov.chatbot.service.dunge.ArticfactService;
 import azhukov.chatbot.service.dunge.data.BossInfo;
 import azhukov.chatbot.service.dunge.data.BossStore;
 import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Service
@@ -23,8 +24,23 @@ public class BossService {
 
     private final ObjectMapper objectMapper;
     private final BossStore store;
+    private final ArticfactService articfactService;
 
     private List<BossInfo> info;
+    @Getter
+    private final Set<String> oldRewards = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    //every 12 hours
+    @Scheduled(cron = "0 * */12 ? * *")
+    void update() {
+        handlePrevBosses(bossInfo -> {
+            if (bossInfo.getRewards() != null) {
+                bossInfo.getRewards().stream()
+                        .filter(s -> articfactService.getById(s) != null)
+                        .forEach(oldRewards::add);
+            }
+        });
+    }
 
     @PostConstruct
     synchronized void init() {
@@ -43,6 +59,7 @@ public class BossService {
         } catch (Exception e) {
             throw new IllegalStateException("While reading dunge/boss", e);
         }
+        update();
     }
 
     public synchronized void updateCurrentBoss(Consumer<BossInfo> consumer) {

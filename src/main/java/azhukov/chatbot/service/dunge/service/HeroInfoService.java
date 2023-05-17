@@ -6,6 +6,7 @@ import azhukov.chatbot.service.util.Randomizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -75,6 +77,8 @@ public class HeroInfoService {
             }
             heroInfo.setDamageGot(HeroDamage.NONE);
             heroInfo.resetShield();
+            heroInfo.setCrit(0);
+            heroInfo.setEvents(0);
         });
         log.info("Heal complete. total: {}, dead: {}", counter.intValue(), toDelete.size());
         toDelete.forEach(store::delete);
@@ -108,4 +112,11 @@ public class HeroInfoService {
     public void updateAll(Consumer<HeroInfo> acceptor) {
         store.updateAll(acceptor);
     }
+
+    public List<Pair<String, Integer>> getTopLevel(int count) {
+        List<Pair<String, Integer>> result = new ArrayList<>();
+        store.handleAll(heroInfo -> result.add(Pair.of(heroInfo.getName(), heroInfo.getLevel())));
+        return result.stream().sorted((o1, o2) -> Integer.compare(o2.getRight(), o1.getRight())).limit(count).collect(Collectors.toList());
+    }
+
 }

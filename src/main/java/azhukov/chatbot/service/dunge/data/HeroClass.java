@@ -3,6 +3,8 @@ package azhukov.chatbot.service.dunge.data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @RequiredArgsConstructor
 public enum HeroClass {
@@ -19,6 +21,8 @@ public enum HeroClass {
 
     //
     ;
+
+    public static final List<HeroClass> VALUES = List.of(values());
 
     private final String label;
 }

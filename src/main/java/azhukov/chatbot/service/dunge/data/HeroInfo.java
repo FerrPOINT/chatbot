@@ -24,6 +24,8 @@ public class HeroInfo {
     private HeroDamage damageGot;
     private LocalDateTime deadTime;
     private int shield;
+    private int crit;
+    private int events;
 
     public int getLevel() {
         return (experience / 1000) + 1;
@@ -78,6 +80,9 @@ public class HeroInfo {
     }
 
     public void addArtifact(Artifact artifact) {
+        if (artifact == null) {
+            return;
+        }
         if (artifacts == null) {
             artifacts = new ArrayList<>();
         }

@@ -1,7 +1,6 @@
 package azhukov.chatbot.service.combination;
 
 import azhukov.chatbot.service.store.DailyStore;
-import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.util.Randomizer;
 import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,17 +59,23 @@ public class CombinationService {
         for (Combination item : items) {
             for (String command : item.getCommands()) {
                 if (lowerCase.startsWith(command)) {
-                    Store combination = dailyStore.getStore("COMBINATION");
-                    String todayValue = combination.get(user);
-                    if (todayValue == null) {
-                        todayValue = createRandomValue(item);
-                        combination.put(user, todayValue);
-                    }
-                    return todayValue;
+//                    Store combination = dailyStore.getStore("COMBINATION");
+//                    String todayValue = combination.get(user);
+//                    if (todayValue == null) {
+//                        todayValue = createRandomValue(item);
+//                        combination.put(user, todayValue);
+//                    }
+//                    return todayValue;
+                    return createRandomValue(item);
                 }
             }
         }
         return null;
+    }
+
+    public String getRandomCombinationMessage(String id) {
+        Combination combination = idToItem.get(id);
+        return combination == null ? null : createRandomValue(combination);
     }
 
     private String createRandomValue(Combination combination) {

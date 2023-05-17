@@ -6,6 +6,7 @@ import azhukov.chatbot.service.dictionary.Dictionary;
 import azhukov.chatbot.service.dictionary.DictionaryService;
 import azhukov.chatbot.service.dunge.ArticfactService;
 import azhukov.chatbot.service.dunge.data.Artifact;
+import azhukov.chatbot.service.dunge.data.HeroInfo;
 import azhukov.chatbot.service.dunge.service.HeroInfoService;
 import azhukov.chatbot.service.users.UserCollectionStore;
 import azhukov.chatbot.service.util.Randomizer;
@@ -29,6 +30,11 @@ public class ExchangeHandler extends MessageHandler {
     public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (lowerCase.startsWith("!обменять")) {
             if (lowerCase.contains("!обменять сейлор на призму")) {
+                HeroInfo hero = heroInfoService.getCurrent(message.getUserName());
+                if (hero.getArtifacts() != null && hero.getArtifacts().stream().anyMatch(artifact -> artifact.getId().equals("prism"))) {
+                    return createUserMessage(message, "У тебя уже есть призма, куда тебе еще нубаська");
+                }
+                heroInfoService.distinctAllArtifacts();
                 Dictionary sailor = dictionaryService.getById("sailor");
                 Set<String> sailorSet = userCollectionStore.getCurrentSet(message.getUserName(), sailor.getId());
                 if (sailorSet != null && sailor.getData().size() == sailorSet.size()) {

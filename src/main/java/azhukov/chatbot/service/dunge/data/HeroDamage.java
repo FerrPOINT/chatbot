@@ -14,7 +14,7 @@ public enum HeroDamage {
     SLIGHT(1, "незначительный урон", "слегка ранен"),
     MEDIUM(2, "средний урон", "средне ранен"),
     BIG(3, "большой урон", "сильно ранен"),
-    HUGE(4, "огромный урон", "очень даже ранен =)"),
+    HUGE(4, "огромный урон", "ужасно ранен"),
     ALMOUST_DEAD(5, "громадный урон", "при смерти"),
     DEAD(6, "смертельный урон", "мертв"),
 
@@ -55,6 +55,17 @@ public enum HeroDamage {
             return damage;
         }
         int newValue = Math.min(damage.getValue() + getValue(), RANGES.length - 1);
+        return getByValue(newValue);
+    }
+
+    public HeroDamage heal(HeroDamage damage) {
+        if (damage.getValue() < 0) {
+            damage = NONE;
+        }
+        if (this.getValue() < 0) {
+            return damage;
+        }
+        int newValue = Math.min(getValue() - damage.getValue(), RANGES.length - 1);
         return getByValue(newValue);
     }
 

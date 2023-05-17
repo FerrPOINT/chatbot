@@ -20,5 +20,6 @@ public class FightResult {
     private HeroInfo hero;
     private int crit;
     private int shieldSpent;
+    private int fightsNumber;
 
 }

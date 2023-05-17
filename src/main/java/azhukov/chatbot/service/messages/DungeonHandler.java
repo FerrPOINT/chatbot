@@ -24,9 +24,6 @@ public class DungeonHandler extends MessageHandler {
     @Override
     public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (lowerCase != null) {
-//            if (lowerCase.contains("!пати")) {
-//
-//            }
             if (lowerCase.contains("!резетвсё13")) {
                 dungeonService.resetAccs();
                 dungeonService.resetBoss();
@@ -41,8 +38,12 @@ public class DungeonHandler extends MessageHandler {
                 return createUserMessage(message, "резет {DOGGIE}");
             }
             if (lowerCase.contains("!резеткур13")) {
-                dungeonService.resetCurrAcc(message.getUserName());
+                dungeonService.resetAcc(message.getUserName());
                 return createUserMessage(message, "резет {DOGGIE}");
+            }
+            if (lowerCase.contains("!резурект13")) {
+                dungeonService.resurrectAcc(message.getText().split(" ")[1]);
+                return createUserMessage(message, "резурект {DOGGIE}");
             }
             if (lowerCase.contains("!боссрезет13")) {
                 dungeonService.resetCurrBoss();
@@ -65,6 +66,21 @@ public class DungeonHandler extends MessageHandler {
                 dungeonService.migra1();
                 return createUserMessage(message, "ревардс {DOGGIE}");
             }
+            if (lowerCase.contains("!апшилд")) {
+                String[] tokens = message.getText().split(" ");
+                dungeonService.upShield(tokens.length == 1 ? message.getUserName() : tokens[1]);
+                return createUserMessage(message, "апшилд {DOGGIE}");
+            }
+            if (lowerCase.contains("!данж13")) {
+                return createMessage(message, dungeonService.getDungeonResponse(message));
+            }
+            if (lowerCase.contains("!артефакт13")) {
+                heroInfoService.addArtifact(message.getText().split(" ")[1], message.getText().split(" ")[2]);
+                return createUserMessage(message, "артефакт {DOGGIE}");
+            }
+            if (lowerCase.contains("!ладдер")) {
+                return createMessage(message, dungeonService.getLadderResponse());
+            }
             if (lowerCase.contains("!стата")) {
                 return createMessage(message, dungeonService.getHeroStats(message));
             }
@@ -73,6 +89,7 @@ public class DungeonHandler extends MessageHandler {
             }
             for (String command : COMMANDS) {
                 if (lowerCase.contains(command)) {
+//                    return createUserMessage(message, "На данже висит табличка \"Закрыто на ремонт, приходите позже\", рядом работает команда догисов-инженеров {DOGGIE}");
                     return createMessage(message, dungeonService.getDungeonResponse(message));
                 }
             }
