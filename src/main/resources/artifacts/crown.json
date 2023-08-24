@@ -1,0 +1,11 @@
+{
+  "id": "crown",
+  "name": "Корона из пластика",
+  "label": "Защищает от похотливых взглядов",
+  "modifications": [
+    {
+      "modificationType": "DAILY_GUARD",
+      "value": 1
+    }
+  ]
+}

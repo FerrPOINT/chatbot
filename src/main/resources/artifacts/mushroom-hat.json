@@ -1,0 +1,11 @@
+{
+  "id": "mushroom-hat",
+  "name": "Шляпка мухомора",
+  "label": "Защищает от похотливых взглядов",
+  "modifications": [
+    {
+      "modificationType": "DAILY_GUARD",
+      "value": 1
+    }
+  ]
+}

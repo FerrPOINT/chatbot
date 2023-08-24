@@ -219,5 +219,57 @@
     "rewards": [
       "slime"
     ]
+  },
+  {
+    "stage": 18,
+    "level": 28,
+    "name": "Стрелок маркедванок",
+    "label": "наносит урон премами по синевикам",
+    "minionsName": "премовые големы",
+    "minionsLabel": "големы движемые силой премов",
+    "strong": "DARK",
+    "weak": "PIE",
+    "rewards": [
+      "challenger"
+    ]
+  },
+  {
+    "stage": 19,
+    "level": 28,
+    "name": "Развратный дедушка Фоллен",
+    "label": "наносит урон эротическими историями",
+    "minionsName": "престарелые извращенцы",
+    "minionsLabel": "престарелые извращенцы",
+    "strong": "HALFLING",
+    "weak": "DARK",
+    "rewards": [
+      "manuscript"
+    ]
+  },
+  {
+    "stage": 20,
+    "level": 30,
+    "name": "Токсичный грибочек трусишных лесов",
+    "label": "заставляет приключенца снимать трусики",
+    "minionsName": "развратные грибы",
+    "minionsLabel": "грибы потерявшие всякий стыд",
+    "strong": "PIE",
+    "weak": "ELF",
+    "rewards": [
+      "mushroom-hat"
+    ]
+  },
+  {
+    "stage": 21,
+    "level": 30,
+    "name": "Молодая шальная императрица",
+    "label": "наносящая урон по самолюбию",
+    "minionsName": "поклонники госпожи",
+    "minionsLabel": "поклонники госпожи",
+    "strong": "LALKA",
+    "weak": "WEREWOLF",
+    "rewards": [
+      "crown"
+    ]
   }
 ]

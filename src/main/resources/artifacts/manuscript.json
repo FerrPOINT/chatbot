@@ -1,0 +1,11 @@
+{
+  "id": "manuscript",
+  "name": "Манускрипт 18 плюс",
+  "label": "Наяривает атаку",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": 10
+    }
+  ]
+}
