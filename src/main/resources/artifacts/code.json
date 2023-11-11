@@ -1,0 +1,11 @@
+{
+  "id": "code",
+  "name": "Программный код успеха",
+  "label": "Программный код успеха - взламывает защиту врага",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": 10
+    }
+  ]
+}

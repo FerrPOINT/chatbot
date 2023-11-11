@@ -1,0 +1,11 @@
+{
+  "id": "spider-bracer",
+  "name": "Паучий браслет антияд",
+  "label": "Паучий браслет антияд - немного защищает от яда",
+  "modifications": [
+    {
+      "modificationType": "DAILY_GUARD",
+      "value": 1
+    }
+  ]
+}

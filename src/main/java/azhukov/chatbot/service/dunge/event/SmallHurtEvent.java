@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 public class SmallHurtEvent implements DungeEvent {
 
-    private static final List<String> MESSAGES = List.of("булыжник. Вы ободрали коленку", "мелкую ловушку. Вы не смогли увенуться от фантомного пендаля", "крысу. Вы были покусаны крыской");
+    private static final List<String> MESSAGES = List.of("булыжник. Вы ободрали коленку", "мелкую ловушку. Вы угодили в крупную мышеловку", "крысу. Вы были покусаны крыской");
 
     @Override
     public String handle(HeroInfo hero) {

@@ -1,0 +1,11 @@
+{
+  "id": "lizard-robe",
+  "name": "Мантия ящера",
+  "label": "Мантия ящера - слизкая защита",
+  "modifications": [
+    {
+      "modificationType": "DAILY_GUARD",
+      "value": 1
+    }
+  ]
+}

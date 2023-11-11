@@ -20,6 +20,8 @@ public class DungeonHandler extends MessageHandler {
 
     private static final List<String> COMMANDS = List.of("!данж", "!dungeon", "!данжн");
     private static final List<String> BOSS_COMMANDS = List.of("!босс", "!boss");
+    private static final List<String> STAT_COMMANDS = List.of("!стата", "!статус");
+    private static final List<String> ARTS_COMMANDS = List.of("!артефакты", "!артифакты");
 
     @Override
     public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
@@ -81,11 +83,15 @@ public class DungeonHandler extends MessageHandler {
             if (lowerCase.contains("!ладдер")) {
                 return createMessage(message, dungeonService.getLadderResponse());
             }
-            if (lowerCase.contains("!стата")) {
-                return createMessage(message, dungeonService.getHeroStats(message));
+            for (String command : STAT_COMMANDS) {
+                if (lowerCase.contains(command)) {
+                    return createMessage(message, dungeonService.getHeroStats(message));
+                }
             }
-            if (lowerCase.contains("!артефакты") || lowerCase.contains("!артифакты")) {
-                return createMessage(message, dungeonService.getArtifactsMessage(message));
+            for (String command : ARTS_COMMANDS) {
+                if (lowerCase.contains(command)) {
+                    return createMessage(message, dungeonService.getArtifactsMessage(message));
+                }
             }
             for (String command : COMMANDS) {
                 if (lowerCase.contains(command)) {

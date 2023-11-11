@@ -1,0 +1,11 @@
+{
+  "id": "new-year-fist",
+  "name": "Рождественнский колпак силы",
+  "label": "Рождественнский колпак - даёт силу рождества",
+  "modifications": [
+    {
+      "modificationType": "ATTACK_CHANGE",
+      "value": 10
+    }
+  ]
+}

@@ -271,5 +271,68 @@
     "rewards": [
       "crown"
     ]
+  },
+  {
+    "stage": 22,
+    "level": 32,
+    "name": "Булочный массивный паук",
+    "label": "наносит урон паутиной из теста прямиком в рот",
+    "minionsName": "паучата",
+    "minionsLabel": "паучата",
+    "strong": "DEFENDER",
+    "weak": "NUBAS",
+    "rewards": [
+      "spider-bracer"
+    ]
+  },
+  {
+    "stage": 23,
+    "level": 34,
+    "name": "Дух рождества",
+    "label": "наносит урон по попам пирожков, которые плохо себя вели",
+    "minionsName": "снеговики",
+    "minionsLabel": "снеговики с морковкой снизу",
+    "rewards": [
+      "new-year-fist"
+    ]
+  },
+  {
+    "stage": 24,
+    "level": 36,
+    "name": "Обаятельный мужчинка Киллеркросс",
+    "label": "наносит психический урон мимишностью и котиками",
+    "minionsName": "мимипсихи",
+    "minionsLabel": "мимипсихи",
+    "strong": "HALFLING",
+    "weak": "DEFENDER",
+    "rewards": [
+      "hentai-disk"
+    ]
+  },
+  {
+    "stage": 25,
+    "level": 36,
+    "name": "БАНщик GM",
+    "label": "заставляет приключенца  отправится к рептилоидам",
+    "minionsName": "рептилии",
+    "minionsLabel": "рептилии с надписью БАН на лбу",
+    "strong": "WEREWOLF",
+    "weak": "ELF",
+    "rewards": [
+      "lizard-robe"
+    ]
+  },
+  {
+    "stage": 26,
+    "level": 40,
+    "name": "Ферпоша киберспортивный",
+    "label": "наносит урон кибер атакой по путникам",
+    "minionsName": "киберпоросята",
+    "minionsLabel": "киберпоросята - вы их ждали и вот они",
+    "strong": "NUBAS",
+    "weak": "DEFENDER",
+    "rewards": [
+      "code"
+    ]
   }
 ]

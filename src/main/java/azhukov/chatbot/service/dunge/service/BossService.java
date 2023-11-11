@@ -127,8 +127,8 @@ public class BossService {
         return currentBoss.isDead() ? "Босс уже отъехал" : new StringJoiner(", ")
                 .add("Текущий босс - " + currentBoss.getName() + " - " + currentBoss.getLabel())
                 .add("со своими приспешниками - " + currentBoss.getMinionsLabel())
-                .add("силен против: " + currentBoss.getStrong().getLabel())
-                .add("слаб против " + currentBoss.getWeak().getLabel())
+                .add("силен против: " + (currentBoss.getStrong() == null ? "всех" : currentBoss.getStrong().getLabel()))
+                .add(currentBoss.getWeak() == null ? "не имеет слабостей" : ("слаб против " + currentBoss.getWeak().getLabel()))
                 .add("ХП: " + currentBoss.getCurrentHp() + " из " + currentBoss.getMaxHp())
                 .toString();
     }
