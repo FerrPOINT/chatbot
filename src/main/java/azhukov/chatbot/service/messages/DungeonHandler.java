@@ -65,8 +65,8 @@ public class DungeonHandler extends MessageHandler {
                 return createUserMessage(message, "ревардс {DOGGIE}");
             }
             if (lowerCase.contains("!мигра113")) {
-                dungeonService.migra1();
-                return createUserMessage(message, "ревардс {DOGGIE}");
+                heroInfoService.migrateCaseSensitive();
+                return createUserMessage(message, "migrateCaseSensitive {DOGGIE}");
             }
             if (lowerCase.contains("!апшилд")) {
                 String[] tokens = message.getText().split(" ");
@@ -95,8 +95,8 @@ public class DungeonHandler extends MessageHandler {
             }
             for (String command : COMMANDS) {
                 if (lowerCase.contains(command)) {
-//                    return createUserMessage(message, "На данже висит табличка \"Закрыто на ремонт, приходите позже\", рядом работает команда догисов-инженеров {DOGGIE}");
-                    return createMessage(message, dungeonService.getDungeonResponse(message));
+                    return createUserMessage(message, "На данже висит табличка \"Dungeons and Doggies 2 coming soon\" {DOGGIE}");
+//                    return createMessage(message, dungeonService.getDungeonResponse(message));
                 }
             }
             for (String command : BOSS_COMMANDS) {

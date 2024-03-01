@@ -1,0 +1,365 @@
+[
+  {
+    "id": "challenger",
+    "name": "Пистолет челенджер",
+    "label": "Наяривает атаку",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "code",
+    "name": "Программный код успеха",
+    "label": "Программный код успеха - взламывает защиту врага",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "crown",
+    "name": "Корона из пластика",
+    "label": "Защищает от похотливых взглядов",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "expert-medal",
+    "name": "Медаль экспертного воина",
+    "label": "Защищает от дилетантов",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "hentai-disk",
+    "name": "Диск с хентаем",
+    "label": "Диск с хентаем - защита от пси атак",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "lizard-robe",
+    "name": "Мантия ящера",
+    "label": "Мантия ящера - слизкая защита",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "macaroni-shield",
+    "name": "Макаронный щит",
+    "label": "Защищает от мучных изделий",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "magic-binoculars",
+    "name": "Магический бинокль",
+    "label": "Наяривает атаку",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "manuscript",
+    "name": "Манускрипт 18 плюс",
+    "label": "Наяривает атаку",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "mushroom-hat",
+    "name": "Шляпка мухомора",
+    "label": "Защищает от похотливых взглядов",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "new-year-fist",
+    "name": "Рождественнский колпак силы",
+    "label": "Рождественнский колпак - даёт силу рождества",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "ozara-item",
+    "name": "Плащ Озары",
+    "label": "Защищает один раз в день",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 2
+      }
+    ]
+  },
+  {
+    "id": "pie",
+    "name": "Булка от воришки",
+    "label": "Защищает один раз в день",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "pisos",
+    "name": "Проклятье писоса",
+    "label": "Снижает атаку",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": -10
+      }
+    ]
+  },
+  {
+    "id": "prism",
+    "name": "Лунная призма",
+    "label": "Лунная призма дарует вам силу",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 50
+      }
+    ]
+  },
+  {
+    "id": "shell-bra",
+    "name": "Бронеливчик из ракушек",
+    "label": "Защищает от похотливых взглядов",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "slime",
+    "name": "Люминесцентная слизь",
+    "label": "Проклинает носителя",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": -10
+      }
+    ]
+  },
+  {
+    "id": "slipknot",
+    "name": "Удавка душителя",
+    "label": "Наяривает атаку",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "spider-bracer",
+    "name": "Паучий браслет антияд",
+    "label": "Паучий браслет антияд - немного защищает от яда",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "stick-of-wisdom",
+    "name": "Посох мудрости",
+    "label": "бьёт мудростью",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "sytkin-guitar",
+    "name": "Гитара Сюткина",
+    "label": "Даёт дополнительную атаку",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "talismans",
+    "name": "12 Талисманов",
+    "label": "Защита и большой крит",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 3
+      }
+    ]
+  },
+  {
+    "id": "tanos-gems",
+    "name": "Булки бесконечности",
+    "label": "Булки бесконечности",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 3
+      }
+    ]
+  },
+  {
+    "id": "thief-gloves",
+    "name": "Перчатки вора",
+    "label": "увеличивает силу атаки в полтора раза",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_PERCENT",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "id": "tolerancy-item",
+    "name": "Палка толерантности",
+    "label": "Даёт дополнительную атаку",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "tomato-item",
+    "name": "Магический бинокль",
+    "label": "Наяривает атаку",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "turkey-leg",
+    "name": "Лапка индейки",
+    "label": "Увеличивает силу и удачу",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "twins-item",
+    "name": "Палки близняшек",
+    "label": "Сила близняшек",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "werewolf-tail",
+    "name": "Хвост оборотеня",
+    "label": "Баф хвостовой атаки",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "latex-suite",
+    "name": "Латексный костюм аниме кошечки",
+    "label": "скользкая защита",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 5
+      }
+    ]
+  },
+  {
+    "id": "fbi-item",
+    "name": "Значок FBI против пришельцев",
+    "label": "защита свидетелей от ФБР",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 5
+      }
+    ]
+  },
+  {
+    "id": "zeal-armor",
+    "name": "Броня Адепта Усердия",
+    "label": "защищайтесь сударь",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 5
+      }
+    ]
+  },
+  {
+    "id": "crab-hammer",
+    "name": "Молот краба",
+    "label": "приславутый бан-молот",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 20
+      }
+    ]
+  }
+]

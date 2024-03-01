@@ -12,4 +12,19 @@ public class HeroInfoStore extends TypedStore<HeroInfo> {
         super(() -> dbService.getDb(DbType.DUNGE), DbType.DUNGE.name(), HeroInfo.class);
     }
 
+    @Override
+    public String put(String key, HeroInfo heroInfo) {
+        return super.put(key.toLowerCase(), heroInfo);
+    }
+
+    @Override
+    public String delete(String key) {
+        return super.delete(key.toLowerCase());
+    }
+
+    @Override
+    public HeroInfo get(String key) {
+        return super.get(key.toLowerCase());
+    }
+
 }

@@ -8,8 +8,10 @@ import org.mapdb.DB;
 import org.mapdb.HTreeMap;
 import org.mapdb.serializer.SerializerString;
 
+import java.util.Comparator;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
@@ -43,22 +45,46 @@ public class TypedStore<T> {
         getMap().clear();
     }
 
-    public void updateAll(Consumer<T> acceptor) {
+    public void updateAll(Consumer<T> acceptor, StoreUpdater<T> storeUpdater) {
         Set<String> keys = getMap().getKeys();
-        for (String s : keys) {
-            T value = get(s);
-            acceptor.accept(value);
-            put(s, value);
+        for (String key : keys) {
+            T value = get(key);
+            if (storeUpdater != null) {
+                Function<String, String> keyUpdater = storeUpdater.getKeyUpdater();
+                Comparator<T> comparator = storeUpdater.getComparator();
+                String updatedKey = keyUpdater.apply(key);
+                if (!updatedKey.equals(key)) {
+                    T anotherValue = get(updatedKey);
+                    if (anotherValue != null) {
+                        int compare = value == null ? -1 : comparator.compare(value, anotherValue);
+                        if (compare < 0) {
+                            value = anotherValue;
+                        }
+                    }
+                    key = updatedKey;
+                }
+            }
+            if (value != null) {
+                acceptor.accept(value);
+                put(key, value);
+            }
         }
+    }
+
+    public void updateAll(Consumer<T> acceptor) {
+        updateAll(acceptor, null);
     }
 
     public void handleAll(Consumer<T> acceptor) {
         Set<String> keys = getMap().getKeys();
         for (String s : keys) {
             T value = get(s);
-            acceptor.accept(value);
+            if (value != null) {
+                acceptor.accept(value);
+            }
         }
     }
+
 
     private HTreeMap<String, String> getMap() {
         return dbGet.get().hashMap(this.key, new SerializerString(), new SerializerString()).createOrOpen();

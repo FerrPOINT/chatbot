@@ -2,6 +2,7 @@ package azhukov.chatbot.service.dunge.service;
 
 import azhukov.chatbot.service.dunge.ArticfactService;
 import azhukov.chatbot.service.dunge.data.*;
+import azhukov.chatbot.service.store.StoreUpdater;
 import azhukov.chatbot.service.util.Randomizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -24,6 +26,7 @@ public class HeroInfoService {
 
     private final HeroInfoStore store;
     private final ArticfactService articfactService;
+
 
     public HeroInfo getCurrent(String name) {
         return store.get(name);
@@ -118,5 +121,13 @@ public class HeroInfoService {
         store.handleAll(heroInfo -> result.add(Pair.of(heroInfo.getName(), heroInfo.getLevel())));
         return result.stream().sorted((o1, o2) -> Integer.compare(o2.getRight(), o1.getRight())).limit(count).collect(Collectors.toList());
     }
+
+    public void migrateCaseSensitive() {
+        store.updateAll(
+                heroInfo -> heroInfo.setName(heroInfo.getName().toLowerCase()),
+                new StoreUpdater<>(String::toLowerCase, Comparator.comparingInt(HeroInfo::getExperience))
+        );
+    }
+
 
 }

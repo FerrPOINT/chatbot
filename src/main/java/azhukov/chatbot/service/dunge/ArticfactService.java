@@ -27,10 +27,12 @@ public class ArticfactService {
         try {
             IOUtils.listFilesFromResources("artifacts", ".json", inputStream -> {
                 try {
-                    final Artifact data = objectMapper.readValue(inputStream, Artifact.class);
-                    items.add(data);
-                    if (idToItem.put(data.getId(), data) != null) {
-                        throw new IllegalStateException("Duplicate id: " + data.getId());
+                    final Artifact[] data = objectMapper.readValue(inputStream, Artifact[].class);
+                    for (Artifact datum : data) {
+                        items.add(datum);
+                        if (idToItem.put(datum.getId(), datum) != null) {
+                            throw new IllegalStateException("Duplicate id: " + datum.getId());
+                        }
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);

@@ -175,6 +175,7 @@ public class DungeonService {
         }
         return "Вы сбежали из-за опасности. " + (damageGet.getValue() <= 0 ? "Вы всё задоджили " :
                 "Вам досталось " + damageGet.getLabel()) +
+                (fight.getStealArt() == null ? "" : ", у вас вероломно украли " + fight.getStealArt()) +
                 (fight.getShieldSpent() > 0 ? ", потрачено брони: " + fight.getShieldSpent() : "") +
                 ", получено опыта: " + fight.getExp() + ", общий статус: " + hero.getDamageGot().getStatus() + ", " +
                 getDangerByDamage(boss, hero);
@@ -269,6 +270,17 @@ public class DungeonService {
                     }
                 }
                 damageFromBoss = damageFromBoss.join(iterationDamage);
+            }
+        }
+
+        if (boss.getStealPercent() > 0) {
+            if (Randomizer.getPercent() < boss.getStealPercent()) {
+                List<Artifact> artifacts = heroInfo.getArtifacts();
+                if (CollectionUtils.isNotEmpty(artifacts)) {
+                    Artifact randomItem = Randomizer.getRandomItem(artifacts);
+                    result.setStealArt(randomItem.getName());
+                    artifacts.remove(randomItem);
+                }
             }
         }
 

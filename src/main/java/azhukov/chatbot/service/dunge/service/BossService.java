@@ -3,6 +3,7 @@ package azhukov.chatbot.service.dunge.service;
 import azhukov.chatbot.service.dunge.ArticfactService;
 import azhukov.chatbot.service.dunge.data.BossInfo;
 import azhukov.chatbot.service.dunge.data.BossStore;
+import azhukov.chatbot.service.dunge.data.HeroClass;
 import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +27,7 @@ public class BossService {
     private final BossStore store;
     private final ArticfactService articfactService;
 
-    private List<BossInfo> info;
+    private List<BossInfo> bosses;
     @Getter
     private final Set<String> oldRewards = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
@@ -45,13 +46,30 @@ public class BossService {
     @PostConstruct
     synchronized void init() {
         try {
-            info = new ArrayList<>();
+            bosses = new ArrayList<>();
             IOUtils.listFilesFromResources("dunge", "bosses.json", inputStream -> {
                 try {
                     final List<BossInfo> infos = objectMapper.readValue(inputStream, new TypeReference<>() {
                     });
-                    info.addAll(infos);
-                    info.sort(Comparator.comparing(BossInfo::getStage));
+                    bosses.addAll(infos);
+                    bosses.sort(Comparator.comparing(BossInfo::getStage));
+
+                    Map<HeroClass, Integer> strongMap = new EnumMap<>(HeroClass.class);
+                    Map<HeroClass, Integer> weakgMap = new EnumMap<>(HeroClass.class);
+                    for (BossInfo boss : bosses) {
+                        HeroClass strong = boss.getStrong();
+                        if (strong != null) {
+                            strongMap.compute(strong, (heroClass, integer) -> integer == null ? 1 : integer + 1);
+                        }
+                        HeroClass weak = boss.getWeak();
+                        if (weak != null) {
+                            weakgMap.compute(weak, (heroClass, integer) -> integer == null ? 1 : integer + 1);
+                        }
+                    }
+
+                    log.info("Boss strong counters: \n {}", strongMap);
+                    log.info("Boss weak counters: \n {}", weakgMap);
+
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -80,7 +98,7 @@ public class BossService {
     public synchronized BossInfo getCurrentBoss() {
         BossInfo bigBoss = store.get("CURRENT_BOSS");
         if (bigBoss == null) {
-            store.put("CURRENT_BOSS", info.get(0));
+            store.put("CURRENT_BOSS", bosses.get(0));
             bigBoss = store.get("CURRENT_BOSS");
         } else if (bigBoss.isDead()) {
             bigBoss = next(bigBoss);
@@ -93,7 +111,7 @@ public class BossService {
     }
 
     private synchronized BossInfo next(BossInfo bigBoss) {
-        for (BossInfo iter : info) {
+        for (BossInfo iter : bosses) {
             if (iter.getStage() > bigBoss.getStage()) {
                 store.put("BOSS_" + bigBoss.getStage(), bigBoss);
                 bigBoss = iter;
@@ -104,11 +122,11 @@ public class BossService {
     }
 
     public synchronized BossInfo getBossInfo(int stage) {
-        return info.get(stage - 1);
+        return bosses.get(stage - 1);
     }
 
     public synchronized void setCurrentBoss(int stage) {
-        store.put("CURRENT_BOSS", info.get(stage - 1));
+        store.put("CURRENT_BOSS", bosses.get(stage - 1));
     }
 
     public synchronized BossInfo damage(String hero, int damage) {

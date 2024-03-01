@@ -21,5 +21,6 @@ public class FightResult {
     private int crit;
     private int shieldSpent;
     private int fightsNumber;
+    private String stealArt;
 
 }
