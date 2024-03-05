@@ -22,5 +22,6 @@ public class FightResult {
     private int shieldSpent;
     private int fightsNumber;
     private String stealArt;
+    private boolean immunity;
 
 }

@@ -22,6 +22,7 @@ public class BossInfo {
     private Set<String> damagedHeroes = new HashSet<>();
     private Set<String> rewards = new HashSet<>();
     private int stealPercent;
+    private HeroClass immunity;
 
     public int getMaxHp() {
         return level * DUNGEON_MULTIPLIER;

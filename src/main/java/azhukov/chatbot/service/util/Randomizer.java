@@ -27,6 +27,10 @@ public class Randomizer {
         return getRandom().nextInt(bound);
     }
 
+    public static int nextSafeInt(int bound) {
+        return bound < 1 ? 0 : nextInt(bound);
+    }
+
     public static int nextInt(int origin, int bound) {
         return getRandom().nextInt(origin, bound);
     }

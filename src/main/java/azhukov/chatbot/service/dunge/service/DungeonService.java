@@ -78,7 +78,7 @@ public class DungeonService {
         HeroInfo current = heroInfoService.getCurrent(userName);
         if (current == null) {
             current = heroInfoService.createNew(userName);
-            return "Новый герой - " + getUserShortStats(userName, current) + " уже готов спуститься в подземелье !данж !стата !босс !артефакты !ладдер {DOGGIE}";
+            return "Новый герой - " + getUserShortStats(userName, current) + " уже готов спуститься в подземелье !данж !стата !босс !артефакты !ладдер !герои {DOGGIE}";
         }
         if (current.getDamageGot() == DEAD || current.getDeadTime() != null) {
             return "Вы мертвы, ваша душа блуждает в другом мире, подождите чтобы вновь обрести физическую форму! {DOGGIE}";
@@ -154,8 +154,9 @@ public class DungeonService {
         BossInfo boss = fight.getBoss();
         HeroInfo hero = fight.getHero();
         return "Данж " + hero.getName() + " " + fight.getHero().getType().getLabel() + " VS " + boss.getName() + " " + fight.getBoss().getLabel() +
-                ". Продолжительность боя: " + fight.getFightsNumber() + " раундов. Ваш урон " + fight.getDamageDone() + (fight.getCrit() > 1 ? ", КРИТ Х" + fight.getCrit() : "") +
-                (boss.isDead() ? (", ВЫ ЗАВАЛИЛИ БОССА, ПОЗДРАВЛЯЕМ! Все бившиеся герои получают: " + getRewardsString(boss)) : ", у босса осталось " + boss.getCurrentHp() + " HP");
+                ". Продолжительность боя: " + fight.getFightsNumber() + " раундов." + (fight.isImmunity() ? " У босса иммунитет против вашего класса" :
+                (" Ваш урон " + fight.getDamageDone() + (fight.getCrit() > 1 ? ", КРИТ Х" + fight.getCrit() : ""))) +
+                (boss.isDead() ? (", ВЫ ЗАВАЛИЛИ БОССА, ПОЗДРАВЛЯЕМ! Все бившиеся герои получают: " + getRewardsString(boss)) : (fight.isImmunity() ? "" : ", у босса осталось " + boss.getCurrentHp() + " HP"));
     }
 
     private String getRewardsString(BossInfo boss) {
@@ -175,7 +176,7 @@ public class DungeonService {
         }
         return "Вы сбежали из-за опасности. " + (damageGet.getValue() <= 0 ? "Вы всё задоджили " :
                 "Вам досталось " + damageGet.getLabel()) +
-                (fight.getStealArt() == null ? "" : ", у вас вероломно украли " + fight.getStealArt()) +
+                (fight.getStealArt() == null ? "" : ", в бою у вас УКРАЛИ артефакт: " + fight.getStealArt()) +
                 (fight.getShieldSpent() > 0 ? ", потрачено брони: " + fight.getShieldSpent() : "") +
                 ", получено опыта: " + fight.getExp() + ", общий статус: " + hero.getDamageGot().getStatus() + ", " +
                 getDangerByDamage(boss, hero);
@@ -205,7 +206,7 @@ public class DungeonService {
     private String getUserStats(String userName, HeroInfo info) {
         return new StringJoiner(", ")
                 .add(userName + ", Класс: " + info.getType().getLabel())
-                .add("Здоровье: " + info.getDamageGot().getStatus() + ", " + (info.getDamageGot().getValue() - info.getShield() > HeroDamage.MEDIUM.getValue() ? (info.getDamageGot() == DEAD ? "(го завтра?)" : getDangerByDamage(bossService.getCurrentBoss(), info)) : " (го в данж)"))
+                .add("Здоровье: " + info.getDamageGot().getStatus() + " " + (info.getDamageGot().getValue() - info.getShield() > HeroDamage.MEDIUM.getValue() ? (info.getDamageGot() == DEAD ? "(го завтра?)" : getDangerByDamage(bossService.getCurrentBoss(), info)) : "(го в данж)"))
                 .add("Защита: " + info.getShield())
                 .add("Уровень: " + info.getLevel())
                 .add("Опыт: " + info.getExperience())
@@ -232,6 +233,9 @@ public class DungeonService {
         FightResult result = new FightResult()
                 .setBoss(boss)
                 .setHero(heroInfo);
+
+        boolean immunity = boss.getImmunity() == heroInfo.getType();
+        result.setImmunity(immunity);
 
         // hero
         HeroDamage damageFromBoss = NONE;
@@ -273,25 +277,19 @@ public class DungeonService {
             }
         }
 
-        if (boss.getStealPercent() > 0) {
-            if (Randomizer.getPercent() < boss.getStealPercent()) {
-                List<Artifact> artifacts = heroInfo.getArtifacts();
-                if (CollectionUtils.isNotEmpty(artifacts)) {
-                    Artifact randomItem = Randomizer.getRandomItem(artifacts);
-                    result.setStealArt(randomItem.getName());
-                    artifacts.remove(randomItem);
-                }
-            }
-        }
+        result.setStealArt(tryToSteal(boss.getStealPercent(), heroInfo));
 
+        int heroDamage = 0;
         // boss
-        int heroDamage = IntStream.range(0, fights).map(operand -> heroInfo.getAttack(boss) * crit.intValue()).sum();
-        boss.dealDamage(heroDamage);
-        result.setDamageDone(heroDamage);
-        result.setFightsNumber(fights);
-        result.setCrit(crit.intValue());
+        if (!immunity) {
+            heroDamage = IntStream.range(0, fights).map(operand -> heroInfo.getAttack(boss) * crit.intValue()).sum();
+            boss.dealDamage(heroDamage);
+            result.setDamageDone(heroDamage);
+            result.setCrit(crit.intValue());
+        }
         bossService.damage(heroInfo.getName(), heroDamage);
 
+        result.setFightsNumber(fights);
         result.setDamageReceived(damageFromBoss);
         result.setShieldSpent(shieldSpent);
 
@@ -306,6 +304,7 @@ public class DungeonService {
             if (finalShieldSpent > 0) {
                 hero.setShield(finalShieldEvailable);
             }
+            hero.setArtifacts(heroInfo.getArtifacts());
         };
         update.accept(heroInfo);
         earnXP(result);
@@ -318,12 +317,27 @@ public class DungeonService {
         return result;
     }
 
+    public static String tryToSteal(int stealPercent, HeroInfo heroInfo) {
+        if (stealPercent > 0 && CollectionUtils.isNotEmpty(heroInfo.getArtifacts())) {
+            int random = Randomizer.getPercent();
+            if (random > 0 && random < stealPercent) {
+                List<Artifact> artifacts = heroInfo.getArtifacts();
+                if (CollectionUtils.isNotEmpty(artifacts)) {
+                    Artifact randomItem = Randomizer.getRandomItem(artifacts);
+                    artifacts.remove(randomItem);
+                    return randomItem.getName();
+                }
+            }
+        }
+        return null;
+    }
+
     private BossInfo getCurrentOrNext() {
         return bossService.getCurrentBoss();
     }
 
     public void earnXP(FightResult fight) {
-        fight.setExp(IntStream.range(0, fight.getFightsNumber()).map(operand -> (fight.getDamageReceived().getValue() / fight.getFightsNumber() * 10) + (fight.getDamageDone() / fight.getHero().getLevel()) + fight.getBoss().getStage() + Randomizer.nextInt(50 - fight.getHero().getLevel())).sum());
+        fight.setExp(IntStream.range(0, fight.getFightsNumber()).map(operand -> (fight.getDamageReceived().getValue() * 10) + (fight.getDamageDone() / fight.getHero().getLevel()) + Math.max(0, 100 - fight.getBoss().getStage() - fight.getHero().getLevel())).sum());
         fight.getHero().setExperience(fight.getHero().getExperience() + fight.getExp());
     }
 
@@ -347,6 +361,10 @@ public class DungeonService {
             sj.add((i + 1) + ". " + p.getLeft() + " " + p.getRight() + "lvl");
         }
         return "Топ выживших в подземелье - " + sj;
+    }
+
+    public String getHeroesListResponse() {
+        return HeroClass.VALUES.stream().map(HeroClass::getLabel).collect(Collectors.joining(", ", "На данный момент в подземелье котируются следующие классы: ", " {DOGGIE}"));
     }
 
     // TODO remove

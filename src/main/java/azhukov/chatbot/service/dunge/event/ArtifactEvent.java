@@ -24,6 +24,10 @@ public class ArtifactEvent implements DungeEvent {
     @Override
     public String handle(HeroInfo hero) {
         Set<String> oldRewards = bossService.getOldRewards();
+        if (oldRewards.isEmpty()) {
+            hero.setExperience(hero.getExperience() + XP_BY_ART);
+            return "тайник. Кто-то из предыдущих героев оставил заначку в виде артефакта, но вы не можете его опознать, по этому вы жертвуете артефакт на алтаре Догена и получаете " + XP_BY_ART + " опыта.";
+        }
         String randomItem = Randomizer.getRandomItem(new ArrayList<>(oldRewards));
         Artifact randomArt = articfactService.getById(randomItem);
         boolean added = hero.getArtifacts() == null || hero.getArtifacts().stream().noneMatch(artifact -> artifact.getId().equals(randomItem));

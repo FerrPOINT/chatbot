@@ -12,9 +12,9 @@ class ClassChangeEventTest {
     void test() {
         ClassChangeEvent classChangeEvent = new ClassChangeEvent();
         HeroInfo hero = new HeroInfo();
-        hero.setType(HeroClass.LALKA);
+        hero.setType(HeroClass.SAILOR);
         String handle = classChangeEvent.handle(hero);
-        assertNotEquals(HeroClass.LALKA, hero.getType());
+        assertNotEquals(HeroClass.SAILOR, hero.getType());
     }
 
 }

@@ -6,20 +6,22 @@
     "label": "похитительница сладких булочек",
     "minionsName": "воришки",
     "minionsLabel": "воришки из чата",
-    "strong": "PIE",
-    "weak": "ELF",
+    "strong": "FAIRY",
+    "weak": "PRISONER",
     "rewards": [
       "pie"
-    ]
+    ],
+    "stealPercent": 50,
+    "immunity": "ROGUE"
   },
   {
     "stage": 2,
     "level": 2,
-    "name": "Озара",
-    "label": "бандюга с пушкой",
+    "name": "Азара",
+    "label": "бандит в длинном плаще",
     "minionsName": "бандюганы",
     "minionsLabel": "бандюганы с пистолетами",
-    "strong": "LALKA",
+    "strong": "SAILOR",
     "weak": "WEREWOLF",
     "rewards": [
       "ozara-item"
@@ -32,11 +34,13 @@
     "label": "второй вор в гильдии",
     "minionsName": "опытные воришки",
     "minionsLabel": "матёрые воришки из чата",
-    "strong": "ELF",
-    "weak": "ORC",
+    "strong": "PRISONER",
+    "weak": "SHAMAN",
     "rewards": [
       "thief-gloves"
-    ]
+    ],
+    "stealPercent": 5,
+    "immunity": "ROGUE"
   },
   {
     "stage": 4,
@@ -45,8 +49,7 @@
     "label": "вернулась с 12-ю талисманами",
     "minionsName": "талисманы",
     "minionsLabel": "всеми 12-ю талисманами",
-    "strong": "PIE",
-    "weak": "LALKA",
+    "strong": "FAIRY",
     "rewards": [
       "talismans"
     ]
@@ -59,7 +62,7 @@
     "minionsName": "индюшата",
     "minionsLabel": "яростные индейки",
     "strong": "WEREWOLF",
-    "weak": "HALFLING",
+    "weak": "SAMURAI",
     "rewards": [
       "turkey-leg"
     ]
@@ -71,8 +74,8 @@
     "label": "пятый сталкер в гильдии",
     "minionsName": "маньячата)",
     "minionsLabel": "сталкеры из чатика",
-    "strong": "DARK",
-    "weak": "ORC",
+    "strong": "NECRO",
+    "weak": "ROGUE",
     "rewards": [
       "magic-binoculars"
     ]
@@ -84,8 +87,8 @@
     "label": "с удавкой",
     "minionsName": "душнята)",
     "minionsLabel": "душнилы из чатика",
-    "strong": "HALFLING",
-    "weak": "DARK",
+    "strong": "SAMURAI",
+    "weak": "NECRO",
     "rewards": [
       "slipknot"
     ]
@@ -98,7 +101,7 @@
     "minionsName": "булки",
     "minionsLabel": "порабощенные булки",
     "strong": "DEFENDER",
-    "weak": "NUBAS",
+    "weak": "NOBLE",
     "rewards": [
       "tanos-gems"
     ]
@@ -110,11 +113,12 @@
     "label": "первый из Догэнов",
     "minionsName": "псинки",
     "minionsLabel": "остальные оборотени",
-    "strong": "WEREWOLF",
-    "weak": "LALKA",
+    "strong": "NOBLE",
+    "weak": "SAILOR",
     "rewards": [
       "werewolf-tail"
-    ]
+    ],
+    "immunity": "WEREWOLF"
   },
   {
     "stage": 10,
@@ -123,8 +127,8 @@
     "label": "близняшки с палками",
     "minionsName": "пекари",
     "minionsLabel": "пекари чата",
-    "strong": "NUBAS",
-    "weak": "ELF",
+    "strong": "ROGUE",
+    "weak": "PRISONER",
     "rewards": [
       "twins-item"
     ]
@@ -136,7 +140,7 @@
     "label": "повелитель, дёргающий за ниточки",
     "minionsName": "нету",
     "minionsLabel": "кот самодостаточен",
-    "strong": "LALKA",
+    "strong": "SAILOR",
     "weak": "WEREWOLF",
     "rewards": [
       "pisos"
@@ -149,8 +153,8 @@
     "label": "наносит токсичный урон по площади",
     "minionsName": "огородик",
     "minionsLabel": "гопники из огородика",
-    "strong": "HALFLING",
-    "weak": "DARK",
+    "strong": "SAMURAI",
+    "weak": "NECRO",
     "rewards": [
       "tomato-item"
     ]
@@ -162,8 +166,8 @@
     "label": "темная сущность из будущего",
     "minionsName": "мучные",
     "minionsLabel": "мучные изделия из будущего",
-    "strong": "PIE",
-    "weak": "DARK",
+    "strong": "FAIRY",
+    "weak": "NECRO",
     "rewards": [
       "macaroni-shield"
     ]
@@ -176,7 +180,7 @@
     "minionsName": "феи",
     "minionsLabel": "ворчащие феи",
     "strong": "WEREWOLF",
-    "weak": "LALKA",
+    "weak": "ROGUE",
     "rewards": [
       "stick-of-wisdom"
     ]
@@ -188,8 +192,8 @@
     "label": "наносит урон цифровой атакой",
     "minionsName": "советчики",
     "minionsLabel": "советчики из чата",
-    "strong": "ORC",
-    "weak": "PIE",
+    "strong": "SHAMAN",
+    "weak": "FAIRY",
     "rewards": [
       "expert-medal"
     ]
@@ -201,8 +205,8 @@
     "label": "манящая моряков из чатика",
     "minionsName": "морячки",
     "minionsLabel": "влюблённые морячки",
-    "strong": "NUBAS",
-    "weak": "LALKA",
+    "strong": "NOBLE",
+    "weak": "SAILOR",
     "rewards": [
       "shell-bra"
     ]
@@ -214,8 +218,8 @@
     "label": "из темных глубин",
     "minionsName": "тентакли",
     "minionsLabel": "тентакли из водички",
-    "strong": "LALKA",
-    "weak": "ORC",
+    "strong": "ROGUE",
+    "weak": "SHAMAN",
     "rewards": [
       "slime"
     ]
@@ -227,8 +231,8 @@
     "label": "наносит урон премами по синевикам",
     "minionsName": "премовые големы",
     "minionsLabel": "големы движемые силой премов",
-    "strong": "DARK",
-    "weak": "PIE",
+    "strong": "NECRO",
+    "weak": "FAIRY",
     "rewards": [
       "challenger"
     ]
@@ -240,8 +244,8 @@
     "label": "наносит урон эротическими историями",
     "minionsName": "престарелые извращенцы",
     "minionsLabel": "престарелые извращенцы",
-    "strong": "HALFLING",
-    "weak": "DARK",
+    "strong": "SAMURAI",
+    "weak": "SHAMAN",
     "rewards": [
       "manuscript"
     ]
@@ -253,8 +257,8 @@
     "label": "заставляет приключенца снимать трусики",
     "minionsName": "развратные грибы",
     "minionsLabel": "грибы потерявшие всякий стыд",
-    "strong": "PIE",
-    "weak": "ELF",
+    "strong": "SHAMAN",
+    "weak": "NOBLE",
     "rewards": [
       "mushroom-hat"
     ]
@@ -266,8 +270,8 @@
     "label": "наносящая урон по самолюбию",
     "minionsName": "поклонники госпожи",
     "minionsLabel": "поклонники госпожи",
-    "strong": "LALKA",
-    "weak": "WEREWOLF",
+    "strong": "SAILOR",
+    "weak": "ROGUE",
     "rewards": [
       "crown"
     ]
@@ -280,7 +284,7 @@
     "minionsName": "паучата",
     "minionsLabel": "паучата",
     "strong": "DEFENDER",
-    "weak": "NUBAS",
+    "weak": "NOBLE",
     "rewards": [
       "spider-bracer"
     ]
@@ -303,7 +307,7 @@
     "label": "наносит психический урон мимишностью и котиками",
     "minionsName": "мимипсихи",
     "minionsLabel": "мимипсихи",
-    "strong": "HALFLING",
+    "strong": "PRISONER",
     "weak": "DEFENDER",
     "rewards": [
       "hentai-disk"
@@ -317,7 +321,7 @@
     "minionsName": "рептилии",
     "minionsLabel": "рептилии с надписью БАН на лбу",
     "strong": "WEREWOLF",
-    "weak": "ELF",
+    "weak": "PRISONER",
     "rewards": [
       "lizard-robe"
     ]
@@ -329,7 +333,7 @@
     "label": "наносит урон кибер атакой по путникам",
     "minionsName": "киберпоросята",
     "minionsLabel": "киберпоросята - вы их ждали и вот они",
-    "strong": "NUBAS",
+    "strong": "NOBLE",
     "weak": "DEFENDER",
     "rewards": [
       "code"
@@ -345,7 +349,8 @@
     "rewards": [
       "thief-gloves"
     ],
-    "stealPercent": 5
+    "stealPercent": 10,
+    "immunity": "ROGUE"
   },
   {
     "stage": 28,
@@ -354,8 +359,8 @@
     "label": "шпион гачистов, наносит урон аниме-плетью из данжена",
     "minionsName": "гачи посоны",
     "minionsLabel": "гачи данжн мастеры",
-    "strong": "ORC",
-    "weak": "PIE",
+    "strong": "SHAMAN",
+    "weak": "FAIRY",
     "rewards": [
       "latex-suite"
     ]
@@ -367,8 +372,8 @@
     "label": "наносит психический урон допросами с пристрастием",
     "minionsName": "пещерные досзнаватели",
     "minionsLabel": "пещерные досзнаватели",
-    "strong": "ELF",
-    "weak": "HALFLING",
+    "strong": "PRISONER",
+    "weak": "SAMURAI",
     "rewards": [
       "fbi-item"
     ]
@@ -380,7 +385,7 @@
     "label": "замуровывает приключенца в коробке пока не соберет головоломку",
     "minionsName": "постыдные пазломэны",
     "minionsLabel": "постыдные пазломэны",
-    "strong": "DARK",
+    "strong": "NECRO",
     "weak": "DEFENDER",
     "rewards": [
       "zeal-armor"

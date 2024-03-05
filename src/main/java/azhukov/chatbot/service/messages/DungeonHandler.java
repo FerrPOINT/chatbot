@@ -80,6 +80,9 @@ public class DungeonHandler extends MessageHandler {
                 heroInfoService.addArtifact(message.getText().split(" ")[1], message.getText().split(" ")[2]);
                 return createUserMessage(message, "артефакт {DOGGIE}");
             }
+            if (lowerCase.contains("!герои")) {
+                return createMessage(message, dungeonService.getHeroesListResponse());
+            }
             if (lowerCase.contains("!ладдер")) {
                 return createMessage(message, dungeonService.getLadderResponse());
             }
@@ -95,8 +98,8 @@ public class DungeonHandler extends MessageHandler {
             }
             for (String command : COMMANDS) {
                 if (lowerCase.contains(command)) {
-                    return createUserMessage(message, "На данже висит табличка \"Dungeons and Doggies 2 coming soon\" {DOGGIE}");
-//                    return createMessage(message, dungeonService.getDungeonResponse(message));
+//                    return createUserMessage(message, "На данже висит табличка \"Dungeons and Doggies 2 coming soon\" {DOGGIE}");
+                    return createMessage(message, dungeonService.getDungeonResponse(message));
                 }
             }
             for (String command : BOSS_COMMANDS) {
