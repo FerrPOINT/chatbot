@@ -401,5 +401,84 @@
     "rewards": [
       "crab-hammer"
     ]
+  },
+  {
+    "stage": 32,
+    "level": 50,
+    "name": "Дезпони",
+    "label": "олдфажный конь и шпион майлитлпони",
+    "minionsName": "минипони",
+    "minionsLabel": "радужные кони",
+    "rewards": [
+      "horse"
+    ],
+    "stealPercent": 20,
+    "immunity": "FAIRY"
+  },
+  {
+    "stage": 33,
+    "level": 50,
+    "name": " Апофис",
+    "label": " харизматичный макарончик",
+    "minionsName": "мини макарошки",
+    "minionsLabel": "отважные спагетти",
+    "strong": "SAILOR",
+    "weak": "WEREWOLF",
+    "rewards": [
+      "apophis"
+    ]
+  },
+  {
+    "stage": 34,
+    "level": 55,
+    "name": "Джаствалкер",
+    "label": "мучитель данжа и спамер команд",
+    "minionsName": "спамерские программы",
+    "minionsLabel": "быстрые руки запада",
+    "strong": "PRISONER",
+    "weak": "SHAMAN",
+    "rewards": [
+      "justwalker"
+    ],
+    "stealPercent": 10,
+    "immunity": "ROGUE"
+  },
+  {
+    "stage": 35,
+    "level": 55,
+    "name": "Ранушка74",
+    "label": "хакер со стажем",
+    "minionsName": "материнские платы",
+    "minionsLabel": "ИИ интелект",
+    "weak": "ROGUE",
+    "rewards": [
+      "run74"
+    ]
+  },
+  {
+    "stage": 36,
+    "level": 60,
+    "name": "Драй нострилс",
+    "label": "владелец булочной плантации",
+    "minionsName": "чахлые маковки",
+    "minionsLabel": "несъедобные пирожки",
+    "strong": "WEREWOLF",
+    "weak": "SAMURAI",
+    "rewards": [
+      "drynorls"
+    ]
+  },
+  {
+    "stage": 37,
+    "level": 60,
+    "name": "Беллер",
+    "label": "повелитель сирен и музыкальной шкатулки",
+    "minionsName": "грудастные сирены",
+    "minionsLabel": "ультразвуковые мелодии",
+    "strong": "NECRO",
+    "weak": "ROGUE",
+    "rewards": [
+      "beller"
+    ]
   }
 ]

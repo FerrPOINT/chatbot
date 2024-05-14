@@ -361,5 +361,71 @@
         "value": 20
       }
     ]
+  },
+  {
+    "id": "justwalker",
+    "name": "Очки защиты от спама",
+    "label": "кибербезопасность",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 6
+      }
+    ]
+  },
+  {
+    "id": "run74",
+    "name": "Хакерский код судьбы",
+    "label": "судьбоносный код",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "drynorls",
+    "name": "Граната из булок",
+    "label": "осколочная булочная граната",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "beller",
+    "name": "Укулеле короля догенов",
+    "label": "музыкальный гипноз",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "horse",
+    "name": "Значок коня",
+    "label": "конь дающий защиту",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 7
+      }
+    ]
+  },
+  {
+    "id": "apophis",
+    "name": "Апофис",
+    "label": "Апофис - что бы это не значило)",
+    "modifications": [
+      {
+        "modificationType": "DAILY_GUARD",
+        "value": 7
+      }
+    ]
   }
 ]
