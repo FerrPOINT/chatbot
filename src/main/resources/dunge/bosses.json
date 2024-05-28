@@ -480,5 +480,121 @@
     "rewards": [
       "beller"
     ]
+  },
+  {
+    "stage": 38,
+    "level": 80,
+    "name": "Костебрак пывовар",
+    "label": "повелитель хмеля и таверны",
+    "minionsName": "шаловливый бармен",
+    "minionsLabel": "пси-напитки",
+    "strong": "WEREWOLF",
+    "weak": "SAMURAI",
+    "rewards": [
+      "kostebrak"
+    ]
+  },
+  {
+    "stage": 39,
+    "level": 100,
+    "name": "Мезза архивариус",
+    "label": "знаток коллекции аниме и манги",
+    "minionsName": "титаны одиночества",
+    "minionsLabel": "кавайные девочки",
+    "strong": "NOBLE",
+    "weak": "SAMURAI",
+    "rewards": [
+      "mezza"
+    ]
+  },
+  {
+    "stage": 40,
+    "level": 130,
+    "name": "Алекс гусь-гидра",
+    "label": "удушающая гуська гидруська",
+    "minionsName": "три гуся",
+    "minionsLabel": "перепончатые лапки",
+    "strong": "FAIRY",
+    "weak": "PRISONER",
+    "rewards": [
+      "goose"
+    ]
+  },
+  {
+    "stage": 41,
+    "level": 160,
+    "name": "Клоун Робин барабек",
+    "label": "весельчак с предсмертной шуткой",
+    "minionsName": "клоуны вызывающие фобии",
+    "minionsLabel": "гномы клоуны",
+    "strong": "DEFENDER",
+    "rewards": [
+      "robin"
+    ]
+  },
+  {
+    "stage": 42,
+    "level": 200,
+    "name": "Мягколапый, когтистый Котовски",
+    "label": "наносит атаку ядовитыми когтями",
+    "minionsName": "токсичные коготки",
+    "minionsLabel": "подушечки обояния",
+    "strong": "NECRO",
+    "weak": "DEFENDER",
+    "rewards": [
+      "kotovski"
+    ]
+  },
+  {
+    "stage": 43,
+    "level": 250,
+    "name": "Гигантская Уточка Утан",
+    "label": "повелитель лабиринта и побегов из Таркова",
+    "minionsName": "боты убийцы",
+    "minionsLabel": "резиновые уточки",
+    "strong": "DEFENDER",
+    "weak": "SAMURAI",
+    "rewards": [
+      "utan"
+    ]
+  },
+  {
+    "stage": 44,
+    "level": 300,
+    "name": "Вечно ворующий еду у догена Kowak",
+    "label": "мягколапый вор сладких рулетов",
+    "minionsName": "могучие клыки кота",
+    "minionsLabel": "адепты гильдии воров - сироты котята",
+    "rewards": [
+      "kowak"
+    ],
+    "stealPercent": 40,
+    "immunity": "ROGUE"
+  },
+  {
+    "stage": 45,
+    "level": 350,
+    "name": "Колдун из школы вредности Грин43",
+    "label": "завсягдатый постоялец банной комнаты",
+    "minionsName": "язвительные заклятия",
+    "minionsLabel": "монументы боли",
+    "strong": "SAMURAI",
+    "weak": "WEREWOLF",
+    "rewards": [
+      "grin43"
+    ]
+  },
+  {
+    "stage": 46,
+    "level": 400,
+    "name": "Темный эльф королевства теней Чар09",
+    "label": "атакующий приключенца из тени деревянной палкой",
+    "minionsName": "деревянные палки",
+    "minionsLabel": "деревянные палки",
+    "strong": "ROGUE",
+    "weak": "FAIRY",
+    "rewards": [
+      "char09"
+    ]
   }
 ]

@@ -427,5 +427,104 @@
         "value": 7
       }
     ]
+  },
+  {
+    "id": "kostebrak",
+    "name": "Элексир маны и хп",
+    "label": "зелье невидимости",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "id": "mezza",
+    "name": "Фолиант заклинаний",
+    "label": "папирус мудрости",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "id": "goose",
+    "name": "Свиток воскрешения",
+    "label": "бумажный гусь-сюрекен",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "id": "robin",
+    "name": "Журнал с мемами",
+    "label": "Настолка с мемами",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 30
+      }
+    ]
+  },
+  {
+    "id": "kotovski",
+    "name": "Кошачья лапка",
+    "label": "Меховые трусы обороны",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "id": "utan",
+    "name": "Автомат с уточкой",
+    "label": "Шлем с уткой",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "kowak",
+    "name": "Мешок с бесконечной едой",
+    "label": "Кулинарная книга",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 10
+      }
+    ]
+  },
+  {
+    "id": "grin43",
+    "name": "Некрономикон заговоров",
+    "label": "Колпак обоятельности",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 20
+      }
+    ]
+  },
+  {
+    "id": "char09",
+    "name": "Клинок теней",
+    "label": "повязка клана теней",
+    "modifications": [
+      {
+        "modificationType": "ATTACK_CHANGE",
+        "value": 30
+      }
+    ]
   }
 ]

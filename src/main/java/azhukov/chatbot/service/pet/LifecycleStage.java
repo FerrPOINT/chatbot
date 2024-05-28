@@ -17,18 +17,19 @@ public enum LifecycleStage {
 
     ;
 
+    public static final LifecycleStage[] VALUES = values();
+
     private final String message;
 
-    private final static LifecycleStage MIN = values()[0];
-    private final static LifecycleStage MAX = values()[values().length - 1];
+    private final static LifecycleStage MIN = VALUES[0];
+    private final static LifecycleStage MAX = VALUES[VALUES.length - 1];
 
     public LifecycleStage offset(int amount) {
-        final LifecycleStage[] all = values();
         final int current = ordinal();
         int result = current + amount;
-        result = Math.min(result, all.length - 1);
+        result = Math.min(result, VALUES.length - 1);
         result = Math.max(result, 0);
-        return all[result];
+        return VALUES[result];
     }
 
     public boolean isMax() {

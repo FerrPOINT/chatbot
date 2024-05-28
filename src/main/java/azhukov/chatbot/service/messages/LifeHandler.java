@@ -28,7 +28,7 @@ public class LifeHandler extends MessageHandler {
 
 
     private ChatResponse randomStray(ChatRequest message) {
-        if (Randomizer.getPercent() % 10 == 7) {
+        if (Randomizer.tossCoin()) {
             lifecycleService.reset();
             return createUserMessage(message, "У собачки итак много еды, но вы случайно привели за собой стаю бездомных догенов, которые всё отобрали у нашей пёси))) {DOGGIE}");
         }
