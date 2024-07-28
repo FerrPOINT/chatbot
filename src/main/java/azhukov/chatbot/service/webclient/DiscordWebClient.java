@@ -94,4 +94,9 @@ public class DiscordWebClient {
 
     }
 
+    public void forceReconnect() {
+        shutdown();
+        init();
+    }
+
 }
