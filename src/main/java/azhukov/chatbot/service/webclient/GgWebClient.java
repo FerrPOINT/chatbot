@@ -133,10 +133,10 @@ public class GgWebClient {
 
     private void sendMessageWithDelay(WebSocketSession session, String message) {
         long delay = Math.max(0, MILLIS_BETWEEN_RESPONSE - (System.currentTimeMillis() - lastMessageTime));
+        lastMessageTime = System.currentTimeMillis() + delay;
         scheduler.schedule(() -> {
             try {
                 session.sendMessage(new TextMessage(message));
-                lastMessageTime = System.currentTimeMillis();
             } catch (Exception e) {
                 log.error("Error while sending message", e);
             }
