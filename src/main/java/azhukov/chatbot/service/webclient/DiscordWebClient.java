@@ -17,11 +17,13 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.springframework.beans.factory.annotation.Value;
+import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -30,28 +32,35 @@ public class DiscordWebClient {
 
     private final MappingService mappingService;
     private final CommonChatService commonChatService;
+    private final DiscordProperties properties;
 
-    @Value("${discord.token:disabled}")
-    private String token;
     private JDA jda;
 
     @PostConstruct
     void init() {
-        if ("disabled".equals(token)) {
+        if ("disabled".equals(properties.getToken())) {
             return;
         }
-        jda = JDABuilder.createDefault(token)
+
+        // Настройка прокси (замените адрес и порт на свои)
+        Proxy proxy = properties.getProxyHost() == null ? null : new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(properties.getProxyHost(), properties.getProxyPort()));
+
+        // Создаём OkHttpClient с настройками прокси
+        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
+        httpClientBuilder.proxy(proxy);
+
+        // Инициализация JDA с использованием прокси
+        jda = JDABuilder.createDefault(properties.getToken())
                 .disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE, CacheFlag.ACTIVITY, CacheFlag.STICKER, CacheFlag.ROLE_TAGS, CacheFlag.FORUM_TAGS, CacheFlag.ONLINE_STATUS, CacheFlag.CLIENT_STATUS)
                 .setBulkDeleteSplittingEnabled(false)
                 .setCompression(Compression.NONE)
                 .setActivity(Activity.playing("собачьи дела"))
                 .setStatus(OnlineStatus.ONLINE)
-                .enableIntents(GatewayIntent.GUILD_MESSAGES)
-                .enableIntents(GatewayIntent.DIRECT_MESSAGES)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
                 .addEventListeners(new MessageListener())
                 .setEnableShutdownHook(true)
                 .setAutoReconnect(true)
+                .setHttpClient(httpClientBuilder.build()) // Передаём кастомный HTTP клиент
                 .build();
     }
 
