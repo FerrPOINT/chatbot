@@ -20,15 +20,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import okhttp3.OkHttpClient;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -46,42 +43,41 @@ public class DiscordWebClient {
         if ("disabled".equals(properties.getToken())) {
             return;
         }
-        System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
-        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> {
-            // Будь крайне осторожен – это снижает уровень безопасности!
-            return hostname.equals("gateway.discord.gg");
-        });
+        try {
+            System.setProperty("jdk.internal.httpclient.disableHostnameVerification", "true");
+            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> {
+                // Будь крайне осторожен – это снижает уровень безопасности!
+                return hostname.equals("gateway.discord.gg");
+            });
 
-        // Настройка прокси (замените адрес и порт на свои)
-        Proxy proxy = properties.getProxyHost() == null ? Proxy.NO_PROXY : new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(properties.getProxyHost(), properties.getProxyPort()));
-        log.info("Using proxy {}", proxy);
+            // Инициализация JDA с использованием прокси
+            jda = JDABuilder.createDefault(properties.getToken())
+                    .disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE, CacheFlag.ACTIVITY, CacheFlag.STICKER, CacheFlag.ROLE_TAGS, CacheFlag.FORUM_TAGS, CacheFlag.ONLINE_STATUS, CacheFlag.CLIENT_STATUS)
+                    .setBulkDeleteSplittingEnabled(false)
+                    .setCompression(Compression.NONE)
+                    .setActivity(Activity.playing("собачьи дела"))
+                    .setStatus(OnlineStatus.ONLINE)
+                    .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
+                    .addEventListeners(new MessageListener())
+                    .setEnableShutdownHook(true)
+                    .setAutoReconnect(true)
+                    .setRequestTimeoutRetry(true)
+                    .setWebsocketFactory(new WebSocketFactory() {
+                        @Override
+                        public WebSocket createSocket(String url) throws IOException {
+                            WebSocketFactory factory = new WebSocketFactory();
+                            factory.setVerifyHostname(false);  // ОТКЛЮЧАЕТ ПРОВЕРКУ HOSTNAME
+                            factory.setSocketTimeout(10000);
+                            factory.setConnectionTimeout(10000);
+                            return factory.createSocket(url);
+                        }
+                    })
+                    .build();
 
-        // Создаём OkHttpClient с настройками прокси
-        OkHttpClient unsafeClient = UnsafeOkHttpClient.getUnsafeOkHttpClient(proxy);
-
-        // Инициализация JDA с использованием прокси
-        jda = JDABuilder.createDefault(properties.getToken())
-                .disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE, CacheFlag.ACTIVITY, CacheFlag.STICKER, CacheFlag.ROLE_TAGS, CacheFlag.FORUM_TAGS, CacheFlag.ONLINE_STATUS, CacheFlag.CLIENT_STATUS)
-                .setBulkDeleteSplittingEnabled(false)
-                .setCompression(Compression.NONE)
-                .setActivity(Activity.playing("собачьи дела"))
-                .setStatus(OnlineStatus.ONLINE)
-                .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
-                .addEventListeners(new MessageListener())
-                .setEnableShutdownHook(true)
-                .setAutoReconnect(true)
-                .setHttpClient(unsafeClient) // Передаём кастомный HTTP клиент
-                .setWebsocketFactory(new WebSocketFactory() {
-                    @Override
-                    public WebSocket createSocket(String url) throws IOException {
-                        WebSocketFactory factory = new WebSocketFactory();
-                        factory.setVerifyHostname(false);  // ОТКЛЮЧАЕТ ПРОВЕРКУ HOSTNAME
-                        return factory.createSocket(url);
-                    }
-                })
-                .build();
-
-        jda.awaitReady(); // Дождаться готовности
+            jda.awaitReady(); // Дождаться готовности
+        } catch (Exception e) {
+            log.error("Error initializing Discord Web Client", e);
+        }
     }
 
     @PreDestroy
