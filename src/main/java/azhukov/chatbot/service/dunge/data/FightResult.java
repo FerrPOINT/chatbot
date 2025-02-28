@@ -1,5 +1,6 @@
 package azhukov.chatbot.service.dunge.data;
 
+import azhukov.chatbot.service.dunge.ability.AbilitiesData;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -23,5 +24,7 @@ public class FightResult {
     private int fightsNumber;
     private String stealArt;
     private boolean immunity;
+    private AbilitiesData nextHeroBuffs;
+    private boolean reborn;
 
 }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,8 +25,10 @@ public class HeroInfo {
     private HeroDamage damageGot;
     private LocalDateTime deadTime;
     private int shield;
-    private int crit;
+    private float crit;
     private int events;
+    private boolean specialAbilityUsed;
+    private int rebornPercentage;
 
     public int getLevel() {
         return (experience / 1000) + 1;
@@ -77,6 +80,34 @@ public class HeroInfo {
             }
         }
         return max;
+    }
+
+    public void addShields(int shields) {
+        setShield(getShield() + shields);
+    }
+
+    public void heal(int heal) {
+        setDamageGot(HeroDamage.getByValue(getDamageGot().getValue() + heal));
+    }
+
+    public void addExp(int exp) {
+        experience += exp;
+    }
+
+    public boolean isDead() {
+        return damageGot == HeroDamage.DEAD;
+    }
+
+    public boolean hasArtifacts() {
+        return CollectionUtils.isNotEmpty(artifacts);
+    }
+
+    public boolean hasArtifact(Artifact artifact) {
+        return hasArtifacts() && artifacts.stream().anyMatch(a -> a.getId().equals(artifact.getId()));
+    }
+
+    public boolean removeArtifact(Artifact artifact) {
+        return hasArtifacts() && artifacts.removeIf(a -> a.getId().equals(artifact.getId()));
     }
 
     public void addArtifact(Artifact artifact) {

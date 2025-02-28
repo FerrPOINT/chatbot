@@ -32,6 +32,10 @@ public class HeroInfoService {
         return store.get(name);
     }
 
+    public void update(HeroInfo info, Consumer<HeroInfo> updater) {
+        update(info.getName(), updater);
+    }
+
     public void update(String name, Consumer<HeroInfo> updater) {
         HeroInfo info = getOrCreateNew(name);
         updater.accept(info);
@@ -82,6 +86,8 @@ public class HeroInfoService {
             heroInfo.resetShield();
             heroInfo.setCrit(0);
             heroInfo.setEvents(0);
+            heroInfo.setSpecialAbilityUsed(false);
+            heroInfo.setRebornPercentage(0);
         });
         log.info("Heal complete. total: {}, dead: {}", counter.intValue(), toDelete.size());
         toDelete.forEach(store::delete);

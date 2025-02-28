@@ -2,6 +2,7 @@ package azhukov.chatbot.service.dunge.service;
 
 import azhukov.chatbot.service.combination.CombinationService;
 import azhukov.chatbot.service.dunge.ArticfactService;
+import azhukov.chatbot.service.dunge.ability.AbilitiesData;
 import azhukov.chatbot.service.dunge.data.*;
 import azhukov.chatbot.service.dunge.event.DungeEvent;
 import azhukov.chatbot.service.store.DailyStore;
@@ -50,6 +51,7 @@ class DungeonServiceTest {
         fight.setFightsNumber(2);
         fight.setDamageDone(IntStream.range(0, fight.getFightsNumber()).map(operand -> hero.getAttack(boss)).sum());
         fight.setDamageReceived(HeroDamage.MEDIUM);
+        fight.setNextHeroBuffs(new AbilitiesData());
 
         for (int i = 0; i < 1000; i++) {
             dungeonService.earnXP(fight);

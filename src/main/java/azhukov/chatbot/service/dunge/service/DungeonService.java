@@ -3,11 +3,14 @@ package azhukov.chatbot.service.dunge.service;
 import azhukov.chatbot.dto.ChatRequest;
 import azhukov.chatbot.service.combination.CombinationService;
 import azhukov.chatbot.service.dunge.ArticfactService;
+import azhukov.chatbot.service.dunge.ability.AbilitiesData;
+import azhukov.chatbot.service.dunge.ability.HeroAbilityService;
 import azhukov.chatbot.service.dunge.data.*;
 import azhukov.chatbot.service.dunge.event.DungeEvent;
 import azhukov.chatbot.service.messages.MessageContainer;
 import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
+import azhukov.chatbot.service.util.DistinctEvictingCollection;
 import azhukov.chatbot.service.util.Randomizer;
 import azhukov.chatbot.service.weight.WeightUtils;
 import azhukov.chatbot.util.RangesContainer;
@@ -42,7 +45,10 @@ public class DungeonService {
     private final DailyStore dailyStore;
     private final List<DungeEvent> events;
     private final CombinationService combinationService;
+    private final HeroAbilityService heroAbilityService;
     private RangesContainer<DungeEvent> eventsContainer;
+
+    private final DistinctEvictingCollection<String> previousHero = new DistinctEvictingCollection<>(10); // Переменная для хранения предыдущего героя
 
     @PostConstruct
     void init() {
@@ -73,6 +79,12 @@ public class DungeonService {
         return current != null ? getUserStats(userName, current) : "Вас нет в мире живых, но вы уже готовы возродиться героем!";
     }
 
+    public String getHeroInfo(ChatRequest request) {
+        String userName = request.getUserName();
+        HeroInfo current = heroInfoService.getCurrent(userName);
+        return current != null ? getUserInfo(userName, current) : "Вас нет в мире живых, но вы уже готовы возродиться героем!";
+    }
+
     public synchronized String getDungeonResponse(ChatRequest request) {
         String userName = request.getUserName();
         HeroInfo current = heroInfoService.getCurrent(userName);
@@ -87,18 +99,35 @@ public class DungeonService {
         if (boss == null || boss.isDead()) {
             return "Данж разорён, тут совсем пусто, подождём пока тут поселится новый злодей! {DOGGIE}";
         }
-        if (current.getEvents() == 0 || (current.getEvents() < MAX_EVENTS_PER_DAY && Randomizer.nextInt(1, 11) < (5 - current.getEvents()))) {
-            DungeEvent randomEvent = eventsContainer.getRandomItem();
-            MessageContainer message = new MessageContainer();
-            heroInfoService.update(request.getUserName(), heroInfo -> {
-                message.setMessage(randomEvent.handle(heroInfo) + " {DOGGIE}");
-                heroInfo.setEvents(heroInfo.getEvents() + 1);
-            });
-            return combinationService.getRandomCombinationMessage("dunge-prefix") + " " + message.getMessage();
+        try {
+            if (current.getEvents() == 0 || (current.getEvents() < MAX_EVENTS_PER_DAY && Randomizer.nextInt(1, 11) < (5 - current.getEvents()))) {
+                DungeEvent randomEvent = eventsContainer.getRandomItem();
+                MessageContainer message = new MessageContainer();
+                heroInfoService.update(request.getUserName(), heroInfo -> {
+                    message.setMessage(randomEvent.handle(heroInfo) + " {DOGGIE}");
+                    heroInfo.setEvents(heroInfo.getEvents() + 1);
+                });
+                return combinationService.getRandomCombinationMessage("dunge-prefix") + " " + message.getMessage();
+            }
+            FightResult fight = fight(userName, current);
+            try {
+                return getBossMessage(fight) + ". " + getHeroMessage(fight) + getRewardsMessage(fight) + " {DOGGIE}";
+            } finally {
+                heroAbilityService.resetNextHeroAbilities();
+            }
+        } finally {
+            previousHero.add(current.getName());
         }
-        FightResult fight = fight(userName, current);
+    }
 
-        return getBossMessage(fight) + ". " + getHeroMessage(fight) + getRewardsMessage(fight) + " {DOGGIE}";
+    public String useHeroAbility(ChatRequest message) {
+        HeroInfo curr = heroInfoService.getCurrent(message.getUserName());
+        if (curr == null) {
+            return "Герой не найден.";
+        }
+        String prevName = previousHero.getPrev();
+        HeroInfo prev = prevName == null ? null : heroInfoService.getCurrent(prevName);
+        return heroAbilityService.useHeroAbility(curr, prev);
     }
 
     private String getRewardsMessage(FightResult fight) {
@@ -121,33 +150,6 @@ public class DungeonService {
             }
         }
         return "";
-    }
-
-    public void resetAccs() {
-        heroInfoService.reset();
-    }
-
-    public void resetBoss() {
-        bossService.reset();
-    }
-
-    public void resetAcc(String name) {
-        heroInfoService.clean(name);
-    }
-
-    public void resurrectAcc(String name) {
-        heroInfoService.update(name, heroInfo -> {
-            heroInfo.setDamageGot(ALMOUST_DEAD);
-            heroInfo.setDeadTime(null);
-        });
-    }
-
-    public void upShield(String name) {
-        heroInfoService.update(name, heroInfo -> heroInfo.setShield(5));
-    }
-
-    public void resetCurrBoss() {
-        bossService.resetCurrentBoss();
     }
 
     private String getBossMessage(FightResult fight) {
@@ -174,7 +176,7 @@ public class DungeonService {
         if (hero.getDamageGot() == DEAD) {
             return "Вы рискнули напасть на этого матёрого босса, и он вам нанес " + damageGet.getLabel() + ", вместе с этим вы получили смертельный урон, PRESS F!";
         }
-        return "Вы сбежали из-за опасности. " + (damageGet.getValue() <= 0 ? "Вы всё задоджили " :
+        return (fight.isReborn() ? "Босс уже добивал вас, но вы спаслись с помощью абилки избегания СМЕРТИ. " : "Вы сбежали из-за опасности. ") + (damageGet.getValue() <= 0 ? "Вы всё задоджили " :
                 "Вам досталось " + damageGet.getLabel()) +
                 (fight.getStealArt() == null ? "" : ", в бою у вас УКРАЛИ артефакт: " + fight.getStealArt()) +
                 (fight.getShieldSpent() > 0 ? ", потрачено брони: " + fight.getShieldSpent() : "") +
@@ -206,11 +208,19 @@ public class DungeonService {
     private String getUserStats(String userName, HeroInfo info) {
         return new StringJoiner(", ")
                 .add(userName + ", Класс: " + info.getType().getLabel())
+                .add("Абилка: " + (info.isSpecialAbilityUsed() ? "использовалалась" : "не использовалалась"))
                 .add("Здоровье: " + info.getDamageGot().getStatus() + " " + (info.getDamageGot().getValue() - info.getShield() > HeroDamage.MEDIUM.getValue() ? (info.getDamageGot() == DEAD ? "(го завтра?)" : getDangerByDamage(bossService.getCurrentBoss(), info)) : "(го в данж)"))
                 .add("Защита: " + info.getShield())
                 .add("Уровень: " + info.getLevel())
                 .add("Опыт: " + info.getExperience())
                 .add(CollectionUtils.isEmpty(info.getArtifacts()) ? "Нет артефактов" : ("Артефакты: " + info.getArtifacts().size() + " штук"))
+                .toString();
+    }
+
+    private String getUserInfo(String userName, HeroInfo info) {
+        return new StringJoiner(", ")
+                .add(userName + ", Класс: " + info.getType().getLabel())
+                .add("Абилка: " + info.getType().getAbilityName() + " - " + info.getType().getAbilityDescription())
                 .toString();
     }
 
@@ -229,10 +239,13 @@ public class DungeonService {
     private FightResult fight(String name, HeroInfo heroInfo) {
         BossInfo boss = getCurrentOrNext();
 
+        AbilitiesData nextHeroBuffs = heroAbilityService.getNextHeroBuffs();
+
         LocalDateTime now = LocalDateTime.now();
         FightResult result = new FightResult()
                 .setBoss(boss)
-                .setHero(heroInfo);
+                .setHero(heroInfo)
+                .setNextHeroBuffs(nextHeroBuffs);
 
         boolean immunity = boss.getImmunity() == heroInfo.getType();
         result.setImmunity(immunity);
@@ -244,7 +257,7 @@ public class DungeonService {
 
         boolean bossStronger = boss.getStrong() == heroInfo.getType();
 
-        int shieldEvailable = heroInfo.getShield();
+        int shieldEvailable = heroInfo.getShield() + nextHeroBuffs.getShieldUpdate();
         int shieldSpent = 0;
 
         HeroDamage damageBoundExclusive = HUGE;
@@ -283,6 +296,9 @@ public class DungeonService {
         // boss
         if (!immunity) {
             heroDamage = IntStream.range(0, fights).map(operand -> heroInfo.getAttack(boss) * crit.intValue()).sum();
+            if (nextHeroBuffs.getAttackUpdate() > 0) {
+                heroDamage = heroDamage + (int) ((double) heroDamage * (double) nextHeroBuffs.getAttackUpdate() / 100D);
+            }
             boss.dealDamage(heroDamage);
             result.setDamageDone(heroDamage);
             result.setCrit(crit.intValue());
@@ -294,13 +310,23 @@ public class DungeonService {
         result.setShieldSpent(shieldSpent);
 
         HeroDamage join = heroInfo.getDamageGot() == null || damageFromBoss.getValue() < 0 ? heroInfo.getDamageGot() : heroInfo.getDamageGot().join(damageFromBoss);
+
+        if (join == DEAD && heroInfo.getRebornPercentage() > 0) {
+            if (Randomizer.getPercent() < heroInfo.getRebornPercentage()) {
+                result.setReborn(true);
+                heroInfo.setRebornPercentage(0);
+                join = ALMOUST_DEAD;
+            }
+        }
+
         int finalShieldSpent = shieldSpent;
         int finalShieldEvailable = shieldEvailable;
+        HeroDamage finalDamage = join;
         Consumer<HeroInfo> update = hero -> {
-            if (join == DEAD) {
+            if (finalDamage == DEAD) {
                 hero.setDeadTime(now);
             }
-            hero.setDamageGot(join);
+            hero.setDamageGot(finalDamage);
             if (finalShieldSpent > 0) {
                 hero.setShield(finalShieldEvailable);
             }
@@ -337,7 +363,13 @@ public class DungeonService {
     }
 
     public void earnXP(FightResult fight) {
-        fight.setExp(IntStream.range(0, fight.getFightsNumber()).map(operand -> (fight.getDamageReceived().getValue() * 10) + (fight.getDamageDone() / fight.getHero().getLevel()) + Math.max(0, 100 - fight.getBoss().getStage() - fight.getHero().getLevel())).sum());
+        int exp = IntStream.range(0, fight.getFightsNumber()).map(operand -> (fight.getDamageReceived().getValue() * 10) + (fight.getDamageDone() / fight.getHero().getLevel()) + Math.max(0, 100 - fight.getBoss().getStage() - fight.getHero().getLevel())).sum();
+
+        if (fight.getNextHeroBuffs().getAttackUpdate() > 0) {
+            exp = exp + (int) ((double) exp * (double) fight.getNextHeroBuffs().getAttackUpdate() / 100D);
+        }
+
+        fight.setExp(exp);
         fight.getHero().setExperience(fight.getHero().getExperience() + fight.getExp());
     }
 
@@ -354,7 +386,7 @@ public class DungeonService {
     }
 
     public String getLadderResponse() {
-        List<Pair<String, Integer>> topLevel = heroInfoService.getTopLevel(10);
+        List<Pair<String, Integer>> topLevel = heroInfoService.getTopLevel(20);
         StringJoiner sj = new StringJoiner(",  ");
         for (int i = 0; i < topLevel.size(); i++) {
             Pair<String, Integer> p = topLevel.get(i);
@@ -364,15 +396,18 @@ public class DungeonService {
     }
 
     public String getHeroesListResponse() {
-        return HeroClass.VALUES.stream().map(HeroClass::getLabel).collect(Collectors.joining(", ", "На данный момент в подземелье котируются следующие классы: ", " {DOGGIE}"));
+        return HeroClass.VALUES.stream()
+                .map(heroClass -> "|" + heroClass.getLabel() + " - " + heroClass.getAbilityName() + "|")
+                .collect(Collectors.joining("\n", "На данный момент в подземелье котируются следующие классы:\n", "\n{DOGGIE}"));
     }
 
-    // TODO remove
-    public void migra1() {
-        heroInfoService.updateAll(heroInfo -> {
-            if (heroInfo.getArtifacts() != null) {
-                heroInfo.getArtifacts().removeIf(Objects::isNull);
-            }
+    public void superuser(ChatRequest message) {
+        heroInfoService.update(message.getUserName(), heroInfo -> {
+            heroInfo.setExperience(50000);
+            heroInfo.setArtifacts(articfactService.getItems());
+            heroInfo.setRebornPercentage(100);
+            heroInfo.setSpecialAbilityUsed(false);
+            heroInfo.setType(HeroClass.NECRO);
         });
     }
 
