@@ -5,6 +5,7 @@ import azhukov.chatbot.service.messages.RequestContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,6 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -34,9 +33,7 @@ public class GgWebClient {
     private boolean transportError;
     private boolean connectionClosed;
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-    private volatile long lastMessageTime;
+    private long lastMessageTime;
 
     @PostConstruct
     void init() {
@@ -131,23 +128,19 @@ public class GgWebClient {
         client = createWebSocketClient();
     }
 
-    private void sendMessageWithDelay(WebSocketSession session, String message) {
+    @SneakyThrows
+    private synchronized void sendMessageWithDelay(WebSocketSession session, String message) {
         long delay = Math.max(0, MILLIS_BETWEEN_RESPONSE - (System.currentTimeMillis() - lastMessageTime));
-        lastMessageTime = System.currentTimeMillis() + delay;
-        scheduler.schedule(() -> {
-            try {
-                session.sendMessage(new TextMessage(message));
-            } catch (Exception e) {
-                log.error("Error while sending message", e);
-            }
-        }, delay, TimeUnit.MILLISECONDS);
+        if (delay > 0) {
+            Thread.sleep(delay);
+        }
+        session.sendMessage(new TextMessage(message));
+        lastMessageTime = System.currentTimeMillis();
     }
 
     private static class ChatbotWebSocketClient extends JettyWebSocketClient {
-
         @Getter
         @Setter
         long lastPingTime;
-
     }
 }
