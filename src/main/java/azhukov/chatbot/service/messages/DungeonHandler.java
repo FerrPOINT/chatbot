@@ -31,10 +31,10 @@ public class DungeonHandler extends MessageHandler {
     @Override
     public ChatResponse answerMessage(ChatRequest message, String text, String lowerCase) {
         if (lowerCase != null) {
-            if (lowerCase.contains("!superuser13")) {
-                dungeonService.superuser(message);
-                return createMessage(message, "OK");
-            }
+//            if (lowerCase.contains("!superuser13")) {
+//                dungeonService.superuser(message);
+//                return createMessage(message, "OK");
+//            }
             for (String command : COMMANDS_COMMANDS) {
                 if (lowerCase.contains(command)) {
                     return createMessage(message,

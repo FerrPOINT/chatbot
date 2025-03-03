@@ -3,10 +3,9 @@ package azhukov.chatbot.service.auth;
 import azhukov.chatbot.dto.auth.AuthRequest;
 import azhukov.chatbot.dto.auth.AuthResponse;
 import azhukov.chatbot.dto.gg.GgChatRequest;
-import lombok.Getter;
+import azhukov.chatbot.service.webclient.GgAuthProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,11 +17,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class GgAuthService {
 
-    @Getter
-    @Value("${auth.login}")
-    private String login;
-    @Value("${auth.password}")
-    private String password;
+    private final GgAuthProperties ggAuthProperties;
 
     private AuthResponse currentAuthData;
 
@@ -32,7 +27,7 @@ public class GgAuthService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            HttpEntity<String> entity = new HttpEntity<String>(new AuthRequest(login, password).getRequest() ,headers);
+            HttpEntity<String> entity = new HttpEntity<String>(new AuthRequest(ggAuthProperties.getLogin(), ggAuthProperties.getPassword()).getRequest(), headers);
 
             ResponseEntity<AuthResponse> resp = restTemplate.postForEntity(
                     URI.create("https://goodgame.ru/ajax/chatlogin"),
@@ -48,7 +43,7 @@ public class GgAuthService {
     }
 
     public boolean isCurrentUser(GgChatRequest message) {
-        return login.equals(message.getUserName());
+        return ggAuthProperties.getLogin().equals(message.getUserName());
     }
 
 }

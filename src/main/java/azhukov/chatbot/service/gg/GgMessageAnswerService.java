@@ -6,6 +6,7 @@ import azhukov.chatbot.dto.gg.*;
 import azhukov.chatbot.service.CommonChatService;
 import azhukov.chatbot.service.MappingService;
 import azhukov.chatbot.service.auth.GgAuthService;
+import azhukov.chatbot.service.webclient.GgAuthProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class GgMessageAnswerService {
     private final GgAuthService authService;
     private final MappingService mappingService;
     private final CommonChatService chatService;
+    private final GgAuthProperties ggAuthProperties;
 
     public List<ReqGg> answer(GgChatRequest ggRequest) {
         String text = ggRequest.getText();
@@ -37,10 +39,10 @@ public class GgMessageAnswerService {
             return reqBan;
         }
 
-        ChatResponse chatResponse = chatService.answerMessage(mappingService.mapDis(ggRequest), text, lowerCase);
+        ChatResponse chatResponse = chatService.answerMessage(mappingService.mapGg(ggRequest), text, lowerCase);
 
         if (chatResponse != null) {
-            GgChatResponse ggMessage = mappingService.mapDis(ggRequest, chatResponse);
+            GgChatResponse ggMessage = mappingService.mapGg(ggRequest, chatResponse);
             return Collections.singletonList(new ReqGg(MessageType.send_message, ggMessage));
         }
 
@@ -69,7 +71,7 @@ public class GgMessageAnswerService {
                         new ReqGg(MessageType.remove_message, new ReqDeleteMessage(
                                 roomId,
                                 message.getMessageId(),
-                                authService.getLogin()
+                                ggAuthProperties.getLogin()
                         )),
                         new ReqGg(MessageType.send_message, new GgChatResponse(message.getChannelId(), comment, false, false))
                 );

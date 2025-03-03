@@ -19,13 +19,6 @@ public class MacrosDictionary {
     );
 
     public static final Map<String, String> DISCORD_DICTIONARY = Map.of(
-//            DOGGIE.getMacro(), ":7_doggie:",
-//            PEKA.getMacro(), ":9_peka:",
-//            LICK.getMacro(), ":veraliz:",
-//            PANTS.getMacro(), ":haha:",
-//            CAT_PISOS.getMacro(), ":8_kotik:",
-//            PLEASURE.getMacro(), ":5_mahmud:",
-//            GUN.getMacro(), ":kotikspistoletom:"
             DOGGIE.getMacro(), ":dog:",
             PEKA.getMacro(), ":smirk:",
             LICK.getMacro(), ":tongue:",
@@ -34,6 +27,17 @@ public class MacrosDictionary {
             PLEASURE.getMacro(), ":heart_eyes:",
             GUN.getMacro(), ":gun:",
             SIGH.getMacro(), ":eyes:"
+    );
+
+    public static final Map<String, String> TWITCH_DICTIONARY = Map.of(
+            DOGGIE.getMacro(), "OhMyDog",
+            PEKA.getMacro(), "LUL",
+            LICK.getMacro(), "BrokeBack",
+            PANTS.getMacro(), "PansexualPride",
+            CAT_PISOS.getMacro(), "DxCat",
+            PLEASURE.getMacro(), "<3",
+            GUN.getMacro(), "twitchRaid",
+            SIGH.getMacro(), "WutFace"
     );
 
     static {
@@ -45,6 +49,10 @@ public class MacrosDictionary {
         }
 
         if (!Arrays.stream(values).map(Macro::getMacro).allMatch(DISCORD_DICTIONARY::containsKey)) {
+            throw new IllegalArgumentException("DISCORD_DICTIONARY not full");
+        }
+
+        if (!Arrays.stream(values).map(Macro::getMacro).allMatch(TWITCH_DICTIONARY::containsKey)) {
             throw new IllegalArgumentException("DISCORD_DICTIONARY not full");
         }
     }

@@ -40,7 +40,7 @@ public class DiscordWebClient {
 
     @PostConstruct
     void init() throws Exception {
-        if ("disabled".equals(properties.getToken())) {
+        if (properties.getToken() == null || "disabled".equals(properties.getToken())) {
             return;
         }
         try {

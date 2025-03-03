@@ -8,3 +8,8 @@ discord:
   token: {discord-token}
   proxyHost: 127.0.0.1
   proxyPort: 1080
+
+twitch:
+  userName: 'dogen_007'
+  channel: 'ferrpoint'
+  oauth-token: {ACCESS TOKEN}

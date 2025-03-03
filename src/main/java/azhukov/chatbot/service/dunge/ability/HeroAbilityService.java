@@ -61,7 +61,7 @@ public class HeroAbilityService {
                         updateAbilityData(previousHero, heroInfo -> {
                             heroInfo.setDamageGot(HeroDamage.MEDIUM);
                             heroInfo.setDeadTime(null);
-                            heroInfo.setExperience(targetHero.getExperience() / 2);
+                            heroInfo.setExperience(heroInfo.getExperience() / 2);
                         });
                         return targetHeroType.getAbilityName() + ": воскрешен " + previousHero.getName();
                     } else {

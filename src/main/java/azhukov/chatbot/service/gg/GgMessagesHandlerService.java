@@ -29,11 +29,10 @@ public class GgMessagesHandlerService {
     private final GgMessageAnswerService messageAnswerService;
     private final ObjectMapper objectMapper;
 
-    @Value("${checked-channels}")
+    @Value("${checked-channels: -1}")
     private int channelId;
 
     private int messagesCounter;
-    private int dogenAnswerCounter;
 
     public List<String> handleResponse(String message, RequestContext requestContext) {
         try {
@@ -66,7 +65,7 @@ public class GgMessagesHandlerService {
                 case message -> null;
                 default -> {
                     log.error("Unhandled message type: {}", messageType);
-                    yield  null;
+                    yield null;
                 }
             };
 
@@ -92,9 +91,6 @@ public class GgMessagesHandlerService {
 
             if (listResult != null) {
                 ArrayList<String> jsonsList = new ArrayList<>(listResult.size());
-                if (listResult.size() == 1) {
-                    dogenAnswerCounter++;
-                }
                 for (ReqGg reqGg : listResult) {
                     String json = objectMapper.writeValueAsString(reqGg);
                     jsonsList.add(json);

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -28,6 +30,7 @@ public class GgWebClient {
     private static final int MILLIS_BETWEEN_RESPONSE = 2000;
 
     private final GgMessagesHandlerService ggMessagesHandler;
+    private final GgAuthProperties ggAuthProperties;
 
     private ChatbotWebSocketClient client;
     private boolean transportError;
@@ -36,18 +39,33 @@ public class GgWebClient {
     private long lastMessageTime;
 
     @PostConstruct
-    void init() {
+    public void initAsync() {
+        CompletableFuture.runAsync(this::init);
+    }
+
+    @Async
+    public void init() {
+        if (ggAuthProperties.getLogin() == null || ggAuthProperties.getPassword() == null) {
+            return;
+        }
         client = createWebSocketClient();
     }
 
     @PreDestroy
     void shutdown() {
-        client.stop();
+        try {
+            client.stop();
+        } catch (Exception ignored) {
+        }
     }
 
     //every 10 mins
     @Scheduled(cron = "0 */10 * ? * *")
+    @Async
     synchronized void reconnect() {
+        if (ggAuthProperties.getLogin() == null || ggAuthProperties.getPassword() == null) {
+            return;
+        }
         if (!client.isRunning()) {
             log.info("RECREATE START");
             client = createWebSocketClient();
@@ -97,7 +115,6 @@ public class GgWebClient {
                 if (requestContext.getLastPingTime() != 0) {
                     client.setLastPingTime(requestContext.getLastPingTime());
                 }
-
             }
 
             @Override
@@ -120,6 +137,7 @@ public class GgWebClient {
         return client;
     }
 
+    @Async
     public void forceReconnect() {
         if (client.isRunning()) {
             client.stop();
