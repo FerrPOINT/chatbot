@@ -11,11 +11,11 @@ import azhukov.chatbot.util.IOUtils;
 import azhukov.chatbot.util.Range;
 import azhukov.chatbot.util.RangesContainer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 

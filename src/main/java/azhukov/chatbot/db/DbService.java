@@ -1,5 +1,7 @@
 package azhukov.chatbot.db;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapdb.DB;
@@ -7,8 +9,6 @@ import org.mapdb.DBMaker;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

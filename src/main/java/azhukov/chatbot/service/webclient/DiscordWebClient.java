@@ -6,6 +6,7 @@ import azhukov.chatbot.service.CommonChatService;
 import azhukov.chatbot.service.MappingService;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketFactory;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +21,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 
@@ -38,7 +39,7 @@ public class DiscordWebClient {
 
     private JDA jda;
 
-    @PostConstruct
+    @EventListener(ContextRefreshedEvent.class)
     void init() throws Exception {
         if (properties.getToken() == null || "disabled".equals(properties.getToken())) {
             return;

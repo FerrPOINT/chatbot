@@ -8,11 +8,11 @@ import azhukov.chatbot.service.store.DailyStore;
 import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.users.UserCollectionStore;
 import azhukov.chatbot.service.util.Randomizer;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Component

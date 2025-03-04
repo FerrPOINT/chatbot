@@ -1,66 +1,66 @@
-# Chatbot Dogen 🐕
+# Chatbot Dogen
 
 ## Описание
 
-Приложение-клиент к чату стрима на Goodgame.ru.
+Chatbot Dogen — это клиентское приложение для чата стримов на платформе Goodgame.ru, позволяющее обрабатывать входящие
+сообщения и отвечать на них в реальном времени.
 
 ## Требования
 
-* Java 17
-* Maven 3.8.5
+- Java 17
+- Maven 3.8.5
 
-## Использование
+## Установка
 
-Для обработки входящих сообщений нужно реализовать компонент следующего типа:
-
-```java
-
-@Component
-public class MyHandler extends MessageHandler {
-
-    @Override
-    public ReqGgMessage answerMessage(RespGgMessage message, String text, String lowerCase) {
-        if (lowerCase.contains("!моя команда")) {
-            return createUserMessage(message, "мой ответ");
-        }
-        return null;
-    }
-}
-```
+1. Склонируйте репозиторий:
+   ```bash
+   git clone https://github.com/FerrPOINT/chatbot.git
+   ```
+2. Перейдите в директорию проекта:
+   ```bash
+   cd chatbot
+   ```
+3. Соберите проект с помощью Maven:
+   ```bash
+   mvn clean install
+   ```
 
 ## Настройка
 
-Настройка приложения осуществляется через application.yml файл. Нужно переименовать файл application.yml-default и
-заполнить поля:
+Пример конфигурационного файла `application.yml`:
 
 ```yaml
+# Аутентификация для подключения к Goodgame.ru
 auth:
-  login: gg_login
-  password: gg_password
+  login: ваш_логин  # Укажите логин от Goodgame
+  password: ваш_пароль  # Укажите пароль от Goodgame
+checked-channels: ID_канала # ID Goodgame каналов, которые бот будет отслеживать
 
-checked-channels: 10017
+# Конфигурация Discord-бота
+discord:
+  token: ваш_токен  # Токен для подключения к Discord API
+
+# Конфигурация Twitch-бота
+twitch:
+  userName: 'ваш_ник'  # Никнейм бота в Twitch
+  channel: 'название_канала'  # Название Twitch-канала
+  oauth-token: "ваш_oauth_token"  # OAuth-токен для аутентификации в Twitch API
 ```
 
-Где
+## Использование
 
-* login и password - логин и пароль с goodgame.ru
-* checked-channels имя канала из настроек
-  ![img.png](channel-name.png)
+Запуск из командной строки:
 
-## Запуск
-
-Запустить можно из Intellij IDEA или собрав запустить из jar файла. Пример команды запуска на linux:
-
-```shell
-nohup /usr/lib/jvm/java-17/bin/java -jar -Xrunjdwp:server=y,transport=dt_socket,address=8000,suspend=n  -Dspring.config.location=application.yml -Dlogging.config=logback.xml chatbot-release.jar &
+```bash
+java -jar target/chatbot.jar
 ```
 
-Где
+## Вклад в проект
 
-* /usr/lib/jvm/java-17/bin/java - к установленной java 17.
-* -Dspring.config.location - путь к application.yml. В проекте лежит под названием application.yml-default.
-* -Dlogging.config - путь к logback.xml - файл настройки логирования. В проекте лежит под названием logback.xml.default
+- Форкните репозиторий.
+- Создайте новую ветку.
+- Отправьте pull request.
 
-## Discord bot example:
+## Лицензия
 
-![img.png](img.png)
+MIT License.

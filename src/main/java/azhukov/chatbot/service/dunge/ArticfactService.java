@@ -3,12 +3,12 @@ package azhukov.chatbot.service.dunge;
 import azhukov.chatbot.service.dunge.data.Artifact;
 import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Service

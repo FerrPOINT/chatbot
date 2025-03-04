@@ -14,6 +14,7 @@ import azhukov.chatbot.service.util.DistinctEvictingCollection;
 import azhukov.chatbot.service.util.Randomizer;
 import azhukov.chatbot.service.weight.WeightUtils;
 import azhukov.chatbot.util.RangesContainer;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -21,7 +22,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;

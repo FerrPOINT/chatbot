@@ -8,13 +8,12 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,28 +25,18 @@ public class TwitchChatClient {
     private final TwitchProperties properties;
     private TwitchClient twitchClient;
 
-    @PostConstruct
-    public void initAsync() {
-        CompletableFuture.runAsync(this::init);
-    }
-
+    @EventListener(ContextRefreshedEvent.class)
     public void init() {
         try {
             OAuth2Credential credential = new OAuth2Credential("twitch", properties.getOauthToken());
 
-            TwitchClient prev = twitchClient;
             twitchClient = TwitchClientBuilder.builder()
                     .withEnableChat(true)
                     .withChatAccount(credential)
+                    .withClientId(properties.getClientId())
+                    .withClientSecret(properties.getClientSecret())
+                    .withBotOwnerId(properties.getBotOwnerId())
                     .build();
-
-            if (prev != null) {
-                try {
-                    prev.close();
-                } catch (Exception e) {
-                    log.error("UNEXPECTED EXCEPTION", e);
-                }
-            }
 
             twitchClient.getEventManager().onEvent(ChannelMessageEvent.class, this::onMessageReceived);
 
@@ -68,6 +57,7 @@ public class TwitchChatClient {
     }
 
     private void onMessageReceived(ChannelMessageEvent event) {
+        log.info("{} says: {}", event.getUser().getName(), event.getMessage());
         ChatRequest request = mappingService.mapTwitch(event);
         ChatResponse response = commonChatService.answerMessage(request, request.getText(), request.getText().toLowerCase());
         if (response != null) {

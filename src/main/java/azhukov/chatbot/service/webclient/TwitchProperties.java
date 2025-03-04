@@ -12,5 +12,8 @@ public class TwitchProperties {
     private String channel;
     private String userName;
     private String oauthToken;
+    private String clientId;
+    private String clientSecret;
+    private String botOwnerId;
 
 }

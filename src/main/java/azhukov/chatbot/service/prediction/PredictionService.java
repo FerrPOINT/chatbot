@@ -5,11 +5,11 @@ import azhukov.chatbot.service.store.Store;
 import azhukov.chatbot.service.util.Randomizer;
 import azhukov.chatbot.util.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Service
