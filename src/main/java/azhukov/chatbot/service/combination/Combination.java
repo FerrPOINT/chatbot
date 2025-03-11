@@ -1,17 +1,19 @@
 package azhukov.chatbot.service.combination;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Getter
-@RequiredArgsConstructor
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Combination {
 
-    private final String id;
-    private final List<String> commands;
-    private final List<String> staticParts;
-    private final List<List<String>> dynamicParts;
+    private String id;
+    private List<String> commands;
+    private List<String> staticParts;
+    private List<List<String>> dynamicParts;
 
 }

@@ -1,17 +1,19 @@
 package azhukov.chatbot.service.dunge.data;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Getter
-@RequiredArgsConstructor
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Artifact {
 
-    private final String id;
-    private final String name;
-    private final String label;
-    private final List<Modificator> modifications;
+    private String id;
+    private String name;
+    private String label;
+    private List<Modificator> modifications;
 
 }

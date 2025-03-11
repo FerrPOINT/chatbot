@@ -16,14 +16,14 @@ public class LifecycleService {
 
     private final DbService dbService;
 
-    //every 12 hours
-    @Scheduled(cron = "0 * */12 ? * *")
+    //every 6 hours
+    @Scheduled(cron = "0 * */6 ? * *")
     void update() {
         offset(-1);
     }
 
     public void reset() {
-        offset(-100500);
+        offset(-2);
     }
 
     public LifecycleStage offset(int count) {

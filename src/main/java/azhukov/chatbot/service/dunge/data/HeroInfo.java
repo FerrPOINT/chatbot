@@ -1,9 +1,8 @@
 package azhukov.chatbot.service.dunge.data;
 
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -13,8 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 public class HeroInfo {
 
