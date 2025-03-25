@@ -5,6 +5,7 @@ import azhukov.chatbot.service.messages.RequestContext;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -122,21 +123,27 @@ public class GgWebClient {
      * Создаём новый клиент и вызываем execute(...), который теперь сам возвращает CompletableFuture.
      */
     private StandardWebSocketClient createWebSocketClient() {
+        try {
+            if (this.handshakeFuture != null) {
+                this.handshakeFuture.get().close(CloseStatus.SERVICE_RESTARTED);
+            }
+        } catch (Exception e) {
+            log.error("Can't close previous handshake", e);
+        }
         StandardWebSocketClient newClient = new StandardWebSocketClient();
-
         // Начиная со Spring 6, execute(...) возвращает CompletableFuture<WebSocketSession>
         CompletableFuture<WebSocketSession> future = newClient.execute(
                 new AbstractWebSocketHandler() {
 
                     @Override
-                    public void afterConnectionEstablished(WebSocketSession session) {
+                    public void afterConnectionEstablished(@NotNull WebSocketSession session) {
                         log.info("GG connection established, session {}", session.getUri());
                         transportError = false;
                         connectionClosed = false;
                     }
 
                     @Override
-                    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                    protected void handleTextMessage(@NotNull WebSocketSession session, @NotNull TextMessage message) {
                         if (message.getPayloadLength() < 1) {
                             log.error("Empty payload for session: {}", session.getAttributes());
                             return;
@@ -154,13 +161,13 @@ public class GgWebClient {
                     }
 
                     @Override
-                    public void handleTransportError(WebSocketSession session, Throwable exception) {
+                    public void handleTransportError(@NotNull WebSocketSession session, @NotNull Throwable exception) {
                         transportError = true;
                         log.error("Transport error", exception);
                     }
 
                     @Override
-                    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+                    public void afterConnectionClosed(@NotNull WebSocketSession session, @NotNull CloseStatus status) {
                         connectionClosed = true;
                         log.error("Connection closed with code: {}, reason: {}",
                                 status.getCode(), status.getReason());
