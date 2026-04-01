@@ -25,6 +25,8 @@ public class DungeonHandler extends MessageHandler {
     private static final List<String> STAT_COMMANDS = List.of("!стата", "!статус");
     private static final List<String> ARTS_COMMANDS = List.of("!артефакты", "!артифакты");
     private static final List<String> ABILITY_COMMANDS = List.of("!абилка", "!способность", "!ульт", "!абилити");
+    private static final List<String> COINS_COMMANDS = List.of("!монеты", "!coins");
+    private static final List<String> RUSH_COMMANDS = List.of("!рывок", "!rush");
     private static final List<String> INFO_COMMANDS = List.of("!инфо");
     private static final List<String> COMMANDS_COMMANDS = List.of("!команды");
 
@@ -38,7 +40,7 @@ public class DungeonHandler extends MessageHandler {
             for (String command : COMMANDS_COMMANDS) {
                 if (lowerCase.contains(command)) {
                     return createMessage(message,
-                            "Команды: " + String.join(" | ", INFO_COMMANDS.toString(), COMMANDS.toString(), BOSS_COMMANDS.toString(), STAT_COMMANDS.toString(), ARTS_COMMANDS.toString(), ABILITY_COMMANDS.toString(), "!герои", "!ладдер")
+                            "Команды: " + String.join(" | ", INFO_COMMANDS.toString(), COMMANDS.toString(), BOSS_COMMANDS.toString(), STAT_COMMANDS.toString(), ARTS_COMMANDS.toString(), ABILITY_COMMANDS.toString(), COINS_COMMANDS.toString(), RUSH_COMMANDS.toString(), "!герои", "!ладдер")
                     );
                 }
             }
@@ -51,6 +53,16 @@ public class DungeonHandler extends MessageHandler {
             for (String command : ABILITY_COMMANDS) {
                 if (lowerCase.contains(command)) {
                     return createMessage(message, dungeonService.useHeroAbility(message));
+                }
+            }
+            for (String command : COINS_COMMANDS) {
+                if (lowerCase.contains(command)) {
+                    return createMessage(message, dungeonService.getCoinsInfo(message));
+                }
+            }
+            for (String command : RUSH_COMMANDS) {
+                if (lowerCase.contains(command)) {
+                    return createMessage(message, dungeonService.useBossRush(message));
                 }
             }
             for (String command : INFO_COMMANDS) {

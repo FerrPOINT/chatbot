@@ -55,6 +55,7 @@ public class HeroInfoService {
         HeroInfo heroInfo = new HeroInfo()
                 .setName(name)
                 .setDamageGot(HeroDamage.NONE)
+                .setCoins(0)
                 .setType(Stream.of(values).skip(Randomizer.nextInt(values.length)).findFirst().get());
         store.put(name, heroInfo);
         return heroInfo;

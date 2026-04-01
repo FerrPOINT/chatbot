@@ -38,6 +38,11 @@ import static azhukov.chatbot.service.dunge.data.HeroDamage.*;
 public class DungeonService {
 
     private static final int MAX_EVENTS_PER_DAY = 3;
+    private static final int BASE_COINS_PER_RUN = 1;
+    private static final int COINS_PER_FIGHT_ROUND = 2;
+    private static final int COINS_PER_BOSS_KILL_BONUS = 10;
+    private static final int BOSS_RUSH_COIN_COST = 40;
+    private static final int BOSS_RUSH_DAMAGE_PERCENT = 12;
 
     private final HeroInfoService heroInfoService;
     private final BossService bossService;
@@ -83,6 +88,49 @@ public class DungeonService {
         String userName = request.getUserName();
         HeroInfo current = heroInfoService.getCurrent(userName);
         return current != null ? getUserInfo(userName, current) : "Вас нет в мире живых, но вы уже готовы возродиться героем!";
+    }
+
+    public String getCoinsInfo(ChatRequest request) {
+        HeroInfo current = heroInfoService.getCurrent(request.getUserName());
+        if (current == null) {
+            return "Сначала станьте героем через !данж";
+        }
+        return "Ваши данж-монеты: " + current.getCoins() + ". Рывок к следующему боссу: !рывок (цена " + BOSS_RUSH_COIN_COST + " монет).";
+    }
+
+    public synchronized String useBossRush(ChatRequest request) {
+        String userName = request.getUserName();
+        HeroInfo hero = heroInfoService.getCurrent(userName);
+        if (hero == null) {
+            return "Сначала станьте героем через !данж";
+        }
+        if (hero.getDamageGot() == DEAD || hero.getDeadTime() != null) {
+            return "Мёртвые герои не могут делать рывок. Восстановитесь и попробуйте снова.";
+        }
+
+        BossInfo boss = getCurrentOrNext();
+        if (boss == null || boss.isDead()) {
+            return "Сейчас нет живого босса для рывка.";
+        }
+        if (hero.getCoins() < BOSS_RUSH_COIN_COST) {
+            return "Не хватает данж-монет. Нужно " + BOSS_RUSH_COIN_COST + ", у вас " + hero.getCoins() + ".";
+        }
+
+        int rushDamage = Math.max(1, boss.getMaxHp() * BOSS_RUSH_DAMAGE_PERCENT / 100);
+        int damageBefore = boss.getDamageReceived();
+        int realDamage = Math.min(rushDamage, Math.max(0, boss.getMaxHp() - damageBefore));
+
+        heroInfoService.update(userName, info -> info.addCoins(-BOSS_RUSH_COIN_COST));
+        bossService.damage(userName, realDamage);
+
+        BossInfo updatedBoss = bossService.getCurrentBoss();
+        boolean bossKilled = updatedBoss == null || updatedBoss.getStage() > boss.getStage();
+        if (bossKilled) {
+            return "Вы тратите " + BOSS_RUSH_COIN_COST + " монет и устраиваете рывок на " + realDamage + " урона. Босс " + boss.getName() + " пал, путь к следующему открыт! {DOGGIE}";
+        }
+
+        int hpLeft = updatedBoss == null ? 0 : updatedBoss.getCurrentHp();
+        return "Вы тратите " + BOSS_RUSH_COIN_COST + " монет и делаете рывок на " + realDamage + " урона. У босса осталось " + hpLeft + " HP. {DOGGIE}";
     }
 
     public synchronized String getDungeonResponse(ChatRequest request) {
@@ -180,7 +228,7 @@ public class DungeonService {
                 "Вам досталось " + damageGet.getLabel()) +
                 (fight.getStealArt() == null ? "" : ", в бою у вас УКРАЛИ артефакт: " + fight.getStealArt()) +
                 (fight.getShieldSpent() > 0 ? ", потрачено брони: " + fight.getShieldSpent() : "") +
-                ", получено опыта: " + fight.getExp() + ", общий статус: " + hero.getDamageGot().getStatus() + ", " +
+                ", получено опыта: " + fight.getExp() + ", получено монет: " + fight.getMoneyPrize() + ", общий статус: " + hero.getDamageGot().getStatus() + ", " +
                 getDangerByDamage(boss, hero);
     }
 
@@ -213,6 +261,7 @@ public class DungeonService {
                 .add("Защита: " + info.getShield())
                 .add("Уровень: " + info.getLevel())
                 .add("Опыт: " + info.getExperience())
+                .add("Монеты: " + info.getCoins())
                 .add(CollectionUtils.isEmpty(info.getArtifacts()) ? "Нет артефактов" : ("Артефакты: " + info.getArtifacts().size() + " штук"))
                 .toString();
     }
@@ -299,11 +348,10 @@ public class DungeonService {
             if (nextHeroBuffs.getAttackUpdate() > 0) {
                 heroDamage = heroDamage + (int) ((double) heroDamage * (double) nextHeroBuffs.getAttackUpdate() / 100D);
             }
-            boss.dealDamage(heroDamage);
             result.setDamageDone(heroDamage);
             result.setCrit(crit.intValue());
         }
-        bossService.damage(heroInfo.getName(), heroDamage);
+        result.setBoss(bossService.damage(heroInfo.getName(), heroDamage));
 
         result.setFightsNumber(fights);
         result.setDamageReceived(damageFromBoss);
@@ -338,6 +386,7 @@ public class DungeonService {
         heroInfoService.update(name, info -> {
             update.accept(info);
             info.setExperience(heroInfo.getExperience());
+            info.setCoins(heroInfo.getCoins());
         });
 
         return result;
@@ -363,6 +412,7 @@ public class DungeonService {
     }
 
     public void earnXP(FightResult fight) {
+        BossInfo bossAfterFight = fight.getBoss();
         int exp = IntStream.range(0, fight.getFightsNumber()).map(operand -> (fight.getDamageReceived().getValue() * 10) + (fight.getDamageDone() / fight.getHero().getLevel()) + Math.max(0, 100 - fight.getBoss().getStage() - fight.getHero().getLevel())).sum();
 
         if (fight.getNextHeroBuffs().getAttackUpdate() > 0) {
@@ -371,6 +421,13 @@ public class DungeonService {
 
         fight.setExp(exp);
         fight.getHero().setExperience(fight.getHero().getExperience() + fight.getExp());
+
+        int coins = BASE_COINS_PER_RUN + (fight.getFightsNumber() * COINS_PER_FIGHT_ROUND);
+        if (bossAfterFight != null && bossAfterFight.isDead()) {
+            coins += COINS_PER_BOSS_KILL_BONUS;
+        }
+        fight.setMoneyPrize(coins);
+        fight.getHero().addCoins(coins);
     }
 
     public void updateRewards() {

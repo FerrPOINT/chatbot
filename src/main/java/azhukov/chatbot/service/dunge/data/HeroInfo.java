@@ -25,6 +25,7 @@ public class HeroInfo {
     private int shield;
     private float crit;
     private int events;
+    private int coins;
     private boolean specialAbilityUsed;
     private int rebornPercentage;
 
@@ -90,6 +91,10 @@ public class HeroInfo {
 
     public void addExp(int exp) {
         experience += exp;
+    }
+
+    public void addCoins(int coinsUpdate) {
+        coins += coinsUpdate;
     }
 
     public boolean isDead() {
