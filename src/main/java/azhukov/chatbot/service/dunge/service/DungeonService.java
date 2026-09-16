@@ -219,7 +219,7 @@ public class DungeonService {
         boolean rushAvailable = !hero.isDead() && !hero.isRushUsedToday() && hero.getCoins() >= 40L;
         return hero.getName() + ", класс: " + hero.getType().getLabel() + ", травма: " + hero.getDamageGot().getStatus()
                 + ", щит: " + hero.getShield() + ", риск смерти в следующем бою: " + deathRisk(hero, boss) + "%"
-                + ", босс усилен против класса: " + (boss != null && boss.getStrong() == hero.getType())
+                + (boss != null && boss.getStrong() == hero.getType() ? ", босс усилен против вашего класса" : "")
                 + ", способность: " + (!hero.isSpecialAbilityUsed() && !hero.isDead() ? "доступна" : "недоступна")
                 + ", лечение: " + (healingAvailable ? "доступно" : "недоступно")
                 + ", рывок: " + (rushAvailable ? "доступен" : "недоступен")
