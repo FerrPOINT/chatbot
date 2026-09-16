@@ -1,48 +1,38 @@
 package azhukov.chatbot.service.dunge.event;
 
-import azhukov.chatbot.service.dunge.ArticfactService;
+import azhukov.chatbot.service.dunge.ArtifactCatalog;
+import azhukov.chatbot.service.dunge.DungeonRandom;
 import azhukov.chatbot.service.dunge.data.Artifact;
 import azhukov.chatbot.service.dunge.data.HeroInfo;
+import azhukov.chatbot.service.dunge.data.OwnedArtifact;
 import azhukov.chatbot.service.dunge.service.BossService;
-import azhukov.chatbot.service.util.Randomizer;
 import azhukov.chatbot.service.weight.Weight;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class ArtifactEvent implements DungeEvent {
-
-    private static final int XP_BY_ART = 500;
-
-    private final BossService bossService;
-    private final ArticfactService articfactService;
+    private static final long XP_BY_ART = 1000;
+    private final BossService bosses;
+    private final ArtifactCatalog artifacts;
+    private final DungeonRandom random;
 
     @Override
     public String handle(HeroInfo hero) {
-        Set<String> oldRewards = bossService.getOldRewards();
-        if (oldRewards.isEmpty()) {
-            hero.setExperience(hero.getExperience() + XP_BY_ART);
-            return "тайник. Кто-то из предыдущих героев оставил заначку в виде артефакта, но вы не можете его опознать, по этому вы жертвуете артефакт на алтаре Догена и получаете " + XP_BY_ART + " опыта.";
+        List<String> candidates = bosses.getOldRewards().stream()
+                .filter(id -> artifacts.get(id) != null && !hero.hasArtifact(id) && !hero.hasStolenArtifact(id)).toList();
+        if (candidates.isEmpty()) {
+            hero.addExp(XP_BY_ART);
+            return "тайник без новой реликвии; алтарь даёт " + XP_BY_ART + " опыта";
         }
-        String randomItem = Randomizer.getRandomItem(new ArrayList<>(oldRewards));
-        Artifact randomArt = articfactService.getById(randomItem);
-        boolean added = hero.getArtifacts() == null || hero.getArtifacts().stream().noneMatch(artifact -> artifact.getId().equals(randomItem));
-        if (added) {
-            hero.addArtifact(randomArt);
-        } else {
-            hero.setExperience(hero.getExperience() + XP_BY_ART);
-        }
-        return "тайник. Кто-то из предыдущих героев оставил заначку в виде артефакта: " + randomArt.getName() +
-                (added ? ". Вы спешно прибераете находку к своим лапам!" : (". У вас уже есть такой, по этому вы жертвуете артефакт на алтаре Догена и получаете " + XP_BY_ART + " опыта."));
+        String id = random.item(candidates);
+        Artifact definition = artifacts.get(id);
+        hero.addOwnedArtifact(new OwnedArtifact(id, 1));
+        return "тайник с артефактом «" + definition.getName() + "». Получен базовый ранг 1";
     }
 
-    @Override
-    public Weight getWeight() {
-        return Weight.HIGH;
-    }
-
+    @Override public Weight getWeight() { return Weight.HIGHEST; }
 }

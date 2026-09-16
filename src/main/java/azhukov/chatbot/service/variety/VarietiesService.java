@@ -119,7 +119,7 @@ public class VarietiesService {
                 case "tolerancy" -> arts.add(articfactService.getById("tolerancy-item"));
             }
             if (!arts.isEmpty()) {
-                heroInfoService.update(user, heroInfo -> arts.forEach(heroInfo::addArtifact));
+                arts.forEach(artifact -> heroInfoService.addArtifact(user, artifact));
                 return " В данже у вас появляется: " + arts.stream().map(Artifact::getName).collect(Collectors.joining(", "));
             }
         }

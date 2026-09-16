@@ -11,12 +11,12 @@ public class ExpEqEvent implements DungeEvent {
 
     @Override
     public String handle(HeroInfo hero) {
-        int level = hero.getLevel();
-        int expChange = level > 20 ? -1000 : 1000;
-        hero.setExperience(hero.getExperience() + expChange);
+        long level = hero.getLevel();
+        long expChange = level > 20 ? -1000 : 1000;
+        hero.addExp(expChange);
         return "святилище Догги-уравнителя - сущность управляющую опытом. " + (expChange > 0 ?
                 "Нуждающимся героям уравнитель дарит дополнительный уровень" :
-                "У прокачаных героев уравнитель забирает уровень в пользу бедных");
+                "У прокачанных героев уравнитель забирает уровень в пользу бедных");
     }
 
     @Override

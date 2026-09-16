@@ -9,5 +9,6 @@ public enum DbType {
     USERS,
     DUNGE,
     DUNGE_BOSS,
+    DUNGE_ECONOMY,
 
 }

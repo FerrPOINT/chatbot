@@ -1,28 +1,30 @@
 package azhukov.chatbot.service.dunge.event;
 
+import azhukov.chatbot.service.dunge.ArtifactCatalog;
+import azhukov.chatbot.service.dunge.DungeonRandom;
 import azhukov.chatbot.service.dunge.data.HeroInfo;
-import azhukov.chatbot.service.dunge.service.DungeonService;
+import azhukov.chatbot.service.dunge.data.StolenArtifact;
+import azhukov.chatbot.service.dunge.service.DungeonEconomyService;
 import azhukov.chatbot.service.weight.Weight;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class StealEvent implements DungeEvent {
+    private final DungeonEconomyService economy;
+    private final DungeonRandom random;
+    private final ArtifactCatalog artifacts;
 
     @Override
     public String handle(HeroInfo hero) {
-        String art = DungeonService.tryToSteal(15, hero);
-        if (art == null) {
-            hero.setExperience(hero.getExperience() + 500);
-        }
-        return "святилище Догги-Роги - лучшего воришки прошедших лет. " + (art != null ? ("Вы неправильно прочитали молитву и Рога ворует у вас артефакт: " + art) :
-                "Вы правильно прочитали молитву и получаете дополнительный опыт");
+        StolenArtifact stolen = economy.stealRandom(hero, 15, "DOGGIE_ROGUE_EVENT", random);
+        if (stolen == null) hero.addExp(500);
+        String name = stolen == null || artifacts.get(stolen.getId()) == null ? null : artifacts.get(stolen.getId()).getName();
+        return "святилище Догги-Роги. " + (stolen != null
+                ? "Опасность унесла артефакт: " + name + ". Его можно вернуть через !выкуп " + stolen.getId()
+                : "Молитва удалась: получено 500 опыта");
     }
 
-    @Override
-    public Weight getWeight() {
-        return Weight.RARE;
-    }
-
+    @Override public Weight getWeight() { return Weight.RARE; }
 }

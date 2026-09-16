@@ -1,139 +1,158 @@
 package azhukov.chatbot.service.dunge.service;
 
-import azhukov.chatbot.service.dunge.ArticfactService;
+import azhukov.chatbot.service.dunge.ArtifactCatalog;
+import azhukov.chatbot.service.dunge.DungeonRandom;
 import azhukov.chatbot.service.dunge.data.*;
 import azhukov.chatbot.service.store.StoreUpdater;
-import azhukov.chatbot.service.util.Randomizer;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-@Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class HeroInfoService {
-
     private final HeroInfoStore store;
-    private final ArticfactService articfactService;
+    private final ArtifactCatalog artifacts;
+    private final DungeonRandom random;
+    private final DungeonJournalService journal;
 
-
-    public HeroInfo getCurrent(String name) {
-        return store.get(name);
+    public synchronized HeroInfo getCurrent(String name) {
+        if (name == null) return null;
+        String key = normalize(name);
+        HeroInfo hero = store.get(key);
+        if (hero != null && normalize(hero)) {
+            store.put(key, hero);
+            store.commit();
+        }
+        return hero;
     }
 
-    public void update(HeroInfo info, Consumer<HeroInfo> updater) {
-        update(info.getName(), updater);
-    }
-
-    public void update(String name, Consumer<HeroInfo> updater) {
-        HeroInfo info = getOrCreateNew(name);
+    public synchronized void update(String name, Consumer<HeroInfo> updater) {
+        String key = normalize(name);
+        HeroInfo info = getOrCreateNew(key);
         updater.accept(info);
-        store.put(name, info);
+        normalize(info);
+        store.put(key, info);
+        store.commit();
     }
 
-    public void dead(String name) {
-        update(name, heroInfo -> heroInfo.setDeadTime(LocalDateTime.now()));
-    }
-
-    public void clean(String name) {
-        store.put(name, null);
-    }
-
-    public HeroInfo createNew(String name) {
+    public synchronized HeroInfo createNew(String name) {
+        String key = normalize(name);
         HeroClass[] values = HeroClass.values();
-        HeroInfo heroInfo = new HeroInfo()
-                .setName(name)
-                .setDamageGot(HeroDamage.NONE)
-                .setType(Stream.of(values).skip(Randomizer.nextInt(values.length)).findFirst().get());
-        store.put(name, heroInfo);
-        return heroInfo;
+        HeroInfo hero = new HeroInfo().setName(key).setDamageGot(HeroDamage.NONE)
+                .setType(values[random.nextInt(0, values.length)]);
+        store.put(key, hero);
+        store.commit();
+        return hero;
     }
 
     private HeroInfo getOrCreateNew(String name) {
-        HeroInfo heroInfo = getCurrent(name);
-        if (heroInfo == null) {
-            heroInfo = createNew(name);
-        }
-        return heroInfo;
+        HeroInfo hero = getCurrent(name);
+        return hero == null ? createNew(name) : hero;
     }
 
-    public void reset() {
-        store.clear();
+    public synchronized void updateAll(Consumer<HeroInfo> acceptor) {
+        store.updateAll(hero -> { normalize(hero); acceptor.accept(hero); });
+        store.commit();
     }
 
-    public void healAll() {
-        log.info("Start to heal all");
-        List<String> toDelete = new ArrayList<>();
-        log.info("Start to heal all");
-        MutableInt counter = new MutableInt();
-        store.updateAll(heroInfo -> {
-            counter.increment();
-            if (heroInfo.getDeadTime() != null) {
-                toDelete.add(heroInfo.getName());
-            }
-            heroInfo.setDamageGot(HeroDamage.NONE);
-            heroInfo.resetShield();
-            heroInfo.setCrit(0);
-            heroInfo.setEvents(0);
-            heroInfo.setSpecialAbilityUsed(false);
-            heroInfo.setRebornPercentage(0);
+    public synchronized List<HeroInfo> all() {
+        List<HeroInfo> result = new ArrayList<>();
+        store.handleAll(hero -> { normalize(hero); result.add(hero); });
+        return result;
+    }
+
+    public List<Pair<String, Long>> getTopLevel(int count) {
+        return all().stream().map(h -> Pair.of(h.getName(), h.getLevel()))
+                .sorted((a, b) -> Long.compare(b.getRight(), a.getRight()))
+                .limit(count).collect(Collectors.toList());
+    }
+
+    public synchronized void migrateCaseSensitive() {
+        store.updateAll(hero -> hero.setName(normalize(hero.getName())),
+                new StoreUpdater<>(HeroInfoService::normalize, Comparator.comparingLong(HeroInfo::getExperience)));
+        store.commit();
+    }
+
+    public synchronized MigrationReport migrateAll() {
+        MigrationReport report = new MigrationReport();
+        store.updateAll(hero -> {
+            report.heroes++;
+            Set<String> unknown = artifacts.migrateLegacy(hero);
+            if (!unknown.isEmpty()) report.unknownArtifacts.put(hero.getName(), unknown);
+            normalize(hero);
         });
-        log.info("Heal complete. total: {}, dead: {}", counter.intValue(), toDelete.size());
-        toDelete.forEach(store::delete);
+        store.commit();
+        return report;
     }
+
+    private boolean normalize(HeroInfo hero) {
+        boolean changed = false;
+        if (hero.getDamageGot() == null) { hero.setDamageGot(HeroDamage.NONE); changed = true; }
+        if (hero.getType() == null) { hero.setType(HeroClass.DEFENDER); changed = true; }
+        if (hero.getExperience() < 0) { hero.setExperience(0); changed = true; }
+        if (hero.getCoins() < 0) { hero.setCoins(0); changed = true; }
+        if (hero.getCoinsEarnedToday() < 0) { hero.setCoinsEarnedToday(0); changed = true; }
+        if (hero.getBossDamage() < 0) { hero.setBossDamage(0); changed = true; }
+        if (hero.getBossDonations() < 0) { hero.setBossDonations(0); changed = true; }
+        if (hero.getShield() < 0) { hero.setShield(0); changed = true; }
+        if (hero.getEvents() < 0 || hero.getEvents() > 3) { hero.setEvents(Math.max(0, Math.min(3, hero.getEvents()))); changed = true; }
+        if (!Float.isFinite(hero.getCrit()) || hero.getCrit() < 0) { hero.setCrit(0); changed = true; }
+        if (hero.getDeadTime() != null && hero.getDamageGot() != HeroDamage.DEAD) { hero.setDamageGot(HeroDamage.DEAD); changed = true; }
+        if (hero.getDamageGot() == HeroDamage.DEAD && hero.getDeadTime() == null) { hero.setDeadTime(LocalDateTime.now()); changed = true; }
+        if (hero.getOwnedArtifacts() == null || hero.getStolenArtifacts() == null || hero.getAppliedOperationIds() == null || hero.getArtifacts() != null) {
+            artifacts.migrateLegacy(hero);
+            hero.safeOwnedArtifacts(); hero.safeStolenArtifacts(); hero.safeAppliedOperationIds();
+            changed = true;
+        }
+        return changed;
+    }
+
+    private static String normalize(String name) { return name.toLowerCase(Locale.ROOT).trim(); }
 
     public void addArtifact(String name, Artifact artifact) {
-        update(name, heroInfo -> heroInfo.addArtifact(artifact));
+        if (artifact == null) return;
+        DungeonOperation operation = journal.prepare(DungeonOperation.Type.ARTIFACT_GRANT, name, null);
+        operation.setArtifactId(artifact.getId());
+        journal.save(operation);
+        applyArtifactGrant(operation);
+        journal.complete(operation);
     }
 
     public void addArtifact(String name, String artifactId) {
-        addArtifact(name, articfactService.getById(artifactId));
+        Artifact artifact = artifacts.get(artifactId);
+        if (artifact != null) addArtifact(name, artifact);
     }
 
-    public void distinctAllArtifacts() {
-        HashMap<String, Artifact> arts = new HashMap<>();
-        store.updateAll(heroInfo -> {
-            arts.clear();
-            List<Artifact> artifacts = heroInfo.getArtifacts();
-            if (artifacts != null) {
-                for (Artifact artifact : artifacts) {
-                    Artifact byId = articfactService.getById(artifact.getId());
-                    if (byId != null) {
-                        arts.put(byId.getId(), byId);
-                    }
-                }
-                heroInfo.setArtifacts(new ArrayList<>(arts.values()));
+    public void distinctAllArtifacts() { migrateAll(); }
+
+    private void applyArtifactGrant(DungeonOperation operation) {
+        update(operation.getHero(), hero -> {
+            if (hero.safeAppliedOperationIds().add(operation.getId())) {
+                Artifact artifact = artifacts.get(operation.getArtifactId());
+                if (artifact != null) hero.addArtifact(artifact);
             }
         });
     }
 
-    public void updateAll(Consumer<HeroInfo> acceptor) {
-        store.updateAll(acceptor);
+    public void replayPendingArtifactGrants() {
+        for (DungeonOperation operation : journal.pending()) {
+            if (operation.getType() == DungeonOperation.Type.ARTIFACT_GRANT) {
+                journal.replay(operation);
+                applyArtifactGrant(operation);
+                journal.complete(operation);
+            }
+        }
     }
 
-    public List<Pair<String, Integer>> getTopLevel(int count) {
-        List<Pair<String, Integer>> result = new ArrayList<>();
-        store.handleAll(heroInfo -> result.add(Pair.of(heroInfo.getName(), heroInfo.getLevel())));
-        return result.stream().sorted((o1, o2) -> Integer.compare(o2.getRight(), o1.getRight())).limit(count).collect(Collectors.toList());
+    @lombok.Data
+    public static class MigrationReport {
+        private int heroes;
+        private Map<String, Set<String>> unknownArtifacts = new LinkedHashMap<>();
     }
-
-    public void migrateCaseSensitive() {
-        store.updateAll(
-                heroInfo -> heroInfo.setName(heroInfo.getName().toLowerCase()),
-                new StoreUpdater<>(String::toLowerCase, Comparator.comparingInt(HeroInfo::getExperience))
-        );
-    }
-
-
 }

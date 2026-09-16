@@ -2,12 +2,12 @@ package azhukov.chatbot.db;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.util.Map;
@@ -15,22 +15,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class DbService {
+    private final String folder;
+    private final Map<String, DB> cache = new ConcurrentHashMap<>();
 
-    private static final String FOLDER = "/opt/db" + File.separator;
-
-    private Map<String, DB> cache = new ConcurrentHashMap<>();
+    public DbService(@Value("${dogen.db.folder:/opt/db}") String folder) {
+        this.folder = folder.endsWith(File.separator) ? folder : folder + File.separator;
+    }
 
     @PostConstruct
-    void init() {
-        new File(FOLDER).mkdirs();
+    public void init() {
+        new File(folder).mkdirs();
     }
 
     public DB getDb(DbType dbType) {
-        return cache.computeIfAbsent(dbType.name(), s -> DBMaker.fileDB(FOLDER + s + ".db")
+        return cache.computeIfAbsent(dbType.name(), s -> DBMaker.fileDB(folder + s + ".db")
                 .transactionEnable()
-                .closeOnJvmShutdown()
                 .fileLockWait()
                 .make()
         );
@@ -49,12 +49,14 @@ public class DbService {
     }
 
     @PreDestroy
-    void shutdown() {
+    public void shutdown() {
         log.info("Closing DBs");
         for (DB value : cache.values()) {
             try {
-                value.commit();
-                value.close();
+                if (!value.isClosed()) {
+                    value.commit();
+                    value.close();
+                }
             } catch (Exception e) {
                 log.error("While shutdown db service", e);
             }

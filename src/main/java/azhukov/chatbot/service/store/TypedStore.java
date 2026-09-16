@@ -45,9 +45,14 @@ public class TypedStore<T> {
         getMap().clear();
     }
 
+    public void commit() {
+        dbGet.get().commit();
+    }
+
     public void updateAll(Consumer<T> acceptor, StoreUpdater<T> storeUpdater) {
-        Set<String> keys = getMap().getKeys();
+        Set<String> keys = new java.util.HashSet<>(getMap().getKeys());
         for (String key : keys) {
+            String originalKey = key;
             T value = get(key);
             if (storeUpdater != null) {
                 Function<String, String> keyUpdater = storeUpdater.getKeyUpdater();
@@ -67,6 +72,9 @@ public class TypedStore<T> {
             if (value != null) {
                 acceptor.accept(value);
                 put(key, value);
+                if (!originalKey.equals(key)) {
+                    delete(originalKey);
+                }
             }
         }
     }
