@@ -3,18 +3,20 @@ package azhukov.chatbot.service.dunge.event;
 import azhukov.chatbot.service.dunge.data.HeroDamage;
 import azhukov.chatbot.service.dunge.data.HeroInfo;
 import azhukov.chatbot.service.weight.Weight;
+import azhukov.chatbot.service.dunge.service.HeroHealthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
 public class SmallHealEvent implements DungeEvent {
+    private final HeroHealthService health;
 
     @Override
     public String handle(HeroInfo hero) {
         HeroDamage origDamage = hero.getDamageGot();
         if (origDamage != HeroDamage.NONE) {
-            hero.setDamageGot(hero.getDamageGot().heal(HeroDamage.SLIGHT));
+            health.healOne(hero);
         } else {
             hero.setShield(hero.getShield() + 1);
         }

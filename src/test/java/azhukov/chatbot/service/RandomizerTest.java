@@ -6,16 +6,14 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class RandomizerTest {
 
     @Test
-    void test() {
-        Set<Integer> nums = new HashSet<>();
-        for (int i = 0; i < 1000; i++) {
-            final int percent = Randomizer.nextInt(1000);
-//            System.out.println("Randomizer.getPercent() = " + percent);
-            nums.add(percent);
-        }
-        System.out.println("nums.size() = " + nums.size());
+    void tossCoinCanReturnBothOutcomes() {
+        Set<Boolean> outcomes = new HashSet<>();
+        for (int i = 0; i < 1000; i++) outcomes.add(Randomizer.tossCoin());
+        assertEquals(Set.of(false, true), outcomes);
     }
 }

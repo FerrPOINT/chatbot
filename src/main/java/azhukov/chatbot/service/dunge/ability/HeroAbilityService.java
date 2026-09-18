@@ -1,137 +1,152 @@
 package azhukov.chatbot.service.dunge.ability;
 
+import azhukov.chatbot.service.dunge.ArtifactCatalog;
+import azhukov.chatbot.service.dunge.DungeonRandom;
 import azhukov.chatbot.service.dunge.data.*;
-import azhukov.chatbot.service.dunge.service.BossService;
-import azhukov.chatbot.service.dunge.service.HeroInfoService;
-import azhukov.chatbot.service.util.Randomizer;
-import lombok.Getter;
+import azhukov.chatbot.service.dunge.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class HeroAbilityService {
+    private static final long PLANNED_AND_USABLE = 1L;
+    private final HeroInfoService heroes;
+    private final HeroHealthService health;
+    private final DungeonStateService state;
+    private final BossService bosses;
+    private final BossCombatService combat;
+    private final ArtifactCatalog artifacts;
+    private final DungeonRandom random;
+    private final DungeonJournalService journal;
 
-    private static final int ATTACK_BUFF = 20;
-    private static final int EXP_BUFF = 20;
-    private static final int SHIELD_BUFF = 2;
-
-    private final HeroInfoService heroInfoService;
-    private final BossService bossService;
-
-    @Getter
-    private AbilitiesData nextHeroBuffs = new AbilitiesData();
-
-    public synchronized void resetNextHeroAbilities() {
-        nextHeroBuffs = new AbilitiesData();
-    }
-
-    public String useHeroAbility(HeroInfo targetHero, HeroInfo previousHero) {
-        return applySpecialAbility(targetHero, targetHero.getType(), previousHero);
-    }
-
-    private synchronized String applySpecialAbility(HeroInfo targetHero, HeroClass targetHeroType, HeroInfo previousHero) {
-        if (targetHero.isSpecialAbilityUsed()) {
-            return "Способность уже использована и может быть использована только раз в день.";
-        }
-
-        switch (targetHeroType) {
-            case SAILOR:
-                updateAbilityData(targetHero);
-                nextHeroBuffs.setAttackUpdate(nextHeroBuffs.getAttackUpdate() + ATTACK_BUFF);
-                return targetHeroType.getAbilityName() + ": увеличена атака для следующего спустившегося в данж";
-            case DEFENDER:
-                updateAbilityData(targetHero, heroInfo -> heroInfo.addShields(2));
-                // Метод для добавления щита в 2 единицы
-                return targetHeroType.getAbilityName() + ": добавлено 3 единицы щита";
-            case FAIRY:
-                if (previousHero != null) {
-                    updateAbilityData(targetHero);
-                    updateAbilityData(previousHero, heroInfo -> heroInfo.heal(2)); // Метод для лечения на 2 единицы
-                    return targetHeroType.getAbilityName() + ": исцелен " + previousHero.getName() + " на 2 единицы здоровья";
-                }
-                return targetHeroType.getAbilityName() + ": предыдущий герой не найден.";
-            case NECRO:
-                if (previousHero != null) {
-                    if (previousHero.isDead()) {
-                        // Метод для воскрешения героя с половинным уровнем
-                        updateAbilityData(targetHero);
-                        updateAbilityData(previousHero, heroInfo -> {
-                            heroInfo.setDamageGot(HeroDamage.MEDIUM);
-                            heroInfo.setDeadTime(null);
-                            heroInfo.setExperience(heroInfo.getExperience() / 2);
-                        });
-                        return targetHeroType.getAbilityName() + ": воскрешен " + previousHero.getName();
-                    } else {
-                        return targetHeroType.getAbilityName() + ": невозможно воскресить, " + previousHero.getName() + " не мертв";
-                    }
-                }
-                return targetHeroType.getAbilityName() + ": предыдущий герой не найден.";
-            case NOBLE:
-                updateAbilityData(targetHero);
-                nextHeroBuffs.setExpUpdate(nextHeroBuffs.getExpUpdate() + EXP_BUFF);
-                return targetHeroType.getAbilityName() + ": увеличен получаемый опыт для следующего героя" + targetHero.getName();
-            case PRISONER:
-                updateAbilityData(targetHero, heroInfo -> heroInfo.setRebornPercentage(heroInfo.getRebornPercentage() + 50));
-                // Специальная логика выживания при смертельном исходе будет обработана отдельно
-                return targetHeroType.getAbilityName() + ": еще один день, когда ты может быть спасешься, находясь на волосок от смерти";
-            case SHAMAN:
-                nextHeroBuffs.setExpUpdate(nextHeroBuffs.getShieldUpdate() + SHIELD_BUFF);
-                updateAbilityData(targetHero);
-                return targetHeroType.getAbilityName() + ": добавлено 2 единицы щита для следующего героя";
-            case SAMURAI:
-                BossInfo boss = bossService.getCurrentBoss(); // Предполагается существование BossService
-                boss.dealDamage(targetHero.getAttack(boss)); // Метод для нанесения урона боссу
-                updateAbilityData(targetHero);
-                return targetHeroType.getAbilityName() + ": скрытный удар по боссу " + boss.getName();
-            case WEREWOLF:
-                HeroClass randomClass = HeroClass.WEREWOLF;
-                while (randomClass == HeroClass.WEREWOLF) {
-                    randomClass = HeroClass.getRandomClass();
-                }
-                return targetHeroType.getAbilityName() + ": использована рандомная способность. " + applySpecialAbility(targetHero, randomClass, previousHero);
-            case ROGUE:
-                if (previousHero != null) {
-                    if (previousHero.hasArtifacts()) {
-                        if (Randomizer.tossCoin()) {
-                            updateAbilityData(targetHero);
-                            return targetHeroType.getAbilityName() + ": не удалось похитить предмет у " + previousHero.getName();
-                        }
-                        Artifact stolenItem = Randomizer.getRandomItem(previousHero.getArtifacts()); // Метод для кражи предмета
-                        boolean hasArtifact = targetHero.hasArtifact(stolenItem);
-                        if (hasArtifact) {
-                            updateAbilityData(previousHero, heroInfo -> heroInfo.removeArtifact(stolenItem));
-                            updateAbilityData(targetHero, heroInfo -> heroInfo.setExperience(1000));
-                            return targetHeroType.getAbilityName() + ": украден уже имеющийся предмет у " + previousHero.getName() + " и преобразован в 1000 опыта";
-                        } else {
-                            updateAbilityData(targetHero, heroInfo -> targetHero.addArtifact(stolenItem));
-                            return targetHeroType.getAbilityName() + ": украден предмет у " + previousHero.getName();
-                        }
-                    } else {
-                        return targetHeroType.getAbilityName() + ": у " + previousHero.getName() + " нет предметов для кражи";
-                    }
-                } else {
-                    return targetHeroType.getAbilityName() + ": предыдущий герой не найден.";
-                }
-            default:
-                return "Способность не определена.";
+    public synchronized String useHeroAbility(HeroInfo actor, HeroInfo previous) {
+        synchronized (bosses) {
+            return useHeroAbilityLocked(actor, previous);
         }
     }
 
-
-    public void updateAbilityData(HeroInfo info) {
-        updateAbilityData(info, null);
+    private String useHeroAbilityLocked(HeroInfo actor, HeroInfo previous) {
+        if (actor.isDead()) return "Мёртвый герой не может использовать способность.";
+        if (actor.isSpecialAbilityUsed()) return "Способность уже использована сегодня.";
+        HeroClass effective = actor.getType() == HeroClass.WEREWOLF ? randomOtherClass() : actor.getType();
+        BossInfo boss = bosses.getCurrentBoss();
+        DungeonOperation operation = journal.prepare(DungeonOperation.Type.ABILITY, actor.getName(), boss == null ? null : boss.getInstanceId());
+        operation.setAmount(effective.ordinal()).setTargetHero(previous == null ? null : previous.getName());
+        String planMessage = plan(operation, actor, previous, effective, boss);
+        journal.save(operation);
+        String result = operation.getSecondaryAmount() == PLANNED_AND_USABLE
+                ? applyPlanned(operation, false)
+                : planMessage;
+        journal.complete(operation);
+        return actor.getType() == HeroClass.WEREWOLF
+                ? actor.getType().getAbilityName() + " → " + effective.getLabel() + ". " + result
+                : result;
     }
 
-    public void updateAbilityData(HeroInfo info, Consumer<HeroInfo> updater) {
-        heroInfoService.update(info, heroInfo -> {
-            if (updater != null) {
-                updater.accept(heroInfo);
+    private String plan(DungeonOperation op, HeroInfo actor, HeroInfo target, HeroClass type, BossInfo boss) {
+        String error = switch (type) {
+            case FAIRY -> target == null || target.isDead() || target.getDamageGot() == HeroDamage.NONE ? "нет подходящего живого раненого героя" : null;
+            case NECRO -> target == null || !target.isDead() ? "предыдущий герой не мёртв"
+                    : target.getLevel() >= actor.getLevel() ? "цель должна быть ниже уровнем" : null;
+            case SAMURAI -> boss == null || boss.isDead() ? "живой босс не найден" : null;
+            case ROGUE -> target == null || !target.hasArtifacts() ? "у предыдущего героя нет доступных артефактов" : null;
+            default -> null;
+        };
+        if (error != null) {
+            op.setSecondaryAmount(0).setPayload(error);
+            return type.getAbilityName() + ": " + error;
+        }
+        op.setSecondaryAmount(PLANNED_AND_USABLE);
+        if (type == HeroClass.ROGUE) {
+            if (!random.chance(50)) op.setPayload("ROGUE_FAIL");
+            else op.setArtifactId(random.item(target.safeOwnedArtifacts()).getId()).setPayload("ROGUE_COPY");
+        }
+        return type.getAbilityName();
+    }
+
+    private String applyPlanned(DungeonOperation op, boolean replay) {
+        HeroClass type = HeroClass.values()[(int) op.getAmount()];
+        HeroInfo actor = heroes.getCurrent(op.getHero());
+        HeroInfo target = op.getTargetHero() == null ? null : heroes.getCurrent(op.getTargetHero());
+        if (actor == null) return type.getAbilityName() + ": герой не найден";
+        String message = switch (type) {
+            case SAILOR -> applyBuff(op, type, "атака", s -> s.buffs().addAttack());
+            case SHAMAN -> applyBuff(op, type, "щит", s -> s.buffs().addShield());
+            case NOBLE -> applyBuff(op, type, "опыт", s -> s.buffs().addExp());
+            case DEFENDER -> {
+                updateOnce(actor.getName(), op.getId() + ":effect", h -> h.addShields(2));
+                yield type.getAbilityName() + ": добавлено 2 единицы щита";
             }
-            heroInfo.setSpecialAbilityUsed(true);
-        });
+            case FAIRY -> {
+                if (target != null) updateOnce(target.getName(), op.getId() + ":target", h -> health.heal(h, 2));
+                yield type.getAbilityName() + ": " + op.getTargetHero() + " исцелён на две ступени";
+            }
+            case NECRO -> {
+                if (target != null) updateOnce(target.getName(), op.getId() + ":target", health::reviveEarly);
+                yield type.getAbilityName() + ": " + op.getTargetHero() + " возвращён со средней травмой";
+            }
+            case PRISONER -> {
+                updateOnce(actor.getName(), op.getId() + ":effect", h -> h.setRebornPercentage(50));
+                yield type.getAbilityName() + ": следующая смертельная проверка имеет ровно 50% спасения";
+            }
+            case SAMURAI -> {
+                synchronized (bosses) {
+                    BossInfo boss = bosses.getCurrentBoss();
+                    long damage = boss == null ? 0L : artifacts.attack(actor, boss);
+                    BossCombatService.DamageResult hit = combat.damageWithId(op.getId() + ":boss-hit", actor.getName(), damage, DungeonOperation.Type.ABILITY_DAMAGE);
+                    yield type.getAbilityName() + ": безответный удар нанёс " + hit.getRealDamage();
+                }
+            }
+            case ROGUE -> applyRogue(op, actor);
+            case WEREWOLF -> throw new IllegalStateException("Werewolf must be resolved while preparing the operation");
+        };
+        updateOnce(actor.getName(), op.getId(), h -> h.setSpecialAbilityUsed(true));
+        return replay ? type.getAbilityName() + ": незавершённая операция восстановлена" : message;
     }
 
+    private String applyBuff(DungeonOperation op, HeroClass type, String label, java.util.function.Consumer<DungeonState> effect) {
+        final int[] value = {0};
+        state.update(s -> {
+            if (s.safeAppliedOperationIds().add(op.getId())) effect.accept(s);
+            GlobalBuffs buffs = s.buffs();
+            value[0] = type == HeroClass.SAILOR ? buffs.attackPercent()
+                    : type == HeroClass.SHAMAN ? buffs.shield() : buffs.expPercent();
+        });
+        DungeonMetrics.buff("added", label, value[0], op.getId());
+        return type.getAbilityName() + ": глобальный бонус «" + label + "» добавлен для следующего боя";
+    }
+
+    private String applyRogue(DungeonOperation op, HeroInfo actor) {
+        if ("ROGUE_FAIL".equals(op.getPayload())) return HeroClass.ROGUE.getAbilityName() + ": копирование не удалось";
+        final boolean[] duplicate = {false};
+        updateOnce(actor.getName(), op.getId() + ":effect", hero -> {
+            duplicate[0] = hero.hasArtifact(op.getArtifactId()) || hero.hasStolenArtifact(op.getArtifactId());
+            if (duplicate[0]) hero.addExp(1000);
+            else hero.addOwnedArtifact(new OwnedArtifact(op.getArtifactId(), 1));
+        });
+        return HeroClass.ROGUE.getAbilityName() + (duplicate[0] ? ": дубликат превращён в 1000 опыта" : ": скопирован артефакт ранга 1");
+    }
+
+    private void updateOnce(String heroName, String operationId, java.util.function.Consumer<HeroInfo> mutation) {
+        heroes.update(heroName, hero -> { if (hero.safeAppliedOperationIds().add(operationId)) mutation.accept(hero); });
+    }
+
+    private HeroClass randomOtherClass() {
+        List<HeroClass> choices = Arrays.stream(HeroClass.values()).filter(c -> c != HeroClass.WEREWOLF).toList();
+        return random.item(choices);
+    }
+
+    public synchronized void replayPending() {
+        for (DungeonOperation operation : journal.pending()) {
+            if (operation.getType() == DungeonOperation.Type.ABILITY) {
+                journal.replay(operation);
+                if (operation.getSecondaryAmount() == PLANNED_AND_USABLE) applyPlanned(operation, true);
+                journal.complete(operation);
+            }
+        }
+    }
 }

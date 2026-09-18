@@ -31,7 +31,7 @@ public class ExchangeHandler extends MessageHandler {
         if (lowerCase.startsWith("!обменять")) {
             if (lowerCase.contains("!обменять сейлор на призму")) {
                 HeroInfo hero = heroInfoService.getCurrent(message.getUserName());
-                if (hero.getArtifacts() != null && hero.getArtifacts().stream().anyMatch(artifact -> artifact.getId().equals("prism"))) {
+                if (hero != null && hero.hasArtifact("prism")) {
                     return createUserMessage(message, "У тебя уже есть призма, куда тебе еще нубаська");
                 }
                 heroInfoService.distinctAllArtifacts();

@@ -2,25 +2,24 @@ package azhukov.chatbot.service.dunge.data;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class HeroInfoTest {
     @Test
-    void test() {
-        HeroInfo heroInfo = new HeroInfo();
-        heroInfo.addArtifact(new Artifact("", "", "", List.of(new Modificator(ModificationType.DAILY_GUARD, 10))));
-        assertEquals(10, heroInfo.getShield());
+    void experienceNeverBecomesNegativeOrOverflows() {
+        HeroInfo hero = new HeroInfo().setExperience(10);
+        hero.addExp(-20);
+        assertEquals(0, hero.getExperience());
+        hero.setExperience(Long.MAX_VALUE - 1).addExp(100);
+        assertEquals(Long.MAX_VALUE, hero.getExperience());
     }
 
     @Test
-    void testAttack() {
-        HeroInfo heroInfo = new HeroInfo();
-        heroInfo.setType(HeroClass.SAILOR);
-        heroInfo.addArtifact(new Artifact("1", "", "", List.of(new Modificator(ModificationType.ATTACK_CHANGE, 10))));
-        heroInfo.addArtifact(new Artifact("2", "", "", List.of(new Modificator(ModificationType.ATTACK_PERCENT, 50))));
-        assertEquals(30, heroInfo.getAttack(new BossInfo()));
+    void artifactCannotBeOwnedTwice() {
+        HeroInfo hero = new HeroInfo();
+        hero.addOwnedArtifact(new OwnedArtifact("a", 1));
+        hero.addOwnedArtifact(new OwnedArtifact("a", 4));
+        assertEquals(1, hero.getOwnedArtifacts().size());
+        assertEquals(1, hero.findArtifact("a").getRank());
     }
-
 }

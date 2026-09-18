@@ -1,26 +1,30 @@
 package azhukov.chatbot.service.dunge.data;
 
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @NoArgsConstructor
 @Data
 @Accessors(chain = true)
 public class HeroInfo {
-
     private String name;
     private HeroClass type;
-    private int experience;
+    private long experience;
+
+    /** Legacy production shape. Cleared by the idempotent dungeon migration. */
     private List<Artifact> artifacts;
-    private HeroDamage damageGot;
+    private List<OwnedArtifact> ownedArtifacts = new ArrayList<>();
+    private List<StolenArtifact> stolenArtifacts = new ArrayList<>();
+
+    private HeroDamage damageGot = HeroDamage.NONE;
     private LocalDateTime deadTime;
     private int shield;
     private float crit;
@@ -28,97 +32,84 @@ public class HeroInfo {
     private boolean specialAbilityUsed;
     private int rebornPercentage;
 
-    public int getLevel() {
-        return (experience / 1000) + 1;
-    }
+    private long coins;
+    private long coinsEarnedToday;
+    private boolean healUsedToday;
+    private boolean rushUsedToday;
+    private long bossDamage;
+    private long bossDonations;
+    private Set<String> appliedOperationIds = new HashSet<>();
 
-    public int getAttack(BossInfo boss) {
-        int result = getLevel() * 10;
-        if (artifacts != null) {
-            for (Artifact artifact : artifacts) {
-                if (artifact.getModifications() != null) {
-                    for (Modificator modification : artifact.getModifications()) {
-                        if (modification.getModificationType() == ModificationType.ATTACK_CHANGE) {
-                            result += modification.getValue();
-                        }
-                    }
-                }
-            }
-            for (Artifact artifact : artifacts) {
-                if (artifact.getModifications() != null) {
-                    for (Modificator modification : artifact.getModifications()) {
-                        if (modification.getModificationType() == ModificationType.ATTACK_PERCENT) {
-                            result += (int) (((double) result / 100D) * (double) modification.getValue());
-                        }
-                    }
-                }
-            }
-        }
-        if (boss.getWeak() == type) {
-            result += result / 2;
-        }
-        return result;
-    }
-
-    public void resetShield() {
-        setShield(getArtifactsMaxShieldValue());
-    }
-
-    private int getArtifactsMaxShieldValue() {
-        int max = 0;
-        if (artifacts != null) {
-            for (Artifact artifact : artifacts) {
-                if (artifact.getModifications() != null) {
-                    for (Modificator modification : artifact.getModifications()) {
-                        if (modification.getModificationType() == ModificationType.DAILY_GUARD) {
-                            max = Math.max(max, modification.getValue());
-                        }
-                    }
-                }
-            }
-        }
-        return max;
+    public long getLevel() {
+        return Math.max(1L, experience / 1000L + 1L);
     }
 
     public void addShields(int shields) {
-        setShield(getShield() + shields);
+        long updated = (long) getShield() + shields;
+        setShield((int) Math.max(0L, Math.min(Integer.MAX_VALUE, updated)));
     }
 
-    public void heal(int heal) {
-        setDamageGot(HeroDamage.getByValue(getDamageGot().getValue() + heal));
+    public void heal(int levels) {
+        HeroDamage current = damageGot == null ? HeroDamage.NONE : damageGot;
+        setDamageGot(HeroDamage.getByValue(current.getValue() - Math.max(0, levels)));
     }
 
-    public void addExp(int exp) {
-        experience += exp;
+    public void addExp(long exp) {
+        if (exp >= 0) experience = experience > Long.MAX_VALUE - exp ? Long.MAX_VALUE : experience + exp;
+        else experience = exp == Long.MIN_VALUE || experience < -exp ? 0L : experience + exp;
     }
 
     public boolean isDead() {
-        return damageGot == HeroDamage.DEAD;
+        return damageGot == HeroDamage.DEAD || deadTime != null;
     }
 
     public boolean hasArtifacts() {
-        return CollectionUtils.isNotEmpty(artifacts);
+        return ownedArtifacts != null && !ownedArtifacts.isEmpty();
     }
 
-    public boolean hasArtifact(Artifact artifact) {
-        return hasArtifacts() && artifacts.stream().anyMatch(a -> a.getId().equals(artifact.getId()));
+    public boolean hasArtifact(String id) {
+        return id != null && hasArtifacts() && ownedArtifacts.stream().anyMatch(a -> Objects.equals(a.getId(), id));
     }
 
-    public boolean removeArtifact(Artifact artifact) {
-        return hasArtifacts() && artifacts.removeIf(a -> a.getId().equals(artifact.getId()));
+    public boolean hasStolenArtifact(String id) {
+        return id != null && stolenArtifacts != null && stolenArtifacts.stream().anyMatch(a -> Objects.equals(a.getId(), id));
     }
 
+    public OwnedArtifact findArtifact(String id) {
+        return ownedArtifacts == null ? null : ownedArtifacts.stream()
+                .filter(a -> Objects.equals(a.getId(), id)).findFirst().orElse(null);
+    }
+
+    public void addOwnedArtifact(OwnedArtifact artifact) {
+        if (artifact == null || artifact.getId() == null || hasArtifact(artifact.getId()) || hasStolenArtifact(artifact.getId())) return;
+        if (ownedArtifacts == null) ownedArtifacts = new ArrayList<>();
+        artifact.normalize();
+        ownedArtifacts.add(artifact);
+    }
+
+    /** Compatibility for non-dungeon reward call sites; only ownership is persisted. */
     public void addArtifact(Artifact artifact) {
-        if (artifact == null) {
-            return;
-        }
-        if (artifacts == null) {
-            artifacts = new ArrayList<>();
-        }
-        if (artifacts.stream().noneMatch(artifact1 -> Objects.equals(artifact1.getId(), artifact.getId()))) {
-            artifacts.add(artifact);
-            resetShield();
-        }
+        if (artifact != null) addOwnedArtifact(new OwnedArtifact(artifact.getId(), 1));
     }
 
+    public OwnedArtifact removeOwnedArtifact(String id) {
+        OwnedArtifact artifact = findArtifact(id);
+        if (artifact != null) ownedArtifacts.remove(artifact);
+        return artifact;
+    }
+
+    public List<OwnedArtifact> safeOwnedArtifacts() {
+        if (ownedArtifacts == null) ownedArtifacts = new ArrayList<>();
+        return ownedArtifacts;
+    }
+
+    public List<StolenArtifact> safeStolenArtifacts() {
+        if (stolenArtifacts == null) stolenArtifacts = new ArrayList<>();
+        return stolenArtifacts;
+    }
+
+    public Set<String> safeAppliedOperationIds() {
+        if (appliedOperationIds == null) appliedOperationIds = new HashSet<>();
+        return appliedOperationIds;
+    }
 }
